@@ -1,29 +1,21 @@
 package com.example.examplemod;
 
-import com.gregtechceu.gtceu.GTCEu;
+import com.example.examplemod.data.CustomMachines;
+import com.example.examplemod.data.CustomTabs;
+import com.example.examplemod.data.GlobelEnergySavedData;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.data.chemical.material.event.MaterialEvent;
 import com.gregtechceu.gtceu.api.data.chemical.material.event.MaterialRegistryEvent;
 import com.gregtechceu.gtceu.api.data.chemical.material.event.PostMaterialEvent;
-import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
-import com.gregtechceu.gtceu.client.renderer.cover.ICoverRenderer;
-import com.gregtechceu.gtceu.client.renderer.cover.SimpleCoverRenderer;
-import com.gregtechceu.gtceu.common.data.GTCompassNodes;
-import com.gregtechceu.gtceu.common.data.GTCompassSections;
-import com.gregtechceu.gtceu.common.data.GTCovers;
-import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
-import com.gregtechceu.gtceu.common.item.TooltipBehavior;
-import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -32,16 +24,15 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static com.gregtechceu.gtceu.common.data.GTItems.attach;
-import static com.gregtechceu.gtceu.common.data.GTItems.compassNode;
-import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
+import java.util.Map;
+import java.util.UUID;
 
 @Mod(ExampleMod.MOD_ID)
 public class ExampleMod {
     public static final String MOD_ID = "examplemod";
     public static final Logger LOGGER = LogManager.getLogger();
     public static GTRegistrate EXAMPLE_REGISTRATE = GTRegistrate.create(ExampleMod.MOD_ID);
-
+    public static Map<UUID,Long> GlobalEnergy;
 
     public ExampleMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -65,11 +56,13 @@ public class ExampleMod {
         event.enqueueWork(() -> {
             LOGGER.info("Hello from common setup! This is *after* registries are done, so we can do this:");
             LOGGER.info("Look, I found a {}!", Items.DIAMOND);
+
         });
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
         LOGGER.info("Hey, we're on Minecraft version {}!", Minecraft.getInstance().getLaunchedVersion());
+
     }
 
     // You MUST have this for custom materials.
@@ -93,10 +86,22 @@ public class ExampleMod {
     }
 
     private void registerMachines(GTCEuAPI.RegisterEvent<ResourceLocation, MachineDefinition> event) {
-        //CustomMachines.init();
+        CustomTabs.init();
+        CustomMachines.init();
     }
 
     private void registerCovers(GTCEuAPI.RegisterEvent<ResourceLocation, CoverDefinition> event) {
-        CustomCovers.init();
+
     }
+
+//    private static void init() {
+//        LOGGER.info("*********************************************Begin to init*********************************************");
+//        CustomCovers.init();
+//        CustomItems.init();
+//    }
+//    @SubscribeEvent
+//    public void modConstruct(FMLConstructModEvent event) {
+//        // this is done to delay initialization of content to be after KJS has set up.
+//        event.enqueueWork(ExampleMod::init);
+//    }
 }

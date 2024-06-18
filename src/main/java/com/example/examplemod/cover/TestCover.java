@@ -29,7 +29,16 @@ public class TestCover extends CoverBehavior {
 
     @Override
     public boolean canAttach() {
-        return super.canAttach();
+        var targetMachine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+//        SimpleTieredMachine stMachine;
+        if (targetMachine instanceof SimpleTieredMachine) {
+//            stMachine = (SimpleTieredMachine) targetMachine;
+//            stMachine.getCircuitInventory()
+            return true;
+        } else {
+            return false;
+        }
+//        return super.canAttach();
     }
 
     @Override
@@ -49,7 +58,7 @@ public class TestCover extends CoverBehavior {
     private void update(){
 
         if (coverHolder.getOffsetTimer() % 5 == 0) {
-
+            if (!(MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos()) instanceof SimpleTieredMachine)) {return;}
             SimpleTieredMachine machine = (SimpleTieredMachine) MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
 
             if (machine != null) {
