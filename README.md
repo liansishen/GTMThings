@@ -15,7 +15,8 @@
 放置后自动绑定至放置者所属电网，如果处于FTB组队状态则绑定至所属队伍（WIP）<br>
 使用闪存右键可以改变所属者，潜行状态右键则取消绑定状态<br>
 放置后每tick自动从电网拉取能量至满电状态<br>
-可跨维度使用
+可跨维度使用<br>
+也有其他模组实现了无线传电功能 https://github.com/EpimorphicPioneers/EUNetwork
 ## 无线动力仓（WIP）
 操作同无线能源仓<br>
 放置后每tick自动将所有能量存至电网，电网能量存储无上限（BigInteger）<br>
