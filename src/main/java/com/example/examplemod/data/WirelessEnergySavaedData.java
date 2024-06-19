@@ -5,12 +5,9 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.UUID;
 
 import static com.example.examplemod.api.misc.GlobalVariableStorage.GlobalEnergy;
 

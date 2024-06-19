@@ -1,6 +1,5 @@
 package com.example.examplemod.data;
 
-import com.example.examplemod.ExampleMod;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
