@@ -147,8 +147,11 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     protected void autoKeep() {
         if (getOffsetTimer() % 5 == 0) {
             for (int i = 0; i < this.getInventorySize(); i++) {
-                if (!getInventory().storage.getStackInSlot(i).isEmpty()) {
-                    getInventory().storage.getStackInSlot(i).setCount(Integer.MAX_VALUE);
+                ItemStack is = this.creativeStorage.getStackInSlot(i);
+                if (!is.isEmpty()) {
+                    var newItem = is.copy();
+                    newItem.setCount(Integer.MAX_VALUE);
+                    getInventory().storage.setStackInSlot(i,newItem);
                 }
             }
             updateInventorySubscription();

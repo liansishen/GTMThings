@@ -88,6 +88,18 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven {
+        url "https://maven.architectury.dev/"
+    }
+    maven {
+        // FTB
+        url "https://maven.saps.dev/minecraft"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.ftb.mods"
+        }
+    }
+
 }
 
 dependencies {
@@ -126,6 +138,10 @@ dependencies {
     modRuntimeOnly 'appeng:appliedenergistics2-forge-15.2.1'
 //    modRuntimeOnly 'dev.emi:emi-1.1.6+1.20.1+forge'
 //    modRuntimeOnly 'dev:jecharacters-1.20.1-forge-4.5.9'
+
+    modImplementation("dev.architectury:architectury-forge:${project.architectury_version}")
+    modImplementation("dev.ftb.mods:ftb-library-forge:${project.ftb_library_version}") { transitive false }
+    modImplementation("dev.ftb.mods:ftb-teams-forge:${project.ftb_teams_version}") { transitive false }
 }
 
 processResources {

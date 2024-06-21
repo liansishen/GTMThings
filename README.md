@@ -34,3 +34,4 @@ Make GregTech-Modern great again!
 * 远程输入总线->末影物品覆盖版
 * 末影流体覆盖版青春版
 * 可编程电路系列
+* 无线供电覆盖版
