@@ -228,8 +228,8 @@
   "block.gtceu.max_2a_wireless_energy_output_hatch": "§c§lMAX§r无线动力仓",
   "block.gtceu.max_4a_wireless_energy_output_hatch": "4安§c§lMAX§r无线动力仓",
   "block.gtceu.max_16a_wireless_energy_output_hatch": "16安§c§lMAX§r无线动力仓",
-  "gtceu.machine.wireless_energy_hatch.input.tooltip": "手持闪存右键能源仓可变更所有者，潜行状态下右键可解除绑定。",
-  "gtceu.machine.wireless_energy_hatch.output.tooltip": "手持闪存右键动力仓可变更所有者，潜行状态下右键可解除绑定。",
+  "gtceu.machine.wireless_energy_hatch.input.tooltip": "手持闪存右键点击能源仓可绑定·变更所有者，左键点击可解除绑定。",
+  "gtceu.machine.wireless_energy_hatch.output.tooltip": "手持闪存右键点击动力仓可绑定·变更所有者，左键点击可解除绑定。",
   "gtceu.machine.wireless_energy_hatch.tooltip.bind": "成功绑定至：%s",
   "gtceu.machine.wireless_energy_hatch.tooltip.unbind": "解除绑定成功",
   "gtceu.machine.wireless_energy_hatch.tooltip.1": "未绑定所有者",
@@ -237,7 +237,7 @@
   "gtceu.machine.wireless_energy_monitor.tooltip": "监控无线能源的总量和使用量",
   "gtceu.machine.wireless_energy_monitor.tooltip.0": "所有者：%s",
   "gtceu.machine.wireless_energy_monitor.tooltip.1": "能源总量：%s EU",
-  "gtceu.machine.wireless_energy_monitor.tooltip.input": "平均输入：%s EU/t",
-  "gtceu.machine.wireless_energy_monitor.tooltip.output": "平均输出：%s EU/t",
+  "gtceu.machine.wireless_energy_monitor.tooltip.input": "平均输入：§a%s EU/t（%s§r）",
+  "gtceu.machine.wireless_energy_monitor.tooltip.output": "平均输出：§a%s EU/t（%s§r）",
   "config.jade.plugin_gtmthings.wireless_energy_hatch_provider":"[GTCEu] 无线能源监视器"
 }

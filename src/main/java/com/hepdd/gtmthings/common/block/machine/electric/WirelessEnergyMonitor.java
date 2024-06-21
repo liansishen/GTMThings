@@ -1,12 +1,16 @@
 package com.hepdd.gtmthings.common.block.machine.electric;
 
+import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
+import com.gregtechceu.gtceu.utils.FormattingUtil;
+import com.gregtechceu.gtceu.utils.GTUtil;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -84,20 +88,22 @@ public class WirelessEnergyMonitor extends MetaMachine
     private void addDisplayText(@NotNull List<Component> textList) {
 
         BigInteger energyTotal = getUserEU(this.userid);
-        textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.0",this.holder.level().getPlayerByUUID(this.userid).getDisplayName()));
-        textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.1",String.valueOf(energyTotal)));
+        textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.0",
+                this.holder.level().getPlayerByUUID(this.userid).getDisplayName()).withStyle(ChatFormatting.AQUA));
+        textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.1",
+                FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
         //average useage
         BigDecimal avgEnergy = getAvgUsage(energyTotal);
+        Component voltageName = Component.literal(
+                GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
         if (avgEnergy.compareTo(BigDecimal.valueOf(0)) > 0) {
-            textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.input", String.valueOf(avgEnergy.abs())));
+            textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.input",
+                    FormattingUtil.formatNumbers(avgEnergy.abs()),voltageName).withStyle(ChatFormatting.GRAY));
         } else {
-            textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.output", String.valueOf(avgEnergy.abs())));
+            textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.output",
+                    FormattingUtil.formatNumbers(avgEnergy.abs()),voltageName).withStyle(ChatFormatting.GRAY));
         }
-//        if (avgEnergy >= 0L) {
-//            textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.input", String.valueOf(Math.abs(avgEnergy))));
-//        } else {
-//            textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.output", String.valueOf(Math.abs(avgEnergy))));
-//        }
+
     }
 
     private BigDecimal getAvgUsage(BigInteger now) {
@@ -108,7 +114,6 @@ public class WirelessEnergyMonitor extends MetaMachine
         }
         this.longArrayList.add(changed);
 
-//        return Math.round(this.longArrayList.stream().mapToLong(Number::longValue).average().getAsDouble());
         return calculateAverage(this.longArrayList);
     }
 

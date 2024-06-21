@@ -6,17 +6,15 @@ import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
-import com.gregtechceu.gtceu.api.machine.feature.IMachineModifyDrops;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.ItemHandlerProxyRecipeTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
-import com.gregtechceu.gtceu.common.machine.multiblock.part.ItemBusPartMachine;
 import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
+import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.jei.IngredientIO;
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
@@ -65,7 +63,7 @@ public class HugeItemBusPartMachine extends TieredIOPartMachine implements IDist
 
     protected int getInventorySize() {
         int sizeRoot = 1 + Math.min(9, getTier());
-        return sizeRoot * sizeRoot;
+        return sizeRoot * sizeRoot * 2;
     }
 
     protected NotifiableItemStackHandler createInventory(Object... args) {
@@ -192,21 +190,28 @@ public class HugeItemBusPartMachine extends TieredIOPartMachine implements IDist
             rowSize = 4;
             colSize = 2;
         }
-        var group = new WidgetGroup(0, 0, 18 * rowSize + 16, 18 * colSize + 16);
-        var container = new WidgetGroup(4, 4, 18 * rowSize + 8, 18 * colSize + 8);
+        //var group = new WidgetGroup(0, 0, 18 * rowSize + 16 + 8, (18 * colSize + 16)/2);
+        var container = new DraggableScrollableWidgetGroup(0, 0, 18 * rowSize + 12, 18 * colSize / 2 + 8);
+        container.setYScrollBarWidth(8);
+        container.setYBarStyle(GuiTextures.SLIDER_BACKGROUND_VERTICAL, GuiTextures.BUTTON);
+//        container.addWidget(scrollableGroup);
+
+        //var container = new WidgetGroup(4, 4, 18 * rowSize + 8, 18 * colSize + 8);
         int index = 0;
         for (int y = 0; y < colSize; y++) {
             for (int x = 0; x < rowSize; x++) {
                 container.addWidget(
-                        new SlotWidget(getInventory().storage, index++, 4 + x * 18, 4 + y * 18, true, io.support(IO.IN))
-                                .setBackgroundTexture(GuiTextures.SLOT)
-                                .setIngredientIO(this.io == IO.IN ? IngredientIO.INPUT : IngredientIO.OUTPUT));
+                        new SlotWidget(getInventory().storage, index++, 4 + x * 18, 4 + y * 18, true, io.support(IO.IN)) {
+
+                        }
+                        .setBackgroundTexture(GuiTextures.SLOT)
+                        .setIngredientIO(this.io == IO.IN ? IngredientIO.INPUT : IngredientIO.OUTPUT));
             }
         }
 
-        container.setBackground(GuiTextures.BACKGROUND_INVERSE);
-        group.addWidget(container);
+        //container.setBackground(GuiTextures.BACKGROUND_INVERSE);
+        //group.addWidget(container);
 
-        return group;
+        return container;
     }
 }
