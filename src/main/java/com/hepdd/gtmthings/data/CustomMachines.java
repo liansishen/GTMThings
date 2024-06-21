@@ -9,7 +9,6 @@ import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
-import com.gregtechceu.gtceu.common.machine.electric.HullMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.FluidHatchPartMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor;
@@ -174,7 +173,7 @@ public class CustomMachines {
     public static MachineDefinition[] registerWirelessEnergyHatch(IO io, int amperage, PartAbility ability) {
         var name = io == IO.IN ? "input" : "output";
         return registerTieredMachines(amperage + "a_wireless_energy_" + name + "_hatch",
-                (holder, tier) -> new CreativeEnergyHatchPartMachine(holder, tier,  amperage),
+                (holder, tier) -> new WirelessEnergyHatchPartMachine(holder, tier, io, amperage),
                 (tier, builder) -> builder
                         .langValue(VNF[tier] + (io == IO.IN ? " Energy Hatch" : " Dynamo Hatch"))
                         .rotationState(RotationState.ALL)

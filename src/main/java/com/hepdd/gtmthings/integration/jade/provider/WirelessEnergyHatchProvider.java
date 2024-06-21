@@ -60,7 +60,8 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
     protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block,
                               BlockEntity blockEntity, IPluginConfig config) {
 
-        if (!(((MetaMachineBlockEntity)blockEntity).getMetaMachine() instanceof WirelessEnergyHatchPartMachine)) return;
+        if (!(blockEntity instanceof MetaMachineBlockEntity metaMachineBlockEntity)) return;
+        if (!(metaMachineBlockEntity.getMetaMachine() instanceof WirelessEnergyHatchPartMachine)) return;
 
         if (!capData.hasUUID("uuid")) {
             tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.1"));
