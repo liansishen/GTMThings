@@ -1,11 +1,13 @@
 package com.hepdd.gtmthings.integration.jade.provider;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.integration.jade.provider.CapabilityBlockProvider;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessEnergyHatchPartMachine;
+import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -21,6 +23,9 @@ import snownee.jade.api.config.IPluginConfig;
 
 import java.util.UUID;
 
+import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
+import static com.hepdd.gtmthings.utils.TeamUtil.hasOwner;
+
 public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindable> {
 
     public WirelessEnergyHatchProvider() {
@@ -29,22 +34,34 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
 
     @Override
     protected @Nullable IBindable getCapability(Level level, BlockPos pos, @Nullable Direction side) {
-        if (level.getBlockEntity(pos) instanceof MetaMachineBlockEntity metaMachineBlockEntity
-                && metaMachineBlockEntity.getMetaMachine() instanceof WirelessEnergyHatchPartMachine we
-                && we.owner_uuid != null) {
-            UUID uuid = we.owner_uuid;
-            IBindable cap = new IBindable() {
-                @Override
-                public UUID getUUID() {
-                    return uuid;
+        if (level.getBlockEntity(pos) instanceof MetaMachineBlockEntity metaMachineBlockEntity){
+            var metaMachine = metaMachineBlockEntity.getMetaMachine();
+            if (metaMachine instanceof WirelessEnergyHatchPartMachine we && we.owner_uuid != null) {
+                UUID uuid = we.owner_uuid;
+                return new IBindable() {
+                    @Override
+                    public UUID getUUID() {
+                        return uuid;
+                    }
+                    @Override
+                    public void setUUID(UUID uuid1) { }
+                };
+            } else if (metaMachine instanceof SimpleTieredMachine simpleTieredMachine) {
+                var covers = simpleTieredMachine.getCoverContainer().getCovers();
+                for (var cover:covers) {
+                    if(cover instanceof WirelessEnergyReceiveCover wirelessEnergyReceiveCover) {
+                        UUID uuid = wirelessEnergyReceiveCover.getUuid();
+                        return new IBindable() {
+                            @Override
+                            public UUID getUUID() {
+                                return uuid;
+                            }
+                            @Override
+                            public void setUUID(UUID uuid1) { }
+                        };
+                    }
                 }
-
-                @Override
-                public void setUUID(UUID uuid) {
-
-                }
-            };
-            return cap;
+            }
         }
         return null;
     }
@@ -59,19 +76,38 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
     @Override
     protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block,
                               BlockEntity blockEntity, IPluginConfig config) {
-
+        int machineType;
         if (!(blockEntity instanceof MetaMachineBlockEntity metaMachineBlockEntity)) return;
-        if (!(metaMachineBlockEntity.getMetaMachine() instanceof WirelessEnergyHatchPartMachine)) return;
+        var metaMachine = metaMachineBlockEntity.getMetaMachine();
+        if (metaMachine instanceof WirelessEnergyHatchPartMachine) {
+            machineType = 1;
+        } else if (metaMachine instanceof SimpleTieredMachine) {
+            if (!capData.hasUUID("uuid")) return;
+            machineType = 2;
+        } else {
+            return;
+        }
 
         if (!capData.hasUUID("uuid")) {
-            tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.1"));
+            if (machineType==1) {
+                tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.1"));
+            } else {
+                tooltip.add(Component.translatable("gtceu.machine.wireless_energy_cover.tooltip.1"));
+            }
         } else {
             UUID uuid = capData.getUUID("uuid");
-            Player bindPlayer = block.getLevel().getPlayerByUUID(uuid);
-            if (bindPlayer != null) {
-                tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.2",bindPlayer.getName().getString()));
+            if (hasOwner(block.getLevel(),uuid)) {
+                if (machineType == 1) {
+                    tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.2", GetName(block.getLevel(), uuid)));
+                } else {
+                    tooltip.add(Component.translatable("gtceu.machine.wireless_energy_cover.tooltip.2", GetName(block.getLevel(), uuid)));
+                }
             } else {
-                tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.2",uuid));
+                if (machineType == 1) {
+                    tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.3", uuid));
+                } else {
+                    tooltip.add(Component.translatable("gtceu.machine.wireless_energy_cover.tooltip.3", uuid));
+                }
             }
         }
 

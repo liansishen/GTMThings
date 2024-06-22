@@ -47,7 +47,7 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeInputBusPartMachine.class,
             TieredIOPartMachine.MANAGED_FIELD_HOLDER);
 
-    private final int ITEM_SIZE = 6;
+    private final int ITEM_SIZE = 5;
 
     @Getter
     @Persisted
@@ -120,7 +120,6 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
             }
         }
         updateInventorySubscription();
-//        combinedInventory.recomputeEnabledState();
     }
 
     @Override

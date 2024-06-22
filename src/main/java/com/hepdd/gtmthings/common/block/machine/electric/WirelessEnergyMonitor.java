@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.getUserEU;
+import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
+import static com.hepdd.gtmthings.utils.TeamUtil.GetUUID;
 
 public class WirelessEnergyMonitor extends MetaMachine
                 implements IFancyUIMachine {
@@ -77,8 +79,8 @@ public class WirelessEnergyMonitor extends MetaMachine
 
     @Override
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
-        if (this.userid==null || !this.userid.equals(player.getUUID())) {
-            this.userid = player.getUUID();
+        if (this.userid==null || !this.userid.equals(GetUUID(player))) {
+            this.userid = GetUUID(player);
             this.longArrayList = new ArrayList<>();
         }
         this.beforeEnergy = getUserEU(this.userid);
@@ -89,7 +91,7 @@ public class WirelessEnergyMonitor extends MetaMachine
 
         BigInteger energyTotal = getUserEU(this.userid);
         textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.0",
-                this.holder.level().getPlayerByUUID(this.userid).getDisplayName()).withStyle(ChatFormatting.AQUA));
+                GetName(this.holder.level(),this.userid)).withStyle(ChatFormatting.AQUA));
         textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.1",
                 FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
         //average useage

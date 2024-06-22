@@ -14,6 +14,8 @@ import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import dev.ftb.mods.ftbteams.FTBTeams;
+import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,6 +32,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+
+import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
+import static com.hepdd.gtmthings.utils.TeamUtil.GetUUID;
 
 public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implements IInteractedMachine, IBindable, IExplosionMachine, IMachineLife {
 
@@ -93,6 +98,9 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     private void updateEnergy() {
         if (this.owner_uuid==null) return;
+        var newUUID = GetUUID(getLevel(),this.owner_uuid);
+        if (newUUID==null) return;
+        this.owner_uuid = newUUID;
         if (io == IO.IN) {
             useEnergy();
         } else {
@@ -127,9 +135,9 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         ItemStack is = player.getItemInHand(hand);
         if (is.isEmpty()) return InteractionResult.PASS;
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
-            this.owner_uuid = player.getUUID();
+            this.owner_uuid = GetUUID(player);
             if (getLevel().isClientSide()) {
-                player.sendSystemMessage(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.bind",player.getName()));
+                player.sendSystemMessage(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.bind",GetName(player)));
             }
             updateEnergySubscription();
             return InteractionResult.SUCCESS;
@@ -147,7 +155,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
             this.owner_uuid = null;
             if (getLevel().isClientSide()) {
-                player.sendSystemMessage(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.unbind",player.getName()));
+                player.sendSystemMessage(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.unbind"));
             }
             updateEnergySubscription();
             return true;
@@ -158,7 +166,8 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     @Override
     public void onMachinePlaced(@Nullable LivingEntity player, ItemStack stack) {
         if (player != null) {
-            this.owner_uuid = player.getUUID();
+            this.owner_uuid = GetUUID((Player) player);
+            //FTBTeamsAPI.api().getManager().getTeamForPlayerID(player.getUUID());
             updateEnergySubscription();
         }
     }

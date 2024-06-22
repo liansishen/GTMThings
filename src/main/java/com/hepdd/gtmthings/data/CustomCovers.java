@@ -1,20 +1,32 @@
 package com.hepdd.gtmthings.data;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.GTCEuAPI;
+import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.addon.AddonFinder;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.client.renderer.cover.ConveyorCoverRenderer;
 import com.gregtechceu.gtceu.client.renderer.cover.ICoverRenderer;
 import com.gregtechceu.gtceu.client.renderer.cover.SimpleCoverRenderer;
 import com.hepdd.gtmthings.common.cover.TestCover;
+import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
+import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
+import net.minecraftforge.fml.ModLoader;
+import com.gregtechceu.gtceu.api.addon.IGTAddon;
+
+import java.util.Arrays;
+import java.util.Locale;
 
 public class CustomCovers {
 
-    static {
-        //GTRegistries.COVERS.unfreeze();
-    }
-    public final static CoverDefinition TEST_COVER = register(
-            "test_cover", TestCover::new,
-            new SimpleCoverRenderer(GTCEu.id("block/cover/overlay_infinite_water")));
+    public static final int[] ALL_TIERS = GTValues.tiersBetween(GTValues.LV,
+            GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV);
+
+    public final static CoverDefinition[] WIRELESS_ENERGY_RECEIVE = registerTiered(
+            "wireless_energy_receive", WirelessEnergyReceiveCover::new,
+            tier -> new SimpleCoverRenderer(GTCEu.id("block/cover/overlay_controller")), ALL_TIERS);
+
 
     public static CoverDefinition register(String id, CoverDefinition.CoverBehaviourProvider behaviorCreator,
                                            ICoverRenderer coverRenderer) {
@@ -24,16 +36,15 @@ public class CustomCovers {
         return definition;
     }
 
-//    public static ItemEntry<ComponentItem> TEST_COVER_COVER = REGISTRATE
-//            .item("test_cover_cover", ComponentItem::create)
-//            .onRegister(compassNode(GTCompassSections.COVERS, GTCompassNodes.COVER))
-//            .onRegister(attach(new TooltipBehavior(lines -> {
-//                lines.add(Component.translatable("gtceu.universal.tooltip.produces_fluid", 16_000 / 20));
-//            }), new CoverPlaceBehavior(TEST_COVER))).register();
-
-    public static void init() {
-//        AddonFinder.getAddons().forEach(IGTAddon::registerCovers);
-//        ModLoader.get().postEvent(new GTCEuAPI.RegisterEvent<>(GTRegistries.COVERS, CoverDefinition.class));
-//        GTRegistries.COVERS.freeze();
+    public static CoverDefinition[] registerTiered(String id,
+                                                   CoverDefinition.TieredCoverBehaviourProvider behaviorCreator,
+                                                   Int2ObjectFunction<ICoverRenderer> coverRenderer, int... tiers) {
+        return Arrays.stream(tiers).mapToObj(tier -> {
+            var name = id + "." + GTValues.VN[tier].toLowerCase(Locale.ROOT);
+            return register(name, (def, coverable, side) -> behaviorCreator.create(def, coverable, side, tier),
+                    coverRenderer.apply(tier));
+        }).toArray(CoverDefinition[]::new);
     }
+
+    public static void init() { }
 }

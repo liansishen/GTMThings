@@ -1,0 +1,18 @@
+{
+  "button_texture": {
+    "type": "item",
+    "res": "gtceu:lv_wireless_energy_receive_cover"
+  },
+  "items": [
+    "gtceu:lv_wireless_energy_receive_cover"
+  ],
+  "page": "gtceu:covers/wireless_energy_receive_cover",
+  "position": [
+    -250,
+    290
+  ],
+  "pre_nodes": [
+    "gtceu:covers/cover"
+  ],
+  "section": "gtceu:covers"
+}
