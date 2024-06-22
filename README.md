@@ -1,10 +1,61 @@
+# About This Mod
+Add some practical machines to GregTech-Modern.
+Make GregTech-Modern great again!
+
+# Machines Added
+## Creative Mode Input Bus
+Can tag up to 25 items, tagged items can be used directly in crafting without additional input.
+
+## Creative Mode Input Hatch
+Can tag up to 9 types of fluids, tagged fluids can be used directly in crafting without additional input.
+
+## Creative Mode Energy Hatch
+Voltage: LV-MAX, Current: 2A 4A 16A<br>
+Automatically recharges to full state every tick after placement<br>
+Can double the voltage in dual hatches
+
+## Creative Mode Laser Target Hatch
+Voltage: IV-MAX, Current: 256A 1024A 4096A<br>
+Automatically recharges to full state every tick after placement<br>
+
+## Wireless Energy Hatch (WIP)
+Voltage: LV-MAX, Current: 2A 4A 16A<br>
+Automatically binds to the electrical grid of the placer upon placement, or to the team if in FTB teams mode (WIP)<br>
+Using a flash drive with a right-click can change the owner, sneaking with a right-click will unbind it<br>
+Automatically draws energy from the grid to full state every tick after placement<br>
+Can be used across dimensions<br>
+Other mods have implemented wireless power transmission features https://github.com/EpimorphicPioneers/EUNetwork
+
+## Wireless Power Hatch (WIP)
+Operates the same as the Wireless Energy Hatch<br>
+Automatically stores all energy to the grid every tick, the grid's energy storage has no upper limit (BigInteger)<br>
+Can be used across dimensions
+
+## Wireless Energy Monitor (WIP)
+Can view the total energy and average input/output in the owned grid
+
+## Wireless Energy Receiver
+Voltage: LV-OPV<br>
+When used as a cover, it draws energy from the grid to power the machine.<br>
+Only usable on single-block machines. Cannot install a cover that exceeds the machine's voltage level on the machine.<br>
+The transfer rate is 1A of the current voltage level<br>
+
+# Machines Planned to be Added
+* Giant Input Bus
+* Giant Output Bus
+* Remote Input Bus -> Ender Item Cover
+* Ender Fluid Cover Youth Edition
+* Programmable Circuit Series
+
+---
+
 # 关于本mod
 给GTM添加一些实用的机器
 Make GregTech-Modern great again!
 
 # 已添加的机器
 ## 创造模式输入总线
-可标记最多36种物品，被标记的物品可直接用于合成，无须额外输入。
+可标记最多25种物品，被标记的物品可直接用于合成，无须额外输入。
 ## 创造模式输入仓
 可标记最多9种流体，被标记的流体可直接用于合成，无需额外输入。
 ## 创造模式能源仓
@@ -27,6 +78,11 @@ Make GregTech-Modern great again!
 可跨维度使用
 ## 无线能源监视器（WIP）
 可查看所属电网中的能量总量和平均输入/输出
+## 无线能源接收器
+电压：LV-OPV<br>
+作覆盖板时从电网拉取能量传输到机器。<br>
+只可用于单方块机器。无法将超过机器电压等级的覆盖版安装到机器上。<br>
+传输速率为当前电压等级的1A<br>
 
 # 计划添加的机器
 * 巨型输入总线
@@ -34,4 +90,3 @@ Make GregTech-Modern great again!
 * 远程输入总线->末影物品覆盖版
 * 末影流体覆盖版青春版
 * 可编程电路系列
-* 无线供电覆盖版
