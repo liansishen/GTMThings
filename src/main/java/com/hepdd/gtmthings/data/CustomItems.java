@@ -4,8 +4,6 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.registry.registrate.CompassNode;
 import com.gregtechceu.gtceu.api.registry.registrate.CompassSection;
-import com.gregtechceu.gtceu.common.data.GTCompassNodes;
-import com.gregtechceu.gtceu.common.data.GTCompassSections;
 import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
 import com.gregtechceu.gtceu.common.item.TooltipBehavior;
 import com.tterrag.registrate.util.entry.ItemEntry;
@@ -18,7 +16,7 @@ import java.util.Locale;
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.registry.registrate.CompassNode.getOrCreate;
 import static com.gregtechceu.gtceu.common.data.GTItems.attach;
-import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
+import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 
 public class CustomItems {
 
@@ -50,14 +48,13 @@ public class CustomItems {
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV);
 
     private static ItemEntry<ComponentItem> registerTieredCover(String name, String lang,int tier) {
-        return REGISTRATE
+        return GTMTHINGS_REGISTRATE
                 .item(GTValues.VN[tier].toLowerCase(Locale.ROOT) + "_" + name, ComponentItem::create)
                 .lang(VNF[tier] + " " + lang)
-                .onRegister(compassNode(GTCompassSections.COVERS, GTCompassNodes.COVER))
                 .onRegister(attach(new TooltipBehavior(lines -> {
-                    lines.add(Component.translatable("item.gtceu.wireless_energy_receive_cover.tooltip.1"));
-                    lines.add(Component.translatable("item.gtceu.wireless_energy_receive_cover.tooltip.2"));
-                    lines.add(Component.translatable("item.gtceu.wireless_energy_receive_cover.tooltip.3",GTValues.V[tier]));
+                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.1"));
+                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.2"));
+                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3",GTValues.V[tier]));
                 }), new CoverPlaceBehavior(CustomCovers.WIRELESS_ENERGY_RECEIVE[tier-1]))).register();
     }
 

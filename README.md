@@ -18,20 +18,21 @@ Can double the voltage in dual hatches
 Voltage: IV-MAX, Current: 256A 1024A 4096A<br>
 Automatically recharges to full state every tick after placement<br>
 
-## Wireless Energy Hatch (WIP)
-Voltage: LV-MAX, Current: 2A 4A 16A<br>
-Automatically binds to the electrical grid of the placer upon placement, or to the team if in FTB teams mode (WIP)<br>
+## Wireless Energy Hatch
+Voltage: LV-HV, Current: 2A 4A 16A<br>
+Voltage: EV-MAX、Current：2A 4A 16A 64A 256A 1024A 4096A 16384A 65536A<br>
+Automatically binds to the electrical grid of the placer upon placement, or to the team if in FTB teams mode<br>
 Using a flash drive with a right-click can change the owner, sneaking with a right-click will unbind it<br>
 Automatically draws energy from the grid to full state every tick after placement<br>
 Can be used across dimensions<br>
 Other mods have implemented wireless power transmission features https://github.com/EpimorphicPioneers/EUNetwork
 
-## Wireless Power Hatch (WIP)
+## Wireless Power Hatch
 Operates the same as the Wireless Energy Hatch<br>
 Automatically stores all energy to the grid every tick, the grid's energy storage has no upper limit (BigInteger)<br>
 Can be used across dimensions
 
-## Wireless Energy Monitor (WIP)
+## Wireless Energy Monitor
 Can view the total energy and average input/output in the owned grid
 
 ## Wireless Energy Receiver
@@ -65,18 +66,19 @@ Make GregTech-Modern great again!
 ## 创造模式激光靶仓
 电压：IV-MAX、电流：256A 1024A 4096A<br>
 放置后每tick自动恢复至满电状态<br>
-## 无线能源仓（WIP）
-电压：LV-MAX、电流：2A 4A 16A<br>
-放置后自动绑定至放置者所属电网，如果处于FTB组队状态则绑定至所属队伍（WIP）<br>
+## 无线能源仓
+电压：LV-HV、电流：2A 4A 16A<br>
+电压：EV-MAX、电流：2A 4A 16A 64A 256A 1024A 4096A 16384A 65536A<br>
+放置后自动绑定至放置者所属电网，如果处于FTB组队状态则绑定至所属队伍<br>
 使用闪存右键可以改变所属者，潜行状态右键则取消绑定状态<br>
 放置后每tick自动从电网拉取能量至满电状态<br>
 可跨维度使用<br>
 也有其他模组实现了无线传电功能 https://github.com/EpimorphicPioneers/EUNetwork
-## 无线动力仓（WIP）
+## 无线动力仓
 操作同无线能源仓<br>
 放置后每tick自动将所有能量存至电网，电网能量存储无上限（BigInteger）<br>
 可跨维度使用
-## 无线能源监视器（WIP）
+## 无线能源监视器
 可查看所属电网中的能量总量和平均输入/输出
 ## 无线能源接收器
 电压：LV-OPV<br>

@@ -14,8 +14,6 @@ import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import dev.ftb.mods.ftbteams.FTBTeams;
-import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -133,7 +131,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
             this.owner_uuid = player.getUUID();
             if (getLevel().isClientSide()) {
-                player.sendSystemMessage(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.bind",GetName(player)));
+                player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind",GetName(player)));
             }
             updateEnergySubscription();
             return InteractionResult.SUCCESS;
@@ -151,7 +149,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
             this.owner_uuid = null;
             if (getLevel().isClientSide()) {
-                player.sendSystemMessage(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.unbind"));
+                player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.unbind"));
             }
             updateEnergySubscription();
             return true;

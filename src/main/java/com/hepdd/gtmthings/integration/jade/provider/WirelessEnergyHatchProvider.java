@@ -90,23 +90,23 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
 
         if (!capData.hasUUID("uuid")) {
             if (machineType==1) {
-                tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.1"));
+                tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.1"));
             } else {
-                tooltip.add(Component.translatable("gtceu.machine.wireless_energy_cover.tooltip.1"));
+                tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_cover.tooltip.1"));
             }
         } else {
             UUID uuid = capData.getUUID("uuid");
             if (hasOwner(block.getLevel(),uuid)) {
                 if (machineType == 1) {
-                    tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.2", GetName(block.getLevel(), uuid)));
+                    tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.2", GetName(block.getLevel(), uuid)));
                 } else {
-                    tooltip.add(Component.translatable("gtceu.machine.wireless_energy_cover.tooltip.2", GetName(block.getLevel(), uuid)));
+                    tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_cover.tooltip.2", GetName(block.getLevel(), uuid)));
                 }
             } else {
                 if (machineType == 1) {
-                    tooltip.add(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.3", uuid));
+                    tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.3", uuid));
                 } else {
-                    tooltip.add(Component.translatable("gtceu.machine.wireless_energy_cover.tooltip.3", uuid));
+                    tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_cover.tooltip.3", uuid));
                 }
             }
         }

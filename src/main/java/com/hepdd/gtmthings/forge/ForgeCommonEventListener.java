@@ -16,8 +16,6 @@ public class ForgeCommonEventListener {
     public static void levelTick(TickEvent.LevelTickEvent event) {
         if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
             TaskHandler.onTickUpdate(serverLevel);
-            //EnvironmentalHazardSavedData.getOrCreate(serverLevel).tick();
-            //LocalizedHazardSavedData.getOrCreate(serverLevel).tick();
         }
     }
 

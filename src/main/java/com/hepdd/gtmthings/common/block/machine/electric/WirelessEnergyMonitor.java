@@ -89,19 +89,19 @@ public class WirelessEnergyMonitor extends MetaMachine
     private void addDisplayText(@NotNull List<Component> textList) {
 
         BigInteger energyTotal = getUserEU(this.userid);
-        textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.0",
+        textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0",
                 GetName(this.holder.level(),this.userid)).withStyle(ChatFormatting.AQUA));
-        textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.1",
+        textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1",
                 FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
         //average useage
         BigDecimal avgEnergy = getAvgUsage(energyTotal);
         Component voltageName = Component.literal(
                 GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
         if (avgEnergy.compareTo(BigDecimal.valueOf(0)) > 0) {
-            textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.input",
+            textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
                     FormattingUtil.formatNumbers(avgEnergy.abs()),voltageName).withStyle(ChatFormatting.GRAY));
         } else {
-            textList.add(Component.translatable("gtceu.machine.wireless_energy_monitor.tooltip.output",
+            textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
                     FormattingUtil.formatNumbers(avgEnergy.abs()),voltageName).withStyle(ChatFormatting.GRAY));
         }
 

@@ -67,7 +67,6 @@ public class HugeItemBusPartMachine extends TieredIOPartMachine implements IDist
     }
 
     protected NotifiableItemStackHandler createInventory(Object... args) {
-//        return new NotifiableItemStackHandler(this, getInventorySize(), io);
         return new NotifiableItemStackHandler(this, getInventorySize(), io, io, UnlimitedItemStackTransfer::new) {
 
             @Override
