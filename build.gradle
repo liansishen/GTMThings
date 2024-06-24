@@ -7,7 +7,9 @@ base {
     archivesName = project.archives_base_name
 }
 
-version = project.mod_version
+String buildNumber = System.getenv("GITHUB_ACTION_NUMBER")
+version = "${mod_version}" + (buildNumber != null ? "-build_${System.getenv("GITHUB_RUN_NUMBER")}" : "")
+//version = project.mod_version
 group = project.maven_group
 
 java {
