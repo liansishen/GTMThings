@@ -50,8 +50,17 @@ jobs:
           MESSAGE=$(ls build/libs/* | grep sources.jar -v | grep shadow.jar -v | grep slim.jar -v | awk -F '${{ steps.properties.outputs.mod_id }}-|.jar' '{print $2}')
           echo version=$MESSAGE >> $GITHUB_OUTPUT
 
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v4.3.3
+      - name: Release
+        id: release
+        uses: Kir-Antipov/mc-publish@v3.3.0
         with:
-          name: "${{ steps.properties.outputs.mod_name }} ${{ steps.var.outputs.version }}"
-          path: build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.var.outputs.version }}.jar
+          github-tag: ${{ steps.var.outputs.version }}
+          github-token: ${{ liansishen.GITHUB_TOKEN }}
+          files: |
+            build/libs/!(*-@(dev|sources|javadoc)).jar
+            
+      # - name: Upload a Build Artifact
+      #   uses: actions/upload-artifact@v4.3.3
+      #   with:
+      #     name: "${{ steps.properties.outputs.mod_name }} ${{ steps.var.outputs.version }}"
+      #     path: build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.var.outputs.version }}.jar
