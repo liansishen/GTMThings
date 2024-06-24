@@ -14,7 +14,6 @@ public class WirelessEnergySavaedData extends SavedData {
 
     public static WirelessEnergySavaedData INSTANCE;
     private ServerLevel serverLevel;
-    //private HashMap<UUID,Long> wirelessEnergy;
 
     public static WirelessEnergySavaedData getOrCreate(ServerLevel serverLevel) {
         return serverLevel.getDataStorage().computeIfAbsent(tag -> new WirelessEnergySavaedData(serverLevel, tag),
@@ -23,7 +22,6 @@ public class WirelessEnergySavaedData extends SavedData {
 
     public WirelessEnergySavaedData(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
-        //this.wirelessEnergy = new HashMap<>();
     }
 
     public WirelessEnergySavaedData(ServerLevel serverLevel,CompoundTag tag) {
@@ -48,9 +46,4 @@ public class WirelessEnergySavaedData extends SavedData {
         compoundTag.put("allEnergy",allEnergy);
         return compoundTag;
     }
-
-//    public void updateEnergy(UUID owner,Long EU) {
-//        this.wirelessEnergy.put(owner,EU);
-//        setDirty();
-//    }
 }

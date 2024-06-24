@@ -5,6 +5,8 @@ import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
 import java.math.BigInteger;
 import java.util.UUID;
 
+import static com.hepdd.gtmthings.utils.TeamUtil.getTeamUUID;
+
 public class WirelessEnergyManager {
 
     public static void strongCheckOrAddUser(UUID user_uuid) {
@@ -25,15 +27,22 @@ public class WirelessEnergyManager {
         }
 
         // Get the team UUID. Users are by default in a team with a UUID equal to their player UUID.
-        //UUID teamUUID = SpaceProjectManager.getLeader(user_uuid);
+        UUID teamUUID = getTeamUUID(user_uuid);
 
         // Get the teams total energy stored. If they are not in the map, return 0 EU.
-        BigInteger totalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(user_uuid, BigInteger.ZERO);
+        BigInteger totalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(teamUUID, BigInteger.ZERO);
         totalEU = totalEU.add(EU);
+
+        // Get personal energy,when > 0, add to team energy and clear personal energy.
+//        BigInteger userTotalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(user_uuid, BigInteger.ZERO);
+//        if (userTotalEU.signum() > 0) {
+//            totalEU = totalEU.add(userTotalEU);
+//            GlobalVariableStorage.GlobalEnergy.put(user_uuid, BigInteger.ZERO);
+//        }
 
         // If there is sufficient EU then complete the operation and return true.
         if (totalEU.signum() >= 0) {
-            GlobalVariableStorage.GlobalEnergy.put(user_uuid, totalEU);
+            GlobalVariableStorage.GlobalEnergy.put(teamUUID, totalEU);
             //WirelessEnergySavaedData.INSTANCE.updateEnergy(user_uuid,totalEU.longValue());
             return true;
         }
@@ -53,7 +62,7 @@ public class WirelessEnergyManager {
     // ------------------------------------------------------------------------------------
 
     public static BigInteger getUserEU(UUID user_uuid) {
-        return GlobalVariableStorage.GlobalEnergy.getOrDefault(user_uuid, BigInteger.ZERO);
+        return GlobalVariableStorage.GlobalEnergy.getOrDefault(getTeamUUID(user_uuid), BigInteger.ZERO);
     }
 
     // This overwrites the EU in the network. Only use this if you are absolutely sure you know what you are doing.
@@ -66,7 +75,7 @@ public class WirelessEnergyManager {
             exception.printStackTrace();
         }
 
-        GlobalVariableStorage.GlobalEnergy.put(user_uuid, EU);
+        GlobalVariableStorage.GlobalEnergy.put(getTeamUUID(user_uuid), EU);
     }
 
     public static void clearGlobalEnergyInformationMaps() {

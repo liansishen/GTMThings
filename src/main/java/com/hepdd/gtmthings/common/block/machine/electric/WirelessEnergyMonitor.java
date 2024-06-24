@@ -26,7 +26,6 @@ import java.util.UUID;
 
 import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.getUserEU;
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
-import static com.hepdd.gtmthings.utils.TeamUtil.GetUUID;
 
 public class WirelessEnergyMonitor extends MetaMachine
                 implements IFancyUIMachine {
@@ -79,8 +78,8 @@ public class WirelessEnergyMonitor extends MetaMachine
 
     @Override
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
-        if (this.userid==null || !this.userid.equals(GetUUID(player))) {
-            this.userid = GetUUID(player);
+        if (this.userid==null || !this.userid.equals(player.getUUID())) {
+            this.userid = player.getUUID();
             this.longArrayList = new ArrayList<>();
         }
         this.beforeEnergy = getUserEU(this.userid);

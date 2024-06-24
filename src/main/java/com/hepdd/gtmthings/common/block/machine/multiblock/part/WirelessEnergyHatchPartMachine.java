@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
-import static com.hepdd.gtmthings.utils.TeamUtil.GetUUID;
 
 public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implements IInteractedMachine, IBindable, IExplosionMachine, IMachineLife {
 
@@ -98,9 +97,6 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     private void updateEnergy() {
         if (this.owner_uuid==null) return;
-        var newUUID = GetUUID(getLevel(),this.owner_uuid);
-        if (newUUID==null) return;
-        this.owner_uuid = newUUID;
         if (io == IO.IN) {
             useEnergy();
         } else {
@@ -135,7 +131,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         ItemStack is = player.getItemInHand(hand);
         if (is.isEmpty()) return InteractionResult.PASS;
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
-            this.owner_uuid = GetUUID(player);
+            this.owner_uuid = player.getUUID();
             if (getLevel().isClientSide()) {
                 player.sendSystemMessage(Component.translatable("gtceu.machine.wireless_energy_hatch.tooltip.bind",GetName(player)));
             }
@@ -166,8 +162,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     @Override
     public void onMachinePlaced(@Nullable LivingEntity player, ItemStack stack) {
         if (player != null) {
-            this.owner_uuid = GetUUID((Player) player);
-            //FTBTeamsAPI.api().getManager().getTeamForPlayerID(player.getUUID());
+            this.owner_uuid = player.getUUID();
             updateEnergySubscription();
         }
     }
