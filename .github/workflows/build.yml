@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_ACTION_NUMBER: ${{ vars.GITHUB_RUN_NUMBER }}
+      GITHUB_RUN_NUMBER: ${{ vars.GITHUB_RUN_NUMBER }}
+    permissions:
+      contents: write
     steps:
       - name: checkout
         uses: actions/checkout@v4
