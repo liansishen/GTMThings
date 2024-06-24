@@ -266,5 +266,6 @@
   "item.gtmthings.wireless_energy_receive_cover.tooltip.2": "§7Can only used for single block machine.Can't put on the machine blow the cover's voltage",
   "item.gtmthings.wireless_energy_receive_cover.tooltip.3": "§bEnergy transfer speed: §f%s §7EU/t",
   "config.jade.plugin_gtmthings.wireless_energy_hatch_provider":"[gtmthings] Wireless Energy Monitor",
-  "itemGroup.gtmthings.machines": "GTM Things"
+  "itemGroup.gtmthings.creative": "Creative Things",
+  "itemGroup.gtmthings.wireless": "Wireless Energy"
 }

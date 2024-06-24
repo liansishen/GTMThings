@@ -7,10 +7,7 @@ import com.gregtechceu.gtceu.api.data.chemical.material.event.MaterialRegistryEv
 import com.gregtechceu.gtceu.api.data.chemical.material.event.PostMaterialEvent;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.hepdd.gtmthings.data.CustomCovers;
-import com.hepdd.gtmthings.data.CustomItems;
-import com.hepdd.gtmthings.data.CustomMachines;
-import com.hepdd.gtmthings.data.CustomTabs;
+import com.hepdd.gtmthings.data.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -80,7 +77,8 @@ public class GTMThings {
 
     private void registerMachines(GTCEuAPI.RegisterEvent<ResourceLocation, MachineDefinition> event) {
         CustomTabs.init();
-        CustomMachines.init();
+        CreativeMachines.init();
+        WirelessMachines.init();
     }
 
     private void registerCovers(GTCEuAPI.RegisterEvent<ResourceLocation, CoverDefinition> event) {

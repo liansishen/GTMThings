@@ -389,14 +389,6 @@
   "item.gtmthings.wireless_energy_receive_cover.tooltip.2": "§7只可用于单方块机器。无法将超过机器电压等级的覆盖版安装到机器上。",
   "item.gtmthings.wireless_energy_receive_cover.tooltip.3": "§b能量传输效率：§f%s §7EU/t",
   "config.jade.plugin_gtmthings.wireless_energy_hatch_provider":"[gtmthings] 无线能源监视器",
-  "itemGroup.gtmthings.machines": "GTM Things",
-  "block.gtmthings.lv_2a_wireless_energy_output_hatch": "§7LV Wireless Dynoma Hatch",
-  "block.gtmthings.lv_4a_wireless_energy_output_hatch": "§74A LV Wireless Dynoma Hatch",
-  "block.gtmthings.lv_16a_wireless_energy_output_hatch": "§716A LV Wireless Dynoma Hatch",
-  "block.gtmthings.mv_2a_wireless_energy_output_hatch": "§bMV Wireless Dynoma Hatch",
-  "block.gtmthings.mv_4a_wireless_energy_output_hatch": "§b4A MV Wireless Dynoma Hatch",
-  "block.gtmthings.mv_16a_wireless_energy_output_hatch": "§b16A MV Wireless Dynoma Hatch",
-  "block.gtmthings.hv_2a_wireless_energy_output_hatch": "§6HV Wireless Dynoma Hatch",
-  "block.gtmthings.hv_4a_wireless_energy_output_hatch": "§64A HV Wireless Dynoma Hatch",
-  "block.gtmthings.hv_16a_wireless_energy_output_hatch": "§616A HV Wireless Dynoma Hatch"
+  "itemGroup.gtmthings.creative": "创造物品",
+  "itemGroup.gtmthings.wireless": "无线能源"
 }

@@ -18,7 +18,7 @@ import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REG
 public class CustomCovers {
 
     static {
-        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CustomTabs.GTMTHINGS_TAB);
+        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CustomTabs.WIRELESS_TAB);
     }
     public static final int[] ALL_TIERS = GTValues.tiersBetween(GTValues.LV,
             GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV);
