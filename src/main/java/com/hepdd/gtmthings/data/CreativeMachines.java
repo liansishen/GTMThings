@@ -9,10 +9,8 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeEnergyHatchPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputBusPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputHatchPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeLaserHatchPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.*;
+import com.hepdd.gtmthings.common.registry.GTMTRegistration;
 import net.minecraft.network.chat.Component;
 
 import java.util.Locale;
@@ -25,10 +23,9 @@ public class CreativeMachines {
 
     public static final int[] ALL_TIERS = GTValues.tiersBetween(LV, MAX);
     public static final int[] HIGH_TIERS = GTValues.tiersBetween(IV, MAX);
-    public static final int[] WIRELL_ENERGY_HIGH_TIERS = GTValues.tiersBetween(EV,MAX);
 
     static {
-        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CustomTabs.CREATIVE_TAB);
+        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.CREATIVE_TAB);
     }
 
     public static final MachineDefinition CREATIVE_FLUID_INPUT_HATCH = GTMTHINGS_REGISTRATE.machine(
@@ -72,27 +69,13 @@ public class CreativeMachines {
     public static final MachineDefinition[] LASER_INPUT_HATCH_67108864 = registerCreativeLaserHatch(IO.IN,67108864,PartAbility.INPUT_LASER);
 
 
-
-
-
-
-//    public static final MachineDefinition[] HUGE_ITEM_IMPORT_BUS = registerTieredMachines(
-//            "huge_input_bus",
-//            (holder, tier) -> new HugeItemBusPartMachine(holder,tier,IO.IN),
-//            (tier, builder) -> builder
-//                    .langValue(VNF[tier] + " Input Bus")
-//                    .rotationState(RotationState.ALL)
-//                    .abilities(
-//                            tier == 0 ? new PartAbility[] { PartAbility.IMPORT_ITEMS, PartAbility.STEAM_IMPORT_ITEMS } :
-//                                    new PartAbility[] { PartAbility.IMPORT_ITEMS })
-//                    .overlayTieredHullRenderer("item_bus.import")
-//                    .tooltips(Component.translatable("gtmthings.machine.item_bus.import.tooltip"),
-//                            Component.translatable("gtmthings.universal.tooltip.item_storage_capacity",
-//                                    (1 + Math.min(9, tier)) * (1 + Math.min(9, tier))))
-//                    .compassNode("item_bus")
-//                    .register(),
-//            ALL_TIERS);
-
+//    public static final MachineDefinition TEST_INPUT_MACHINE = GTMTHINGS_REGISTRATE
+//            .machine("test_input_machine", testInputBusPartMachine::new)
+//            .abilities(PartAbility.IMPORT_ITEMS)
+//            .overlayTieredHullRenderer("item_bus.import")
+//            .rotationState(RotationState.ALL)
+//            .tier(14)
+//            .register();
 
     public static MachineDefinition[] registerTieredMachines(String name,
                                                              BiFunction<IMachineBlockEntity, Integer, MetaMachine> factory,

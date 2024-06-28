@@ -55,7 +55,7 @@ public class CustomItems {
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.1"));
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.2"));
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3",GTValues.V[tier]));
-                }), new CoverPlaceBehavior(CustomCovers.WIRELESS_ENERGY_RECEIVE[tier-1]))).register();
+                }), new CoverPlaceBehavior(WirelessCovers.WIRELESS_ENERGY_RECEIVE[tier-1]))).register();
     }
 
     public static <T extends ItemLike> NonNullConsumer<T> compassNode(CompassSection section, CompassNode... preNodes) {

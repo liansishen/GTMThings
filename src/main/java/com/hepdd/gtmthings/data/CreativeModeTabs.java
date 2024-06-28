@@ -11,7 +11,7 @@ import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REG
 import static com.hepdd.gtmthings.data.WirelessMachines.WIRELESS_ENERGY_INPUT_HATCH;
 
 
-public class CustomTabs {
+public class CreativeModeTabs {
 
     public static final RegistryEntry<CreativeModeTab> CREATIVE_TAB = GTMTHINGS_REGISTRATE
             .defaultCreativeTab("creative",builder -> builder

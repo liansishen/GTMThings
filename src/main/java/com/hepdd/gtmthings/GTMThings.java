@@ -76,13 +76,13 @@ public class GTMThings {
     }
 
     private void registerMachines(GTCEuAPI.RegisterEvent<ResourceLocation, MachineDefinition> event) {
-        CustomTabs.init();
+        CreativeModeTabs.init();
         CreativeMachines.init();
         WirelessMachines.init();
     }
 
     private void registerCovers(GTCEuAPI.RegisterEvent<ResourceLocation, CoverDefinition> event) {
-        CustomCovers.init();
+        WirelessCovers.init();
         CustomItems.init();
     }
 

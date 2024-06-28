@@ -26,7 +26,7 @@ public class WirelessMachines {
     public static final int[] WIRELL_ENERGY_HIGH_TIERS = GTValues.tiersBetween(EV,MAX);
 
     static {
-        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CustomTabs.WIRELESS_TAB);
+        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.WIRELESS_TAB);
     }
 
     public static final MachineDefinition WIRELESS_ENERGY_MONITOR = GTMTHINGS_REGISTRATE

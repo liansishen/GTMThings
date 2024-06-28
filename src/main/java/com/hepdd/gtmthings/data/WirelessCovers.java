@@ -15,10 +15,10 @@ import java.util.Locale;
 
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 
-public class CustomCovers {
+public class WirelessCovers {
 
     static {
-        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CustomTabs.WIRELESS_TAB);
+        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.WIRELESS_TAB);
     }
     public static final int[] ALL_TIERS = GTValues.tiersBetween(GTValues.LV,
             GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV);
