@@ -49,6 +49,11 @@ public class WirelessMachines {
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH = registerWirelessEnergyHatch(IO.OUT,2,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_4A = registerWirelessEnergyHatch(IO.OUT,4,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_16A = registerWirelessEnergyHatch(IO.OUT,16,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_256A = registerWirelessEnergyHatch(IO.OUT,256,PartAbility.OUTPUT_ENERGY, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_1024A = registerWirelessEnergyHatch(IO.OUT,1024,PartAbility.OUTPUT_ENERGY, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_4096A = registerWirelessEnergyHatch(IO.OUT,4096,PartAbility.OUTPUT_ENERGY, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_16384A = registerWirelessEnergyHatch(IO.OUT,16384,PartAbility.OUTPUT_ENERGY, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_65536A = registerWirelessEnergyHatch(IO.OUT,65536,PartAbility.OUTPUT_ENERGY, WIRELL_ENERGY_HIGH_TIERS);
 
     public static MachineDefinition[] registerTieredMachines(String name,
                                                              BiFunction<IMachineBlockEntity, Integer, MetaMachine> factory,
