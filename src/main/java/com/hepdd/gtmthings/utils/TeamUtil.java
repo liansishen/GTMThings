@@ -13,7 +13,7 @@ import java.util.UUID;
 public class TeamUtil {
 
     public static UUID getTeamUUID(UUID playerUUID) {
-        if (LDLib.isModLoaded("ftbteams")) {
+        if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
             var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
             return team.map(Team::getTeamId).orElse(playerUUID);
         } else{
@@ -22,7 +22,7 @@ public class TeamUtil {
     }
 
     public static Component GetName(Player player) {
-        if (LDLib.isModLoaded("ftbteams")) {
+        if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
             return FTBTeamsAPI.api().getManager().getTeamForPlayerID(player.getUUID()).get().getName();
         } else {
             return player.getName();
@@ -30,7 +30,7 @@ public class TeamUtil {
     }
 
     public static Component GetName(Level level,UUID playerUUID) {
-        if (LDLib.isModLoaded("ftbteams")) {
+        if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
             Component name;
             var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
             if (team.isPresent()) {
@@ -44,7 +44,7 @@ public class TeamUtil {
     }
 
     public static boolean hasOwner(Level level,UUID playerUUID) {
-        if (LDLib.isModLoaded("ftbteams")) {
+        if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
             var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
             if (team.isPresent()) {
                 return true;
