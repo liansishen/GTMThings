@@ -9,8 +9,10 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.*;
-import com.hepdd.gtmthings.common.registry.GTMTRegistration;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeEnergyHatchPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputBusPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputHatchPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeLaserHatchPartMachine;
 import net.minecraft.network.chat.Component;
 
 import java.util.Locale;

@@ -29,7 +29,7 @@ public class WirelessEnergySavaedData extends SavedData {
         ListTag allEnergy = tag.getList("allEnergy", Tag.TAG_COMPOUND);
         for (int i = 0; i < allEnergy.size(); i++) {
             CompoundTag engTag = allEnergy.getCompound(i);
-            GlobalVariableStorage.GlobalEnergy.put(engTag.getUUID("uuid"), BigInteger.valueOf(engTag.getLong("energy")));
+            GlobalVariableStorage.GlobalEnergy.put(engTag.getUUID("uuid"), new BigInteger(engTag.getString("energy")));
         }
     }
 
@@ -39,7 +39,7 @@ public class WirelessEnergySavaedData extends SavedData {
         for(var entry: GlobalVariableStorage.GlobalEnergy.entrySet()) {
             CompoundTag engTag = new CompoundTag();
             engTag.putUUID("uuid",entry.getKey());
-            engTag.putLong("energy",entry.getValue().longValue());
+            engTag.putString("energy",entry.getValue().toString());
 
             allEnergy.add(engTag);
         }

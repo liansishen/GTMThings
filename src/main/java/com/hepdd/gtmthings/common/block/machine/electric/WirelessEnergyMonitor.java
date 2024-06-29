@@ -11,12 +11,14 @@ import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -27,6 +29,8 @@ import java.util.UUID;
 import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.getUserEU;
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class WirelessEnergyMonitor extends MetaMachine
                 implements IFancyUIMachine {
 
@@ -97,12 +101,14 @@ public class WirelessEnergyMonitor extends MetaMachine
         BigDecimal avgEnergy = getAvgUsage(energyTotal);
         Component voltageName = Component.literal(
                 GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
+        BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.V[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]),1,RoundingMode.FLOOR);
+
         if (avgEnergy.compareTo(BigDecimal.valueOf(0)) > 0) {
             textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
-                    FormattingUtil.formatNumbers(avgEnergy.abs()),voltageName).withStyle(ChatFormatting.GRAY));
+                    FormattingUtil.formatNumbers(avgEnergy.abs()),voltageAmperage,voltageName).withStyle(ChatFormatting.GRAY));
         } else {
             textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
-                    FormattingUtil.formatNumbers(avgEnergy.abs()),voltageName).withStyle(ChatFormatting.GRAY));
+                    FormattingUtil.formatNumbers(avgEnergy.abs()),voltageAmperage,voltageName).withStyle(ChatFormatting.GRAY));
         }
 
     }

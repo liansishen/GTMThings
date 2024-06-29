@@ -2,6 +2,7 @@ package com.hepdd.gtmthings.integration.jade.provider;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
+import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.gregtechceu.gtceu.integration.jade.provider.CapabilityBlockProvider;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.GTMThings;
@@ -81,7 +82,7 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
         var metaMachine = metaMachineBlockEntity.getMetaMachine();
         if (metaMachine instanceof WirelessEnergyHatchPartMachine) {
             machineType = 1;
-        } else if (metaMachine instanceof SimpleTieredMachine) {
+        } else if (metaMachine instanceof SimpleTieredMachine || metaMachine instanceof BatteryBufferMachine) {
             if (!capData.hasUUID("uuid")) return;
             machineType = 2;
         } else {

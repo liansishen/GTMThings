@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "gtmthings:item/opv_4a_wireless_energy_receive_cover"
+  }
+}

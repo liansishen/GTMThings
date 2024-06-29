@@ -42,43 +42,70 @@ public class CustomItems {
                     })))
             .register();
 
-     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LV =
-             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LV);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LV =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_MV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",MV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",MV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_HV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",HV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",HV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_EV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",EV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",EV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_IV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",IV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",IV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LUV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LuV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LuV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_ZPM =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",ZPM);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",ZPM,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UHV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UHV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UHV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UEV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UEV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UEV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UIV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UIV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UIV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UXV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UXV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UXV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV);
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV,1);
+
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_MV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",MV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_HV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",HV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_EV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",EV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_IV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",IV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LUV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LuV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_ZPM_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",ZPM,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UHV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UHV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UEV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UEV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UIV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UIV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UXV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UXV,4);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A =
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV,4);
 
 
-    private static ItemEntry<ComponentItem> registerTieredCover(String name, String lang,int tier) {
+    private static ItemEntry<ComponentItem> registerTieredCover(String name, String lang,int tier,int amperage) {
         return GTMTHINGS_REGISTRATE
-                .item(GTValues.VN[tier].toLowerCase(Locale.ROOT) + "_" + name, ComponentItem::create)
+                .item(GTValues.VN[tier].toLowerCase(Locale.ROOT) + "_" + (amperage == 1 ? "" :amperage + "a_") + name, ComponentItem::create)
                 .lang(VNF[tier] + " " + lang)
                 .onRegister(attach(new TooltipBehavior(lines -> {
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.1"));
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.2"));
-                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3",GTValues.V[tier]));
-                }), new CoverPlaceBehavior(WirelessCovers.WIRELESS_ENERGY_RECEIVE[tier-1]))).register();
+                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3",GTValues.V[tier] * amperage));
+                }), new CoverPlaceBehavior(amperage==1?WirelessCovers.WIRELESS_ENERGY_RECEIVE[tier-1]:WirelessCovers.WIRELESS_ENERGY_RECEIVE_4A[tier-1]))).register();
     }
 
     public static <T extends ItemLike> NonNullConsumer<T> compassNode(CompassSection section, CompassNode... preNodes) {
