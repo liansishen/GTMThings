@@ -41,11 +41,16 @@ When used as a cover, it draws energy from the grid to power the machine.<br>
 Only usable on single-block machines. Cannot install a cover that exceeds the machine's voltage level on the machine.<br>
 The transfer rate is 1A of the current voltage level<br>
 
+## Wireless Item Transfer Cover
+When used as a cover, it draws Item from the bind container to the machine.
+
+## Wireless Fluid Transfer Cover
+When used as a cover, it draws Fluid from the bind container to the machine.
+
+
 # Machines Planned to be Added
 * Giant Input Bus
 * Giant Output Bus
-* Remote Input Bus -> Ender Item Cover
-* Ender Fluid Cover Youth Edition
 * Programmable Circuit Series
 
 ---
@@ -85,10 +90,12 @@ Make GregTech-Modern great again!
 作覆盖板时从电网拉取能量传输到机器。<br>
 只可用于单方块机器。无法将超过机器电压等级的覆盖版安装到机器上。<br>
 传输速率为当前电压等级的1A<br>
+## 无线物品传输覆盖板
+作覆盖板时机器中提取物品到绑定的容器中。
+## 无线流体传输覆盖板
+作覆盖板时机器中提取流体到绑定的容器中。
 
 # 计划添加的机器
 * 巨型输入总线
 * 巨型输出总线
-* 远程输入总线->末影物品覆盖版
-* 末影流体覆盖版青春版
 * 可编程电路系列

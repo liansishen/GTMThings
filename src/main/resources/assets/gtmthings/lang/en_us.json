@@ -266,6 +266,14 @@
   "item.gtmthings.wireless_energy_receive_cover.tooltip.2": "§7Can only used for single block machine.Can't put on the machine blow the cover's voltage",
   "item.gtmthings.wireless_energy_receive_cover.tooltip.3": "§bEnergy transfer speed: §f%s §7EU/t",
   "config.jade.plugin_gtmthings.wireless_energy_hatch_provider":"[gtmthings] Wireless Energy Monitor",
+  "item.gtmthings.wireless_item_transfer_cover": "Wireless Item Transfer Cover",
+  "item.gtmthings.wireless_fluid_transfer_cover": "Wireless Fluid Transfer Cover",
+  "item.gtmthings.wireless_transfer.tooltip.1": "§7Bind to: §f%s (%s)",
+  "item.gtmthings.wireless_transfer.tooltip.2": "§7Right click the container with shift to bind container.Right click the air with shift to unbind.",
+  "item.gtmthings.wireless_transfer.tooltip.bind.1": "Success bind to: %s (%s)",
+  "item.gtmthings.wireless_transfer.tooltip.bind.2": "Success unbind.",
+  "item.gtmthings.wireless_transfer.item.tooltip.1": "§7Transfer §bItem§7 to binded container from the machine as §fCover§7.",
+  "item.gtmthings.wireless_transfer.fluid.tooltip.1": "§7Transfer §bFluid§7 to binded container from the machine as §fCover§7.",
   "itemGroup.gtmthings.creative": "Creative Things",
-  "itemGroup.gtmthings.wireless": "Wireless Energy"
+  "itemGroup.gtmthings.wireless": "Gregtech Wireless"
 }

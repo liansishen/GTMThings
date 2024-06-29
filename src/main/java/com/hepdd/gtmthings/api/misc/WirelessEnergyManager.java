@@ -31,6 +31,12 @@ public class WirelessEnergyManager {
 
         // Get the teams total energy stored. If they are not in the map, return 0 EU.
         BigInteger totalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(teamUUID, BigInteger.ZERO);
+        // When totalEU < 0,set it to 0 and save.
+        if (totalEU.signum() <0) {
+            totalEU = BigInteger.ZERO;
+            GlobalVariableStorage.GlobalEnergy.put(getTeamUUID(user_uuid), totalEU);
+        }
+
         totalEU = totalEU.add(EU);
 
         // Get personal energy,when > 0, add to team energy and clear personal energy.
@@ -62,7 +68,13 @@ public class WirelessEnergyManager {
     // ------------------------------------------------------------------------------------
 
     public static BigInteger getUserEU(UUID user_uuid) {
-        return GlobalVariableStorage.GlobalEnergy.getOrDefault(getTeamUUID(user_uuid), BigInteger.ZERO);
+        BigInteger totalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(getTeamUUID(user_uuid), BigInteger.ZERO);
+        if (totalEU.signum() <0) {
+            WirelessEnergySavaedData.INSTANCE.setDirty(true);
+            totalEU = BigInteger.ZERO;
+            GlobalVariableStorage.GlobalEnergy.put(getTeamUUID(user_uuid), totalEU);
+        }
+        return totalEU;
     }
 
     // This overwrites the EU in the network. Only use this if you are absolutely sure you know what you are doing.

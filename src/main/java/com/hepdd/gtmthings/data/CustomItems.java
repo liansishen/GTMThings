@@ -6,6 +6,8 @@ import com.gregtechceu.gtceu.api.registry.registrate.CompassNode;
 import com.gregtechceu.gtceu.api.registry.registrate.CompassSection;
 import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
 import com.gregtechceu.gtceu.common.item.TooltipBehavior;
+import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverPlaceBehavior;
+import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverTooltipBehavior;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import net.minecraft.network.chat.Component;
@@ -19,6 +21,26 @@ import static com.gregtechceu.gtceu.common.data.GTItems.attach;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 
 public class CustomItems {
+
+    public static ItemEntry<ComponentItem> WIRELESS_ITEM_TRANSFER_COVER = GTMTHINGS_REGISTRATE
+            .item("wireless_item_transfer_cover",ComponentItem::create)
+            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(WirelessCovers.WIRELESS_ITEM_TRANSFER),
+                    new CoverPlaceBehavior(WirelessCovers.WIRELESS_ITEM_TRANSFER),
+                    new WirelessTransferCoverTooltipBehavior(lines->{
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.item.tooltip.1"));
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
+                    })))
+            .register();
+
+    public static ItemEntry<ComponentItem> WIRELESS_FLUID_TRANSFER_COVER = GTMTHINGS_REGISTRATE
+            .item("wireless_fluid_transfer_cover",ComponentItem::create)
+            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(WirelessCovers.WIRELESS_FLUID_TRANSFER),
+                    new CoverPlaceBehavior(WirelessCovers.WIRELESS_FLUID_TRANSFER),
+                    new WirelessTransferCoverTooltipBehavior(lines->{
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.fluid.tooltip.1"));
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
+                    })))
+            .register();
 
      public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LV =
              registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LV);
@@ -46,6 +68,7 @@ public class CustomItems {
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UXV);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV =
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV);
+
 
     private static ItemEntry<ComponentItem> registerTieredCover(String name, String lang,int tier) {
         return GTMTHINGS_REGISTRATE
