@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.machine.feature.IExplosionMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableLaserContainer;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.hepdd.gtmthings.api.capability.IBindable;
