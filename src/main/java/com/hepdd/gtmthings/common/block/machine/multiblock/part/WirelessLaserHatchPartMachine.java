@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableLaserContainer;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
@@ -37,10 +38,10 @@ import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implements IInteractedMachine, IBindable, IExplosionMachine, IMachineLife {
+public class WirelessLaserHatchPartMachine extends TieredIOPartMachine implements IInteractedMachine, IBindable, IExplosionMachine, IMachineLife {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            WirelessEnergyHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
+            WirelessLaserHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
 
     @Override
     public ManagedFieldHolder getFieldHolder() {
@@ -50,24 +51,24 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     @Persisted
     public UUID owner_uuid;
     @Persisted
-    public final NotifiableEnergyContainer energyContainer;
+    public final NotifiableLaserContainer energyContainer;
     @Getter
     protected int amperage;
     private TickableSubscription updEnergySubs;
 
-    public WirelessEnergyHatchPartMachine(IMachineBlockEntity holder, int tier, IO io, int amperage, Object... args) {
+    public WirelessLaserHatchPartMachine(IMachineBlockEntity holder, int tier, IO io, int amperage, Object... args) {
         super(holder, tier, io);
         this.amperage = amperage;
         this.energyContainer = createEnergyContainer(args);
     }
 
-    protected NotifiableEnergyContainer createEnergyContainer(Object... args) {
-        NotifiableEnergyContainer container;
+    protected NotifiableLaserContainer createEnergyContainer(Object... args) {
+        NotifiableLaserContainer container;
         if (io == IO.OUT) {
-            container = NotifiableEnergyContainer.emitterContainer(this, GTValues.V[tier] * 64L * amperage,
+            container = NotifiableLaserContainer.emitterContainer(this, GTValues.V[tier] * 64L * amperage,
                     GTValues.V[tier], amperage);
         } else {
-            container = NotifiableEnergyContainer.receiverContainer(this, GTValues.V[tier] * 16L * amperage,
+            container = NotifiableLaserContainer.receiverContainer(this, GTValues.V[tier] * 64L * amperage,
                     GTValues.V[tier], amperage);
         }
         return container;

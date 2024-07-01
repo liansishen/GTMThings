@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessEnergyHatchPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessLaserHatchPartMachine;
 import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -37,15 +38,29 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
     protected @Nullable IBindable getCapability(Level level, BlockPos pos, @Nullable Direction side) {
         if (level.getBlockEntity(pos) instanceof MetaMachineBlockEntity metaMachineBlockEntity){
             var metaMachine = metaMachineBlockEntity.getMetaMachine();
-            if (metaMachine instanceof WirelessEnergyHatchPartMachine we && we.owner_uuid != null) {
+            if (metaMachine instanceof WirelessEnergyHatchPartMachine we && we.owner_uuid != null){
                 UUID uuid = we.owner_uuid;
                 return new IBindable() {
                     @Override
                     public UUID getUUID() {
                         return uuid;
                     }
+
                     @Override
-                    public void setUUID(UUID uuid1) { }
+                    public void setUUID(UUID uuid1) {
+                    }
+                };
+            } else if (metaMachine instanceof WirelessLaserHatchPartMachine wl && wl.owner_uuid != null) {
+                UUID uuid = wl.owner_uuid;
+                return new IBindable() {
+                    @Override
+                    public UUID getUUID() {
+                        return uuid;
+                    }
+
+                    @Override
+                    public void setUUID(UUID uuid1) {
+                    }
                 };
             } else if (metaMachine instanceof SimpleTieredMachine simpleTieredMachine) {
                 var covers = simpleTieredMachine.getCoverContainer().getCovers();
@@ -80,7 +95,7 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
         int machineType;
         if (!(blockEntity instanceof MetaMachineBlockEntity metaMachineBlockEntity)) return;
         var metaMachine = metaMachineBlockEntity.getMetaMachine();
-        if (metaMachine instanceof WirelessEnergyHatchPartMachine) {
+        if (metaMachine instanceof WirelessEnergyHatchPartMachine || metaMachine instanceof WirelessLaserHatchPartMachine) {
             machineType = 1;
         } else if (metaMachine instanceof SimpleTieredMachine || metaMachine instanceof BatteryBufferMachine) {
             if (!capData.hasUUID("uuid")) return;
