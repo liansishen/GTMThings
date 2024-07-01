@@ -369,6 +369,8 @@
   "gtmthings.machine.energy_hatch.output.tooltip": "为多方块结构输出能量",
   "gtmthings.machine.wireless_energy_hatch.input.tooltip": "手持闪存右键点击能源仓可绑定·变更所有者，左键点击可解除绑定。",
   "gtmthings.machine.wireless_energy_hatch.output.tooltip": "手持闪存右键点击动力仓可绑定·变更所有者，左键点击可解除绑定。",
+  "gtmthings.machine.wireless_energy_hatch.target.tooltip": "手持闪存右键点击激光靶仓可绑定·变更所有者，左键点击可解除绑定。",
+  "gtmthings.machine.wireless_energy_hatch.source.tooltip": "手持闪存右键点击激光源仓可绑定·变更所有者，左键点击可解除绑定。",
   "gtmthings.machine.wireless_energy_hatch.tooltip.bind": "成功绑定至：%s",
   "gtmthings.machine.wireless_energy_hatch.tooltip.unbind": "解除绑定成功",
   "gtmthings.machine.wireless_energy_hatch.tooltip.1": "未绑定所有者",
