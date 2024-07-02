@@ -1,12 +1,10 @@
 package com.hepdd.gtmthings.data;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeSerializer;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.common.data.GTSoundEntries;
 import com.hepdd.gtmthings.GTMThings;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -17,7 +15,7 @@ public class GTMTRecipeTypes {
 
     public static final String ELECTRIC = "electric";
 
-    public final static GTRecipeType DIGITAL_MINER = register("digital_miner", ELECTRIC)
+    public final static GTRecipeType DIGITAL_MINER_RECIPE = register("digital_miner", ELECTRIC)
             .setMaxIOSize(0, 27, 0, 0).setEUIO(IO.IN)
             .setSlotOverlay(false, false, GuiTextures.SLOT)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, LEFT_TO_RIGHT);

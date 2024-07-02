@@ -29,8 +29,14 @@ public class CreativeModeTabs {
                     .build())
             .register();
 
-    public static void init(){
-        GTMThings.LOGGER.info("CustomTabs init");
-    }
+    public static final RegistryEntry<CreativeModeTab> MORE_MACHINES = GTMTHINGS_REGISTRATE
+            .defaultCreativeTab("more_machines",builder -> builder
+                    .displayItems(new GTCreativeModeTabs.RegistrateDisplayItemsGenerator("more_machines", GTMTHINGS_REGISTRATE))
+                    .title(GTMTHINGS_REGISTRATE.addLang("itemGroup", GTMThings.id("more_machines"), GTMThings.NAME))
+                    .icon(WIRELESS_ENERGY_INPUT_HATCH[GTValues.MAX-1]::asStack)
+                    .build())
+            .register();
+
+    public static void init(){ }
 
 }

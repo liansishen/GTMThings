@@ -1,62 +1,35 @@
 package com.hepdd.gtmthings.common.block.machine.electric;
 
-import com.google.common.collect.Table;
-import com.google.common.collect.Tables;
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.IControllable;
-import com.gregtechceu.gtceu.api.capability.IMiner;
-import com.gregtechceu.gtceu.api.capability.IWorkable;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.capability.recipe.IRecipeHandler;
-import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
-import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.cover.filter.ItemFilter;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
-import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.WorkableTieredMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.misc.IgnoreEnergyRecipeHandler;
-import com.gregtechceu.gtceu.api.misc.ItemRecipeHandler;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMachines;
-import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
-import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
-import com.gregtechceu.gtceu.utils.GTTransferUtils;
-import com.gregtechceu.gtceu.utils.OreDictExprFilter;
-import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
+import com.hepdd.gtmthings.api.capability.IDigitalMiner;
+import com.hepdd.gtmthings.api.gui.widget.SimpleNumberInputWidget;
 import com.hepdd.gtmthings.common.block.machine.trait.miner.DigitalMinerLogic;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
-import com.lowdragmc.lowdraglib.misc.ItemTransferList;
-import com.lowdragmc.lowdraglib.side.item.IItemTransfer;
+import com.lowdragmc.lowdraglib.misc.ItemStackTransfer;
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
-import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.TickTask;
@@ -64,148 +37,69 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static com.gregtechceu.gtceu.api.GTValues.MV;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DigitalMiner extends WorkableTieredMachine
-        implements IControllable, IFancyUIMachine, IDataInfoProvider {
+        implements IDigitalMiner, IControllable, IFancyUIMachine, IDataInfoProvider {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(DigitalMiner.class,
             WorkableTieredMachine.MANAGED_FIELD_HOLDER);
 
-    private final int INVENTORY_SIZE = 27;
-    private static final Pattern DOUBLE_WILDCARD = Pattern.compile("\\*{2,}");
-    private static final Pattern DOUBLE_AND = Pattern.compile("&{2,}");
-    private static final Pattern DOUBLE_OR = Pattern.compile("\\|{2,}");
-    private static final Pattern DOUBLE_NOT = Pattern.compile("!{2,}");
-    private static final Pattern DOUBLE_XOR = Pattern.compile("\\^{2,}");
-    private static final Pattern DOUBLE_SPACE = Pattern.compile(" {2,}");
 
-    private final long energyPerTick;
+    private long energyPerTick;
     @Nullable
     protected TickableSubscription autoOutputSubs;
     @Nullable
     protected ISubscription exportItemSubs, energySubs;
     @Persisted
-    protected NotifiableItemStackHandler inventory;
-
-    @Nullable
-    private ItemTransferList cachedItemTransfer = null;
+    protected final ItemStackTransfer filterInventory;
     @Getter
-    private final int fortune;
-    @Getter
-    private final int speed;
-    @Getter
-    private final int maximumRadius;
-    @Getter
-    public ItemStack pickaxeTool;
-    private final LinkedList<BlockPos> blocksToMine = new LinkedList<>();
-    @Getter
-    @Persisted
-    protected int x = Integer.MAX_VALUE;
-    @Getter
-    @Persisted
-    protected int y = Integer.MAX_VALUE;
-    @Getter
-    @Persisted
-    protected int z = Integer.MAX_VALUE;
-    @Getter
-    @Persisted
-    protected int startX = Integer.MAX_VALUE;
-    @Getter
-    @Persisted
-    protected int startZ = Integer.MAX_VALUE;
-    @Getter
-    @Persisted
-    protected int startY = Integer.MAX_VALUE;
-    @Getter
-    @Persisted
-    protected int mineX = Integer.MAX_VALUE;
-    @Getter
-    @Persisted
-    protected int mineZ = Integer.MAX_VALUE;
-    @Getter
-    @Persisted
-    protected int mineY = Integer.MAX_VALUE;
-    @Getter
-    private int minBuildHeight = Integer.MAX_VALUE;
+    protected ItemFilter itemFilter;
+    // widget
+    protected SlotWidget filterSlot;
+    protected ButtonWidget resetButton;
+    protected ButtonWidget silkButton;
+    protected ButtonWidget fortuneButton;
+    protected ButtonWidget overClockButton;
+    // miner property
     @Getter
     @Setter
     @Persisted
-    private int currentRadius;
+    private int minerRadius;
     @Getter
+    @Setter
     @Persisted
-    private boolean isDone;
+    private int minHeight;
     @Getter
-    private boolean isInventoryFull;
-    @Getter
-    private final Table<IO, RecipeCapability<?>, List<IRecipeHandler<?>>> capabilitiesProxy;
-    private final ItemRecipeHandler inputItemHandler, outputItemHandler;
-    private final IgnoreEnergyRecipeHandler inputEnergyHandler;
-    @Getter
-    private int oreAmount;
-    private TickableSubscription mineSubs;
+    @Setter
+    @Persisted
+    private int maxHeight;
+    private int silkLevel;
+    private int fortuneLevel;
 
-
-    public DigitalMiner(IMachineBlockEntity holder, int tier, int speed, int maximumRadius, int fortune,
-                        Object... args) {
-        super(holder, tier, GTMachines.defaultTankSizeFunction, args, (tier + 1) * (tier + 1), fortune, speed,
-                maximumRadius);
-        this.energyPerTick = GTValues.V[tier - 1];
-        this.setWorkingEnabled(false);
-        this.inventory = createInventory();
-        this.fortune = fortune;
-        this.speed = speed;
-        this.currentRadius = maximumRadius;
-        this.maximumRadius = maximumRadius;
-        this.isDone = false;
-        this.pickaxeTool = GTItems.TOOL_ITEMS.get(GTMaterials.Neutronium, GTToolType.PICKAXE).get().get();
-        this.pickaxeTool.enchant(Enchantments.BLOCK_FORTUNE, fortune);
-        this.capabilitiesProxy = Tables.newCustomTable(new EnumMap<>(IO.class), IdentityHashMap::new);
-        this.inputItemHandler = new ItemRecipeHandler(IO.IN, INVENTORY_SIZE);
-        this.outputItemHandler = new ItemRecipeHandler(IO.OUT,INVENTORY_SIZE);
-        this.inputEnergyHandler = new IgnoreEnergyRecipeHandler();
-        this.capabilitiesProxy.put(IO.IN, inputItemHandler.getCapability(), List.of(inputItemHandler));
-        this.capabilitiesProxy.put(IO.IN, inputEnergyHandler.getCapability(), List.of(inputEnergyHandler));
-        this.capabilitiesProxy.put(IO.OUT, outputItemHandler.getCapability(), List.of(outputItemHandler));
-        if(this.oreDictFilterExpression==null){
-            this.oreDictFilterExpression="";
-        }
-        if (!this.oreDictFilterExpression.isEmpty()) {
-            SetOreFilter(this.oreDictFilterExpression);
-        }
-    }
-
-    protected NotifiableItemStackHandler createInventory() {
-        return new NotifiableItemStackHandler(this, INVENTORY_SIZE, IO.OUT, IO.OUT, UnlimitedItemStackTransfer::new) {
-
-            @Override
-            public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate, boolean notifyChanges) {
-                var extracted = super.extractItem(slot, amount, simulate, notifyChanges).copy();
-                if (!extracted.isEmpty()) {
-                    extracted.setCount(Integer.MAX_VALUE);
-                }
-                return extracted;
-            }
-        };
+    public DigitalMiner(IMachineBlockEntity holder,Object... args) {
+        super(holder, MV, GTMachines.defaultTankSizeFunction, args);
+        this.energyPerTick = GTValues.V[MV-1];
+        this.filterInventory = createFilterItemHandler();
+        this.fortuneLevel = 1;
+        this.silkLevel = 0;
+        this.minHeight = 0;
+        this.maxHeight = 64;
+        this.minerRadius = 32;
+        setWorkingEnabled(false);
     }
 
     //////////////////////////////////////
@@ -213,20 +107,32 @@ public class DigitalMiner extends WorkableTieredMachine
     //////////////////////////////////////
 
     @Override
-    protected NotifiableItemStackHandler createImportItemHandler(Object... args) {
-        return new NotifiableItemStackHandler(this, 0, IO.NONE);
+    public ManagedFieldHolder getFieldHolder() {
+        return MANAGED_FIELD_HOLDER;
+    }
+
+    protected ItemStackTransfer createFilterItemHandler() {
+        var transfer = new ItemStackTransfer();
+        transfer.setFilter(
+                item -> item.is(GTItems.ITEM_FILTER.asItem()) || item.is(GTItems.ORE_DICTIONARY_FILTER.asItem()));
+        return transfer;
     }
 
     @Override
-    protected NotifiableItemStackHandler createExportItemHandler(Object... args) {
-        return new NotifiableItemStackHandler(this, INVENTORY_SIZE, IO.OUT, IO.BOTH);
+    protected RecipeLogic createRecipeLogic(Object... args) {
+        return new DigitalMinerLogic(this, minerRadius,minHeight,maxHeight,silkLevel,itemFilter);
     }
 
     @Override
     public void onDrops(List<ItemStack> drops, Player entity) {
         clearInventory(drops, exportItems.storage);
+        clearInventory(drops, filterInventory);
     }
 
+    @Override
+    public DigitalMinerLogic getRecipeLogic() {
+        return (DigitalMinerLogic) super.getRecipeLogic();
+    }
 
     @Override
     public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
@@ -238,23 +144,17 @@ public class DigitalMiner extends WorkableTieredMachine
     public void onLoad() {
         super.onLoad();
         if (!isRemote()) {
+            filterChange();
             if (getLevel() instanceof ServerLevel serverLevel) {
                 serverLevel.getServer().tell(new TickTask(0, this::updateAutoOutputSubscription));
             }
-            mineSubs = subscribeServerTick(mineSubs, this::doMineSubscription);
             exportItemSubs = exportItems.addChangedListener(this::updateAutoOutputSubscription);
-            //updateTickSubscription();
         }
     }
 
     @Override
     public void onUnload() {
         super.onUnload();
-        if (mineSubs != null) {
-            mineSubs.unsubscribe();
-            mineSubs = null;
-        }
-
         if (exportItemSubs != null) {
             exportItemSubs.unsubscribe();
             exportItemSubs = null;
@@ -263,16 +163,6 @@ public class DigitalMiner extends WorkableTieredMachine
         if (energySubs != null) {
             energySubs.unsubscribe();
             energySubs = null;
-        }
-    }
-    public void updateTickSubscription() {
-        if (getRecipeLogic().isSuspend() || !isRecipeLogicAvailable()) {
-            if (mineSubs != null) {
-                mineSubs.unsubscribe();
-                mineSubs = null;
-            }
-        } else {
-            mineSubs = subscribeServerTick(mineSubs, this::doMineSubscription);
         }
     }
 
@@ -290,6 +180,7 @@ public class DigitalMiner extends WorkableTieredMachine
         }
     }
 
+
     protected void autoOutput() {
         if (getOffsetTimer() % 5 == 0) {
             exportItems.exportToNearby(getFrontFacing());
@@ -297,405 +188,7 @@ public class DigitalMiner extends WorkableTieredMachine
         updateAutoOutputSubscription();
     }
 
-
-    protected void doMineSubscription() {
-        if (!isWorkingEnabled()) return;
-        if (!getRecipeLogic().isSuspend() && getLevel() instanceof ServerLevel serverLevel && checkCanMine()) {
-            if (!isInventoryFull()) {
-                // always drain storages when working, even if blocksToMine ends up being empty
-                drainInput(false);
-                // since energy is being consumed the miner is now active
-                getRecipeLogic().setStatus(RecipeLogic.Status.WORKING);
-            } else {
-                // the miner cannot drain, therefore it is inactive
-                if (getRecipeLogic().isWorking()) {
-                    getRecipeLogic().setWaiting(Component.translatable("gtceu.recipe_logic.insufficient_out").append(": ")
-                            .append(ItemRecipeCapability.CAP.getName()));
-                }
-            }
-
-            if (blocksToMine.isEmpty()) {
-                checkBlocksToMine();
-                this.oreAmount = blocksToMine.size();
-            }
-
-            if (getOffsetTimer() % this.speed == 0 && !blocksToMine.isEmpty()) {
-                NonNullList<ItemStack> blockDrops = NonNullList.create();
-                BlockState blockState = serverLevel.getBlockState(blocksToMine.getFirst());
-
-                // check to make sure the ore is still there,
-                while (!blockState.is(CustomTags.ORE_BLOCKS)) {
-                    blocksToMine.removeFirst();
-                    this.oreAmount = blocksToMine.size();
-                    if (blocksToMine.isEmpty()) break;
-                    blockState = serverLevel.getBlockState(blocksToMine.getFirst());
-                }
-                // When we are here we have an ore to mine! I'm glad we aren't threaded
-                if (!blocksToMine.isEmpty() & blockState.is(CustomTags.ORE_BLOCKS)) {
-                    LootParams.Builder builder = new LootParams.Builder(serverLevel)
-                            .withParameter(LootContextParams.BLOCK_STATE, blockState)
-                            .withParameter(LootContextParams.ORIGIN, Vec3.atLowerCornerOf(blocksToMine.getFirst()))
-                            .withParameter(LootContextParams.TOOL, getPickaxeTool());
-
-                    // get the block's drops.
-                    getRegularBlockDrops(blockDrops, blockState, builder);
-
-                    // try to insert them
-                    mineAndInsertItems(blockDrops, serverLevel);
-                }
-            }
-
-            if (blocksToMine.isEmpty()) {
-                // there were no blocks to mine, so the current position is the previous position
-                x = mineX;
-                y = mineY;
-                z = mineZ;
-
-                // attempt to get more blocks to mine, if there are none, the miner is done mining
-                blocksToMine.addAll(getBlocksToMine());
-                if (blocksToMine.isEmpty()) {
-                    this.isDone = true;
-                    getRecipeLogic().setStatus(RecipeLogic.Status.IDLE);
-                }
-            }
-        } else {
-            // machine isn't working enabled
-            getRecipeLogic().setStatus(RecipeLogic.Status.IDLE);
-//            if (mineSubs != null) {
-//                mineSubs.unsubscribe();
-//                mineSubs = null;
-//            }
-        }
-    }
-    protected ItemTransferList getCachedItemTransfer() {
-        if (cachedItemTransfer == null) {
-//            cachedItemTransfer = new ItemTransferList(getCapabilitiesProxy()
-//                    .get(IO.OUT, ItemRecipeCapability.CAP).stream().map(IItemTransfer.class::cast).toList());
-            cachedItemTransfer = new ItemTransferList(exportItems);
-        }
-
-        return cachedItemTransfer;
-    }
-
-    private static BlockState findMiningReplacementBlock(Level level) {
-        try {
-            return BlockStateParser.parseForBlock(level.holderLookup(Registries.BLOCK),
-                    ConfigHolder.INSTANCE.machines.replaceMinedBlocksWith, false).blockState();
-        } catch (CommandSyntaxException ignored) {
-            GTCEu.LOGGER.error("failed to parse replaceMinedBlocksWith, invalid BlockState: {}",
-                    ConfigHolder.INSTANCE.machines.replaceMinedBlocksWith);
-            return Blocks.COBBLESTONE.defaultBlockState();
-        }
-    }
-
-    private void mineAndInsertItems(NonNullList<ItemStack> blockDrops, ServerLevel world) {
-        // If the block's drops can fit in the inventory, move the previously mined position to the block
-        // replace the ore block with cobblestone instead of breaking it to prevent mob spawning
-        // remove the ore block's position from the mining queue
-        var transfer = getCachedItemTransfer();
-        if (transfer != null) {
-            if (GTTransferUtils.addItemsToItemHandler(transfer, true, blockDrops)) {
-                GTTransferUtils.addItemsToItemHandler(transfer, false, blockDrops);
-                world.setBlock(blocksToMine.getFirst(), findMiningReplacementBlock(world), 3);
-                mineX = blocksToMine.getFirst().getX();
-                mineZ = blocksToMine.getFirst().getZ();
-                mineY = blocksToMine.getFirst().getY();
-                blocksToMine.removeFirst();
-                this.oreAmount = blocksToMine.size();
-
-                // if the inventory was previously considered full, mark it as not since an item was able to fit
-                isInventoryFull = false;
-            } else {
-                // the ore block was not able to fit, so the inventory is considered full
-                isInventoryFull = true;
-            }
-        }
-    }
-
-    protected void getRegularBlockDrops(NonNullList<ItemStack> blockDrops, BlockState blockState,
-                                        LootParams.Builder builder) {
-        blockDrops.addAll(blockState.getDrops(builder));
-    }
-
-    public void checkBlocksToMine() {
-        if (blocksToMine.isEmpty())
-            blocksToMine.addAll(getBlocksToMine());
-    }
-
-    private LinkedList<BlockPos> getBlocksToMine() {
-        LinkedList<BlockPos> blocks = new LinkedList<>();
-
-        // determine how many blocks to retrieve this time
-        //double quotient = getQuotient(getMeanTickTime(getMachine().getLevel()));
-        //int calcAmount = quotient < 1 ? 1 : (int) (Math.min(quotient, Short.MAX_VALUE));
-        int calcAmount = Short.MAX_VALUE;
-        int calculated = 0;
-
-        if (this.minBuildHeight == Integer.MAX_VALUE)
-            this.minBuildHeight = getLevel().getMinBuildHeight();
-
-        // keep getting blocks until the target amount is reached
-        while (calculated < calcAmount) {
-            // moving down the y-axis
-            if (y > minBuildHeight) {
-                // moving across the z-axis
-                if (z <= startZ + currentRadius * 2) {
-                    // check every block along the x-axis
-                    if (x <= startX + currentRadius * 2) {
-                        BlockPos blockPos = new BlockPos(x, y, z);
-                        BlockState state = getLevel().getBlockState(blockPos);
-                        if (state.getBlock().defaultDestroyTime() >= 0 &&
-                                getLevel().getBlockEntity(blockPos) == null) {
-                            if (this.oreDictFilterExpression.isEmpty() && state.is(CustomTags.ORE_BLOCKS)) {
-                                blocks.addLast(blockPos);
-                            } else if (!this.oreDictFilterExpression.isEmpty() && test(state.getBlock().asItem().getDefaultInstance())) {
-                                blocks.addLast(blockPos);
-                            }
-                        }
-                        // move to the next x position
-                        ++x;
-                    } else {
-                        // reset x and move to the next z layer
-                        x = startX;
-                        ++z;
-                    }
-                } else {
-                    // reset z and move to the next y layer
-                    z = startZ;
-                    --y;
-                }
-            } else
-                return blocks;
-
-            // only count iterations where blocks were found
-            if (!blocks.isEmpty())
-                calculated++;
-        }
-        return blocks;
-    }
-    protected boolean checkCanMine() {
-        // if the miner is finished, the target coordinates are invalid, or it cannot drain storages, stop
-        // if the miner is not finished and has invalid coordinates, get new and valid starting coordinates
-        if (!isDone && checkCoordinatesInvalid()) {
-            initPos(getMiningPos(), currentRadius);
-        }
-        return !isDone && drainInput(true);
-    }
-
-    private boolean checkCoordinatesInvalid() {
-        return x == Integer.MAX_VALUE && y == Integer.MAX_VALUE && z == Integer.MAX_VALUE;
-    }
-
-    public void initPos(@NotNull BlockPos pos, int currentRadius) {
-        x = pos.getX() - currentRadius;
-        z = pos.getZ() - currentRadius;
-        y = pos.getY() - 1;
-        startX = pos.getX() - currentRadius;
-        startZ = pos.getZ() - currentRadius;
-        startY = pos.getY();
-        mineX = pos.getX() - currentRadius;
-        mineZ = pos.getZ() - currentRadius;
-        mineY = pos.getY() - 1;
-        onRemove();
-    }
-
-    public void onRemove() {
-        if (getLevel() instanceof ServerLevel serverLevel) {
-            var pos = getMiningPos().relative(Direction.DOWN);
-            while (serverLevel.getBlockState(pos).is(GTBlocks.MINER_PIPE.get())) {
-                serverLevel.removeBlock(pos, false);
-                pos = pos.relative(Direction.DOWN);
-            }
-        }
-    }
-
-    public BlockPos getMiningPos() {
-        return getPos();
-    }
-    //////////////////////////////////////
-    // *********** GUI ***********//
-    //////////////////////////////////////
-    private static final int BORDER_WIDTH = 3;
-
     @Override
-    public Widget createUIWidget() {
-        int rowSize = 3;
-        int colSize = 9;
-        int width = rowSize * 18 + 120 + 50;
-        //int height = Math.max(rowSize * 18 + 20, 80);
-        int height = rowSize * 18 + 80 + 8;
-        int index = 0;
-
-        WidgetGroup group = new WidgetGroup(0, 0, width, height);
-        WidgetGroup slots = new WidgetGroup(8, 80 + 4 / 2, colSize * 18, rowSize * 18);
-        for (int y = 0; y < rowSize; y++) {
-            for (int x = 0; x < colSize; x++) {
-                var slot = new SlotWidget(exportItems,index++,x*18,y*18,true,false)
-                        .setBackground(GuiTextures.SLOT);
-
-                slots.addWidget(slot);
-            }
-        }
-
-        var componentPanel = new ComponentPanelWidget(4,5,this::addDisplayText).setMaxWidthLimit(110);
-
-        var container = new WidgetGroup(8, 0, 117, 80);
-        container.addWidget(new DraggableScrollableWidgetGroup(4, 4, container.getSize().width - 8,
-                container.getSize().height - 8)
-                .setBackground(GuiTextures.DISPLAY)
-                .addWidget(componentPanel));
-        container.setBackground(GuiTextures.BACKGROUND_INVERSE);
-
-        var label = new LabelWidget(125,0,"过滤标签");
-        var filter = new TextFieldWidget(125,10,80,16,this::getOreDictFilterExpression,this::SetOreFilter)
-                .setMaxStringLength(64)
-                .setValidator(input -> {
-                    // remove all operators that are double
-                    input = DOUBLE_WILDCARD.matcher(input).replaceAll("*");
-                    input = DOUBLE_AND.matcher(input).replaceAll("&");
-                    input = DOUBLE_OR.matcher(input).replaceAll("|");
-                    input = DOUBLE_NOT.matcher(input).replaceAll("!");
-                    input = DOUBLE_XOR.matcher(input).replaceAll("^");
-                    input = DOUBLE_SPACE.matcher(input).replaceAll(" ");
-                    // move ( and ) so it doesn't create invalid expressions f.e. xxx (& yyy) => xxx & (yyy)
-                    // append or prepend ( and ) if the amount is not equal
-                    StringBuilder builder = new StringBuilder();
-                    int unclosed = 0;
-                    char last = ' ';
-                    for (int i = 0; i < input.length(); i++) {
-                        char c = input.charAt(i);
-                        if (c == ' ') {
-                            if (last != '(')
-                                builder.append(" ");
-                            continue;
-                        }
-                        if (c == '(')
-                            unclosed++;
-                        else if (c == ')') {
-                            unclosed--;
-                            if (last == '&' || last == '|' || last == '^') {
-                                int l = builder.lastIndexOf(" " + last);
-                                int l2 = builder.lastIndexOf(String.valueOf(last));
-                                builder.insert(l == l2 - 1 ? l : l2, ")");
-                                continue;
-                            }
-                            if (i > 0 && builder.charAt(builder.length() - 1) == ' ') {
-                                builder.deleteCharAt(builder.length() - 1);
-                            }
-                        } else if ((c == '&' || c == '|' || c == '^') && last == '(') {
-                            builder.deleteCharAt(builder.lastIndexOf("("));
-                            builder.append(c).append(" (");
-                            continue;
-                        }
-
-                        builder.append(c);
-                        last = c;
-                    }
-                    if (unclosed > 0) {
-                        builder.append(")".repeat(unclosed));
-                    } else if (unclosed < 0) {
-                        unclosed = -unclosed;
-                        for (int i = 0; i < unclosed; i++) {
-                            builder.insert(0, "(");
-                        }
-                    }
-                    input = builder.toString();
-                    input = input.replaceAll(" {2,}", " ");
-                    return input;
-                });
-
-
-        //var btn = new ButtonWidget(125,50,20,20,this::reset);
-        var btn = new ButtonWidget(125, 40+BORDER_WIDTH, 18, 16 - BORDER_WIDTH,
-                new TextTexture("重置").setDropShadow(false).setColor(ChatFormatting.BLACK.getColor()), this::reset)
-                .setHoverTooltips(Component.literal("重置"));
-
-        group.addWidget(btn);
-        group.addWidget(label);
-        group.addWidget(filter);
-        group.addWidget(container);
-        group.addWidget(slots);
-
-        return group;
-    }
-
-    private void reset(ClickData clickData) {
-        this.isDone = false;
-        this.x = Integer.MAX_VALUE;
-        this.y = Integer.MAX_VALUE;
-        this.z = Integer.MAX_VALUE;
-        blocksToMine.clear();
-    }
-
-
-    @Getter
-    @Persisted
-    protected String oreDictFilterExpression;
-    //protected Consumer<ItemFilter> itemWriter = filter -> {};
-    //protected Consumer<ItemFilter> onUpdated = filter -> itemWriter.accept(filter);
-
-    @Persisted
-    protected final List<OreDictExprFilter.MatchRule> matchRules = new ArrayList<>();
-
-    private final Object2BooleanMap<Item> cache = new Object2BooleanOpenHashMap<>();
-
-    private void SetOreFilter(String oreDict) {
-        cache.clear();
-        matchRules.clear();
-        this.oreDictFilterExpression = oreDict;
-        OreDictExprFilter.parseExpression(matchRules, oreDictFilterExpression);
-        //onUpdated.accept(this);
-    }
-
-//    @Override
-//    public void saveCustomPersistedData(CompoundTag tag, boolean forDrop) {
-//        tag.putString("oreDict",this.oreDictFilterExpression);
-//        super.saveCustomPersistedData(tag, forDrop);
-//    }
-//
-//    @Override
-//    public void loadCustomPersistedData(CompoundTag tag) {
-//        this.oreDictFilterExpression = tag.getString("oreDict");
-//        super.loadCustomPersistedData(tag);
-//    }
-
-    public boolean test(ItemStack itemStack) {
-        if (oreDictFilterExpression.isEmpty()) return true;
-        if (cache.containsKey(itemStack.getItem())) return cache.getOrDefault(itemStack.getItem(), false);
-        if (OreDictExprFilter.matchesOreDict(matchRules, itemStack)) {
-            cache.put(itemStack.getItem(), true);
-            return true;
-        }
-        cache.put(itemStack.getItem(), false);
-        return false;
-    }
-
-    private void addDisplayText(@NotNull List<Component> textList) {
-//        int workingArea = IMiner.getWorkingArea(getCurrentRadius());
-//        textList.add(Component.translatable("gtceu.machine.miner.startx", getX()).append(" ")
-//                .append(Component.translatable("gtceu.machine.miner.minex", getMineX())));
-//        textList.add(Component.translatable("gtceu.machine.miner.starty", getY()).append(" ")
-//                .append(Component.translatable("gtceu.machine.miner.miney", getMineY())));
-//        textList.add(Component.translatable("gtceu.machine.miner.startz", getZ()).append(" ")
-//                .append(Component.translatable("gtceu.machine.miner.minez", getMineZ())));
-//        textList.add(Component.translatable("gtceu.universal.tooltip.working_area", workingArea, workingArea));
-        textList.add(Component.literal("Ore Amount: ").append(String.valueOf(getOreAmount())));
-        if (isDone())
-            textList.add(Component.translatable("gtceu.multiblock.large_miner.done")
-                    .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
-//        else if (isWorking())
-//            textList.add(Component.translatable("gtceu.multiblock.large_miner.working")
-//                    .setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)));
-        else if (!this.isWorkingEnabled())
-            textList.add(Component.translatable("gtceu.multiblock.work_paused"));
-        if (isInventoryFull())
-            textList.add(Component.translatable("gtceu.multiblock.large_miner.invfull")
-                    .setStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
-        if (!drainInput(true))
-            textList.add(Component.translatable("gtceu.multiblock.large_miner.needspower")
-                    .setStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
-    }
-
     public boolean drainInput(boolean simulate) {
         long resultEnergy = energyContainer.getEnergyStored() - energyPerTick;
         if (resultEnergy >= 0L && resultEnergy <= energyContainer.getEnergyCapacity()) {
@@ -704,6 +197,145 @@ public class DigitalMiner extends WorkableTieredMachine
             return true;
         }
         return false;
+    }
+    private static final int BORDER_WIDTH = 3;
+
+    @Override
+    public Widget createUIWidget() {
+        int rowSize = 3;
+        int colSize = 9;
+        int width = colSize * 18 + 16;
+        int height = rowSize * 18 + 76 + 4;
+        int index = 0;
+
+        WidgetGroup group = new WidgetGroup(0, 0, width, height);
+
+        // infomation screen
+        var componentPanel = new ComponentPanelWidget(4,5,this::addDisplayText).setMaxWidthLimit(110);
+        var container = new WidgetGroup(8, 0, 87, 76);
+        container.addWidget(new DraggableScrollableWidgetGroup(4, 4, container.getSize().width - 8,
+                container.getSize().height - 8)
+                .setBackground(GuiTextures.DISPLAY)
+                .addWidget(componentPanel));
+        container.setBackground(GuiTextures.BACKGROUND_INVERSE);
+        group.addWidget(container);
+
+        // output slots
+        WidgetGroup slots = new WidgetGroup(8, 76 + 4 / 2, colSize * 18, rowSize * 18);
+        for (int y = 0; y < rowSize; y++) {
+            for (int x = 0; x < colSize; x++) {
+                var slot = new SlotWidget(exportItems,index++,x*18,y*18,true,false)
+                        .setBackground(GuiTextures.SLOT);
+                slots.addWidget(slot);
+            }
+        }
+        group.addWidget(slots);
+
+        // filter slot
+        this.filterSlot  = new SlotWidget(this.filterInventory,0,117,4,true,true);
+        this.filterSlot.setChangeListener(this::filterChange).setBackground(GuiTextures.SLOT, GuiTextures.FILTER_SLOT_OVERLAY);
+        group.addWidget(filterSlot);
+
+        // Radius
+        group.addWidget(new LabelWidget(99,26,"水平范围:"));
+        group.addWidget(new SimpleNumberInputWidget(140,24,24,12,this::getMinerRadius,this::setMinerRadius)
+                .setMin(1).setMax(32));
+
+        // Min height
+        group.addWidget(new LabelWidget(99,44,"最小高度:"));
+        group.addWidget(new SimpleNumberInputWidget(140,42,24,12,this::getMinHeight,this::setMinHeight)
+                .setMin(getLevel().getMinBuildHeight()).setMax(getLevel().getMaxBuildHeight()));
+
+        // Max height
+        group.addWidget(new LabelWidget(99,62,"最大高度:"));
+        group.addWidget(new SimpleNumberInputWidget(140,60,24,12,this::getMaxHeight,this::setMaxHeight)
+                .setMin(getLevel().getMinBuildHeight()).setMax(getLevel().getMaxBuildHeight()));
+
+
+        // reset button
+        this.resetButton = new ButtonWidget(16, 46+BORDER_WIDTH, 18, 16 - BORDER_WIDTH,
+                new TextTexture("重置").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()), this::reset);
+        this.resetButton.setHoverTooltips(Component.literal("修改配置后必须重置才能生效。"));
+        group.addWidget(this.resetButton);
+
+        // silk button
+        this.silkButton = new ButtonWidget(36,46+BORDER_WIDTH, 18, 16 - BORDER_WIDTH,
+                new TextTexture("精准")
+                        .setDropShadow(false)
+                        .setColor(silkLevel==0?ChatFormatting.GRAY.getColor():ChatFormatting.GREEN.getColor()), this::setSilk);
+        this.silkButton.setHoverTooltips(Component.literal("开启精准采集模式，4倍耗电。"));
+        group.addWidget(this.silkButton);
+
+        // fortune button
+//        this.fortuneButton = new ButtonWidget(56,46+BORDER_WIDTH, 18, 16 - BORDER_WIDTH,
+//                new TextTexture("时运").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()), this::setFortune);
+//        this.fortuneButton.setHoverTooltips(Component.literal("时运III模式，4倍耗电，与精准采集不能同时开启。"));
+//        group.addWidget(this.fortuneButton);
+
+        // overclock button
+//        this.overClockButton = new ButtonWidget(189,86+BORDER_WIDTH, 18, 16 - BORDER_WIDTH,
+//                new TextTexture("超频").setDropShadow(false).setColor(ChatFormatting.BLACK.getColor()), this::setOverClock);
+//        this.overClockButton.setHoverTooltips(Component.literal("超频模式，4倍耗电"));
+//        group.addWidget(this.overClockButton);
+
+        return group;
+    }
+
+    private void filterChange() {
+        this.itemFilter = null;
+        if (!filterInventory.getStackInSlot(0).isEmpty())
+            this.itemFilter = ItemFilter.loadFilter(filterInventory.getStackInSlot(0));
+    }
+
+    private void reset(ClickData clickData) {
+        setWorkingEnabled(false);
+        getRecipeLogic().resetRecipeLogic(this.minerRadius,this.minHeight,this.maxHeight,this.silkLevel,itemFilter);
+    }
+
+    private void setSilk(ClickData clickData) {
+        if (silkLevel == 0) {
+            silkLevel = 1;
+            this.silkButton.setButtonTexture(new TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GREEN.getColor()));
+        } else {
+            silkLevel = 0;
+            this.silkButton.setButtonTexture(new TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
+        }
+//        fortuneLevel = 1;
+//        this.fortuneButton.setButtonTexture(new TextTexture("时运").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
+        energyPerTick = GTValues.V[MV-1] * 4 * silkLevel;
+    }
+
+//    private void setFortune(ClickData clickData) {
+//        var energyMulti = 0;
+//        if (fortuneLevel == 1) {
+//            fortuneLevel = 6;
+//            energyMulti = 1;
+//            this.fortuneButton.setButtonTexture(new TextTexture("时运").setDropShadow(false).setColor(ChatFormatting.GREEN.getColor()));
+//        } else {
+//            fortuneLevel = 1;
+//            this.fortuneButton.setButtonTexture(new TextTexture("时运").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
+//        }
+//        silkLevel = 0;
+//        this.silkButton.setButtonTexture(new TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
+//        energyPerTick = GTValues.V[MV-1] * 4 * energyMulti;
+//    }
+
+    private void addDisplayText(@NotNull List<Component> textList) {
+        textList.add(Component.literal("挖掘: ").append(String.valueOf(getRecipeLogic().getOreAmount())));
+        if (getRecipeLogic().isDone())
+            textList.add(Component.translatable("gtceu.multiblock.large_miner.done")
+                    .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
+        else if (getRecipeLogic().isWorking())
+            textList.add(Component.translatable("gtceu.multiblock.large_miner.working")
+                    .setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)));
+        else if (!this.isWorkingEnabled())
+            textList.add(Component.translatable("gtceu.multiblock.work_paused"));
+        if (getRecipeLogic().isInventoryFull())
+            textList.add(Component.translatable("gtceu.multiblock.large_miner.invfull")
+                    .setStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+        if (!drainInput(true))
+            textList.add(Component.translatable("gtceu.multiblock.large_miner.needspower")
+                    .setStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
     }
 
     //////////////////////////////////////
@@ -715,17 +347,17 @@ public class DigitalMiner extends WorkableTieredMachine
         if (isRemote()) return InteractionResult.SUCCESS;
 
         if (!this.isActive()) {
-            int currentRadius = getCurrentRadius();
+            int currentRadius = getRecipeLogic().getCurrentRadius();
             if (currentRadius == 1)
-                setCurrentRadius(getMaximumRadius());
+                getRecipeLogic().setCurrentRadius(getRecipeLogic().getMaximumRadius());
             else if (playerIn.isShiftKeyDown())
-                setCurrentRadius(Math.max(1, Math.round(currentRadius / 2.0f)));
+                getRecipeLogic().setCurrentRadius(Math.max(1, Math.round(currentRadius / 2.0f)));
             else
-                setCurrentRadius(Math.max(1, currentRadius - 1));
+                getRecipeLogic().setCurrentRadius(Math.max(1, currentRadius - 1));
 
-            //resetArea(true);
+            getRecipeLogic().resetArea(true);
 
-            int workingArea = IMiner.getWorkingArea(getCurrentRadius());
+            int workingArea = IDigitalMiner.getWorkingArea(getRecipeLogic().getCurrentRadius());
             playerIn.sendSystemMessage(
                     Component.translatable("gtceu.universal.tooltip.working_area", workingArea, workingArea));
         } else {
@@ -739,7 +371,7 @@ public class DigitalMiner extends WorkableTieredMachine
     public List<Component> getDataInfo(PortableScannerBehavior.DisplayMode mode) {
         if (mode == PortableScannerBehavior.DisplayMode.SHOW_ALL ||
                 mode == PortableScannerBehavior.DisplayMode.SHOW_MACHINE_INFO) {
-            int workingArea = IMiner.getWorkingArea(getCurrentRadius());
+            int workingArea = IDigitalMiner.getWorkingArea(getRecipeLogic().getCurrentRadius());
             return Collections.singletonList(
                     Component.translatable("gtceu.universal.tooltip.working_area", workingArea, workingArea));
         }

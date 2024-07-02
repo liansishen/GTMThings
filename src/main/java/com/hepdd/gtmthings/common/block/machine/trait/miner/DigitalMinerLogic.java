@@ -3,10 +3,9 @@ package com.hepdd.gtmthings.common.block.machine.trait.miner;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.capability.IMiner;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
+import com.gregtechceu.gtceu.api.cover.filter.ItemFilter;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.misc.IgnoreEnergyRecipeHandler;
@@ -60,11 +59,11 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     @Nullable
     private ItemTransferList cachedItemTransfer = null;
     @Getter
-    private final int fortune;
+    private int silk;
     @Getter
     private final int speed;
     @Getter
-    private final int maximumRadius;
+    private int maximumRadius;
     @Getter
     public ItemStack pickaxeTool;
     private final LinkedList<BlockPos> blocksToMine = new LinkedList<>();
@@ -100,9 +99,10 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     protected int mineY = Integer.MAX_VALUE;
     @Getter
     private int minBuildHeight = Integer.MAX_VALUE;
-//    @Getter
-//    @Persisted
-//    private int pipeLength = 0;
+    @Getter
+    private int minHeight = Integer.MAX_VALUE;
+    @Getter
+    private int maxHeight = Integer.MAX_VALUE;
     @Getter
     @Setter
     @Persisted
@@ -118,25 +118,23 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     private final IgnoreEnergyRecipeHandler inputEnergyHandler;
     @Getter
     private int oreAmount;
+    @Getter
+    private ItemFilter itemFilter;
 
-    /**
-     * Creates the general logic for all in-world ore block miners
-     *
-     * @param machine       the {@link MetaMachine} this logic belongs to
-     * @param fortune       the fortune amount to apply when mining ores
-     * @param speed         the speed in ticks per block mined
-     * @param maximumRadius the maximum radius (square shaped) the miner can mine in
-     */
-    public DigitalMinerLogic(@NotNull IRecipeLogicMachine machine, int fortune, int speed, int maximumRadius) {
+
+    public DigitalMinerLogic(@NotNull IRecipeLogicMachine machine, int maximumRadius, int minHeight, int maxHeight, int silk, ItemFilter itemFilter) {
         super(machine);
         this.miner = (IDigitalMiner) machine;
-        this.fortune = fortune;
-        this.speed = speed;
+        this.silk = silk;
+        this.speed = 10;
         this.currentRadius = maximumRadius;
         this.maximumRadius = maximumRadius;
         this.isDone = false;
+        this.minHeight = minHeight;
+        this.maxHeight = maxHeight;
         this.pickaxeTool = GTItems.TOOL_ITEMS.get(GTMaterials.Neutronium, GTToolType.PICKAXE).get().get();
-        this.pickaxeTool.enchant(Enchantments.BLOCK_FORTUNE, fortune);
+        this.pickaxeTool.enchant(Enchantments.BLOCK_FORTUNE, 1);
+        this.itemFilter = itemFilter;
         this.capabilitiesProxy = Tables.newCustomTable(new EnumMap<>(IO.class), IdentityHashMap::new);
         this.inputItemHandler = new ItemRecipeHandler(IO.IN,
                 machine.getRecipeType().getMaxInputs(ItemRecipeCapability.CAP));
@@ -153,7 +151,17 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         super.resetRecipeLogic();
         resetArea(false);
         this.cachedItemTransfer = null;
-//        this.pipeLength = 0;
+        this.setWorkingEnabled(false);
+    }
+
+    public void resetRecipeLogic(int maximumRadius,int minHeight,int maxHeight,int silk, ItemFilter itemFilter) {
+        this.silk = silk;
+        this.currentRadius = maximumRadius;
+        this.maximumRadius = maximumRadius;
+        this.minHeight = minHeight;
+        this.maxHeight = maxHeight;
+        this.itemFilter = itemFilter;
+        this.resetRecipeLogic();
     }
 
     @Override
@@ -200,14 +208,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
                 }
             }
 
-            // drill a hole beneath the miner and extend the pipe downwards by one
-//            if (mineY < pipeY) {
-//                BlockPos miningPos = getMiningPos();
-//                serverLevel.destroyBlock(new BlockPos(miningPos.getX(), pipeY, miningPos.getZ()), false);
-//                --pipeY;
-//                incrementPipeLength();
-//            }
-
             // check if the miner needs new blocks to mine and get them if needed
             checkBlocksToMine();
 
@@ -230,8 +230,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
                             .withParameter(LootContextParams.ORIGIN, Vec3.atLowerCornerOf(blocksToMine.getFirst()))
                             .withParameter(LootContextParams.TOOL, getPickaxeTool());
 
-                    // get the small ore drops, if a small ore
-                    getSmallOreBlockDrops(blockDrops, blockState, builder);
                     // get the block's drops.
                     if (isSilkTouchMode()) {
                         getSilkTouchDrops(blockDrops, blockState, builder);
@@ -287,23 +285,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
      */
     protected void onMineOperation() {}
 
-    /**
-     * called to handle mining small ores
-     *
-     * @param blockDrops the List of items to fill after the operation
-     * @param blockState the {@link BlockState} of the block being mined
-     */
-    // todo implement small ores
-    protected void getSmallOreBlockDrops(NonNullList<ItemStack> blockDrops, BlockState blockState,
-                                         LootParams.Builder builder) {
-        /*
-         * small ores
-         * if orePrefix of block in blockPos is small
-         * applyTieredHammerNoRandomDrops...
-         * else
-         * current code...
-         */
-    }
 
     /**
      * Should we apply additional processing according to the recipe type.
@@ -313,7 +294,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     }
 
     protected boolean isSilkTouchMode() {
-        return false;
+        return silk == 1;
     }
 
     /**
@@ -431,14 +412,14 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     public void initPos(@NotNull BlockPos pos, int currentRadius) {
         x = pos.getX() - currentRadius;
         z = pos.getZ() - currentRadius;
-        y = pos.getY() - 1;
+        y = maxHeight;
         startX = pos.getX() - currentRadius;
         startZ = pos.getZ() - currentRadius;
-        startY = pos.getY();
+        startY = maxHeight;
 //        pipeY = pos.getY() - 1;
         mineX = pos.getX() - currentRadius;
         mineZ = pos.getZ() - currentRadius;
-        mineY = pos.getY() - 1;
+        mineY = maxHeight;
         onRemove();
     }
 
@@ -492,7 +473,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         // keep getting blocks until the target amount is reached
         while (calculated < calcAmount) {
             // moving down the y-axis
-            if (y > minBuildHeight) {
+            if (y > this.minHeight) {
                 // moving across the z-axis
                 if (z <= startZ + currentRadius * 2) {
                     // check every block along the x-axis
@@ -502,7 +483,11 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
                         if (state.getBlock().defaultDestroyTime() >= 0 &&
                                 getMachine().getLevel().getBlockEntity(blockPos) == null &&
                                 state.is(CustomTags.ORE_BLOCKS)) {
-                            blocks.addLast(blockPos);
+                            if (itemFilter==null) {
+                                blocks.addLast(blockPos);
+                            } else if (itemFilter.test(state.getBlock().asItem().getDefaultInstance())) {
+                                blocks.addLast(blockPos);
+                            }
                         }
                         // move to the next x position
                         ++x;

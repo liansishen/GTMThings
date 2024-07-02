@@ -4,14 +4,15 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.hepdd.gtmthings.common.block.machine.trait.miner.DigitalMinerLogic;
 
-public interface IDigitalMiner extends  IMachineLife  {
-//    @Override
-//    DigitalMinerLogic getRecipeLogic();
+public interface IDigitalMiner extends IRecipeLogicMachine, IMachineLife  {
 
-//    @Override
-//    default void onMachineRemoved() {
-//        getRecipeLogic().onRemove();
-//    }
+    @Override
+    DigitalMinerLogic getRecipeLogic();
+
+    @Override
+    default void onMachineRemoved() {
+        getRecipeLogic().onRemove();
+    }
 
     boolean drainInput(boolean simulate);
 

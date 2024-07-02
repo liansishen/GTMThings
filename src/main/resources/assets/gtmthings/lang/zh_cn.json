@@ -361,6 +361,7 @@
   "block.gtmthings.creative_item_input_bus": "创造模式输入总线",
   "block.gtmthings.wireless_energy_monitor": "无线能源监视器",
   "block.gtmthings.wireless_energy_interface": "无线能源接口",
+  "block.gtmthings.digital_miner": "数字型采矿机",
   "gtmthings.creative_tooltip.1": "§7你需要",
   "gtmthings.creative_tooltip.2": "§b创造模式",
   "gtmthings.creative_tooltip.3": "§7来使用它",
@@ -424,5 +425,6 @@
   "item.gtmthings.wireless_transfer.fluid.tooltip.1": "§7作§f覆盖板§7时机器中提取§b流体§7到绑定的容器中。",
   "config.jade.plugin_gtmthings.wireless_energy_hatch_provider":"[gtmthings] 无线能源监视器",
   "itemGroup.gtmthings.creative": "创造物品",
-  "itemGroup.gtmthings.wireless": "格雷无线科技"
+  "itemGroup.gtmthings.wireless": "格雷无线科技",
+  "itemGroup.gtmthings.more_machines": "更多机器"
 }
