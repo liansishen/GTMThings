@@ -73,14 +73,12 @@ public class GTMThings {
 
     private void registerRecipeTypes(GTCEuAPI.RegisterEvent<ResourceLocation, GTRecipeType> event) {
         //CustomRecipeTypes.init();
-        GTMTRecipeTypes.init();
     }
 
     private void registerMachines(GTCEuAPI.RegisterEvent<ResourceLocation, MachineDefinition> event) {
         CreativeModeTabs.init();
         CreativeMachines.init();
         WirelessMachines.init();
-        CustomMachines.init();
     }
 
     private void registerCovers(GTCEuAPI.RegisterEvent<ResourceLocation, CoverDefinition> event) {
