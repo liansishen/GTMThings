@@ -47,9 +47,9 @@ public class CustomMachines {
                             tier == 0 ? new PartAbility[] { PartAbility.IMPORT_ITEMS, PartAbility.STEAM_IMPORT_ITEMS } :
                                     new PartAbility[] { PartAbility.IMPORT_ITEMS })
                     .overlayTieredHullRenderer("item_bus.import")
-                    .tooltips(Component.translatable("gtceu.machine.item_bus.import.tooltip"),
+                    .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.import.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
-                                    (1 + Math.min(9, tier)) * (1 + Math.min(9, tier))))
+                                    (1 + tier)))
                     .compassNode("item_bus")
                     .register(),
             ALL_TIERS);
@@ -63,9 +63,9 @@ public class CustomMachines {
                             tier == 0 ? new PartAbility[] { PartAbility.EXPORT_ITEMS, PartAbility.STEAM_EXPORT_ITEMS } :
                                     new PartAbility[] { PartAbility.EXPORT_ITEMS })
                     .overlayTieredHullRenderer("item_bus.export")
-                    .tooltips(Component.translatable("gtceu.machine.item_bus.export.tooltip"),
+                    .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.export.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
-                                    (1 + Math.min(9, tier)) * (1 + Math.min(9, tier))))
+                                    (1 + tier)))
                     .compassNode("item_bus")
                     .register(),
             ALL_TIERS);

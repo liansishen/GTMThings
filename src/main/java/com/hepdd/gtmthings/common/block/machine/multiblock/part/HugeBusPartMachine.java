@@ -15,6 +15,7 @@ import com.gregtechceu.gtceu.common.machine.multiblock.part.ItemBusPartMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.hepdd.gtmthings.api.machine.fancyconfigurator.ButtonConfigurator;
 import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
+import com.hepdd.gtmthings.api.transfer.UnlimitItemTransferHelper;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
@@ -29,6 +30,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.TickTask;
@@ -42,6 +44,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Set;
+
+import static com.hepdd.gtmthings.utils.FormatUtil.formatNumber;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -102,6 +106,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         }
     }
 
+
     @Override
     public void onLoad() {
         super.onLoad();
@@ -120,6 +125,17 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
             inventorySubs.unsubscribe();
             inventorySubs = null;
         }
+
+    }
+
+    @Override
+    public void saveCustomPersistedData(CompoundTag tag, boolean forDrop) {
+        super.saveCustomPersistedData(tag, forDrop);
+    }
+
+    @Override
+    public void loadCustomPersistedData(CompoundTag tag) {
+        super.loadCustomPersistedData(tag);
     }
 
     @Override
@@ -138,7 +154,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         if(ItemTransferHelper.getItemTransfer(getLevel(), getPos().relative(getFrontFacing()),
                 getFrontFacing().getOpposite()) != null) {
             setWorkingEnabled(false);
-            getInventory().exportToNearby(getFrontFacing());
+            exportToNearby(getInventory(),getFrontFacing());
         }
     }
     //////////////////////////////////////
@@ -172,7 +188,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         if (getOffsetTimer() % 5 == 0) {
             if (isWorkingEnabled()) {
                 if (io == IO.OUT) {
-                    getInventory().exportToNearby(getFrontFacing());
+                    exportToNearby(getInventory(),getFrontFacing());
                 } else if (io == IO.IN) {
                     getInventory().importFromNearby(getFrontFacing());
                 }
@@ -181,6 +197,15 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         }
     }
 
+    public void exportToNearby(NotifiableItemStackHandler handler,@NotNull Direction... facings) {
+        if (handler.isEmpty()) return;
+        var level = getLevel();
+        var pos = getPos();
+        for (Direction facing : facings) {
+            UnlimitItemTransferHelper.exportToTarget(handler, Integer.MAX_VALUE, f -> true, level, pos.relative(facing),
+                    facing.getOpposite());
+        }
+    }
     @Override
     public void setWorkingEnabled(boolean workingEnabled) {
         super.setWorkingEnabled(workingEnabled);
@@ -196,16 +221,18 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         if (this.io == IO.IN) {
             configuratorPanel.attachConfigurators(new CircuitFancyConfigurator(circuitInventory.storage));
             configuratorPanel.attachConfigurators(new ButtonConfigurator(new GuiTextureGroup(GuiTextures.BUTTON, new TextTexture("🔙")), this::refundAll)
-                    .setTooltips(List.of(Component.literal("退回所有的物品"))));
+                    .setTooltips(List.of(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.1"))));
         }
     }
 
     @Override
     public Widget createUIWidget() {
-        var group = new WidgetGroup(0, 0, 182 + 4, 117 + 4);
+        int height = 117;
+        int width = 178;
+        var group = new WidgetGroup(0, 0, width + 8, height + 4);
 
-        var componentPanel = new ComponentPanelWidget(4,5,this::addDisplayText).setMaxWidthLimit(180);
-        var screen = new DraggableScrollableWidgetGroup(4, 4, 182, 117)
+        var componentPanel = new ComponentPanelWidget(8,5,this::addDisplayText).setMaxWidthLimit(width - 16);
+        var screen = new DraggableScrollableWidgetGroup(4, 4, width, height)
                 .setBackground(GuiTextures.DISPLAY)
                 .addWidget(componentPanel);
         group.addWidget(screen);
@@ -214,18 +241,21 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
     }
 
     private void addDisplayText(@NotNull List<Component> textList) {
-
+        int itemCount = 0;
         for (int i = 0; i < getInventorySize(); i++) {
             ItemStack is = getInventory().getStackInSlot(i);
             if (!is.isEmpty()) {
-                textList.add(Component.translatable(is.getDescriptionId())
+                textList.add(is.getDisplayName().copy()
                         .setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW))
-                                .append(Component.literal(": " + is.getCount())
+                                .append(Component.literal(formatNumber(is.getCount()))
                                         .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))));
+                itemCount++;
             }
         }
         if (textList.isEmpty()) {
-            textList.add(Component.literal("Bus is empty"));
+            textList.add(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.3"));
         }
+        textList.add(0,Component.translatable("gtmthings.machine.huge_item_bus.tooltip.2" , itemCount, getInventorySize())
+                .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));;
     }
 }
