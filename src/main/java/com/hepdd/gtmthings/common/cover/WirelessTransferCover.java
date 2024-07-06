@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.FluidHatchPartMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.ItemBusPartMachine;
+import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper;
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -66,6 +67,16 @@ public class WirelessTransferCover extends CoverBehavior {
         if (targetMachine instanceof SimpleTieredMachine simpleTieredMachine) {
             if ((simpleTieredMachine.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM)
                     || (simpleTieredMachine.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID)) {
+
+                for (var cover:targetMachine.getCoverContainer().getCovers()) {
+                    if (cover instanceof WirelessTransferCover wirelessTransferCover
+                            && wirelessTransferCover.transferType == this.transferType) return false;
+                }
+                return true;
+            }
+        } else if (targetMachine instanceof DigitalMiner digitalMiner) {
+            if ((digitalMiner.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM)
+                    || (digitalMiner.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID)) {
 
                 for (var cover:targetMachine.getCoverContainer().getCovers()) {
                     if (cover instanceof WirelessTransferCover wirelessTransferCover
