@@ -70,15 +70,6 @@ public class CreativeMachines {
 //    public static final MachineDefinition[] LASER_INPUT_HATCH_16777216 = registerLaserHatch(IO.IN,16777216,PartAbility.INPUT_LASER);
     public static final MachineDefinition[] LASER_INPUT_HATCH_67108864 = registerCreativeLaserHatch(IO.IN,67108864,PartAbility.INPUT_LASER);
 
-
-//    public static final MachineDefinition TEST_INPUT_MACHINE = GTMTHINGS_REGISTRATE
-//            .machine("test_input_machine", testInputBusPartMachine::new)
-//            .abilities(PartAbility.IMPORT_ITEMS)
-//            .overlayTieredHullRenderer("item_bus.import")
-//            .rotationState(RotationState.ALL)
-//            .tier(14)
-//            .register();
-
     public static MachineDefinition[] registerTieredMachines(String name,
                                                              BiFunction<IMachineBlockEntity, Integer, MetaMachine> factory,
                                                              BiFunction<Integer, MachineBuilder<MachineDefinition>, MachineDefinition> builder,

@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import lombok.Getter;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
 
+import static com.gregtechceu.gtceu.api.GTValues.MV;
 import static com.gregtechceu.gtceu.api.capability.GTCapabilityHelper.getEnergyContainer;
 
 @ParametersAreNonnullByDefault
@@ -67,6 +69,13 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
             return true;
         } else if (machine instanceof BatteryBufferMachine batteryBufferMachine) {
             return batteryBufferMachine.getTier() >= this.tier;
+        } else if (machine instanceof DigitalMiner digitalMiner) {
+            if (digitalMiner.getTier() < this.tier) return false;
+            var covers = digitalMiner.getCoverContainer().getCovers();
+            for (var cover : covers) {
+                if (cover instanceof WirelessEnergyReceiveCover) return false;
+            }
+            return true;
         } else {
             return false;
         }
@@ -79,6 +88,8 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
         var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
         if (machine instanceof SimpleTieredMachine simpleTieredMachine) {
             this.machineMaxEnergy = GTValues.V[simpleTieredMachine.getTier()] * 64L;
+        } else if (machine instanceof DigitalMiner) {
+            this.machineMaxEnergy = GTValues.V[MV] *64L;
         }
         updateCoverSub();
     }
