@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.function.BiFunction;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
+import static com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine.INV_MULTIPLE;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 import static com.hepdd.gtmthings.data.GTMTRecipeTypes.DIGITAL_MINER_RECIPE;
 
@@ -49,7 +50,7 @@ public class CustomMachines {
                     .overlayTieredHullRenderer("item_bus.import")
                     .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.import.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
-                                    (1 + tier)))
+                                    (1 + tier) * INV_MULTIPLE))
                     .compassNode("item_bus")
                     .register(),
             ALL_TIERS);
@@ -65,7 +66,7 @@ public class CustomMachines {
                     .overlayTieredHullRenderer("item_bus.export")
                     .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.export.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
-                                    (1 + tier)))
+                                    (1 + tier)* INV_MULTIPLE))
                     .compassNode("item_bus")
                     .register(),
             ALL_TIERS);

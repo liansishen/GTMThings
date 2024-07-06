@@ -8,6 +8,7 @@ import net.minecraft.world.item.CreativeModeTab;
 
 import static com.gregtechceu.gtceu.common.data.GTMachines.CREATIVE_ENERGY;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
+import static com.hepdd.gtmthings.data.CustomMachines.DIGITAL_MINER;
 import static com.hepdd.gtmthings.data.WirelessMachines.WIRELESS_ENERGY_INPUT_HATCH;
 
 
@@ -33,7 +34,7 @@ public class CreativeModeTabs {
             .defaultCreativeTab("more_machines",builder -> builder
                     .displayItems(new GTCreativeModeTabs.RegistrateDisplayItemsGenerator("more_machines", GTMTHINGS_REGISTRATE))
                     .title(GTMTHINGS_REGISTRATE.addLang("itemGroup", GTMThings.id("more_machines"), GTMThings.NAME))
-                    .icon(WIRELESS_ENERGY_INPUT_HATCH[GTValues.MAX-1]::asStack)
+                    .icon(DIGITAL_MINER::asStack)
                     .build())
             .register();
 

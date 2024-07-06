@@ -9,11 +9,13 @@ import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigura
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.ItemHandlerProxyRecipeTrait;
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.ItemBusPartMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.hepdd.gtmthings.api.machine.fancyconfigurator.ButtonConfigurator;
+import com.hepdd.gtmthings.api.machine.fancyconfigurator.InventoryFancyConfigurator;
 import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
 import com.hepdd.gtmthings.api.transfer.UnlimitItemTransferHelper;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
@@ -53,9 +55,11 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(HugeBusPartMachine.class,
             TieredIOPartMachine.MANAGED_FIELD_HOLDER);
+
+    public static final int INV_MULTIPLE = 2;
     @Getter
     @Persisted
-    private final NotifiableItemStackHandler inventory;
+    protected final NotifiableItemStackHandler inventory;
     @Nullable
     protected TickableSubscription autoIOSubs;
     @Nullable
@@ -64,12 +68,16 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
     @Persisted
     protected final NotifiableItemStackHandler circuitInventory;
     @Getter
+    @Persisted
+    protected final NotifiableItemStackHandler shareInventory;
+    @Getter
     protected final ItemHandlerProxyRecipeTrait combinedInventory;
 
     public HugeBusPartMachine(IMachineBlockEntity holder, int tier, IO io, Object... args) {
         super(holder, tier, io);
         this.inventory = createInventory(args);
         this.circuitInventory = createCircuitItemHandler(io);
+        this.shareInventory = new NotifiableItemStackHandler(this, 4, IO.IN, IO.NONE);
         this.combinedInventory = createCombinedItemHandler(io);
     }
 
@@ -82,11 +90,11 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
     }
 
     protected int getInventorySize() {
-        return 1 + getTier();
+        return (1 + getTier()) * INV_MULTIPLE;
     }
 
     protected NotifiableItemStackHandler createInventory(Object... args) {
-        return new NotifiableItemStackHandler(this, getInventorySize(), io, io==IO.IN?IO.BOTH:IO.OUT, UnlimitedItemStackTransfer::new);
+        return new NotifiableItemStackHandler(this, getInventorySize(), io, io == IO.IN ? IO.BOTH : IO.OUT, UnlimitedItemStackTransfer::new);
     }
 
     protected NotifiableItemStackHandler createCircuitItemHandler(Object... args) {
@@ -100,12 +108,11 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
 
     protected ItemHandlerProxyRecipeTrait createCombinedItemHandler(Object... args) {
         if (args.length > 0 && args[0] instanceof IO io && io == IO.IN) {
-            return new ItemHandlerProxyRecipeTrait(this, Set.of(getInventory(), circuitInventory), IO.IN, IO.NONE);
+            return new ItemHandlerProxyRecipeTrait(this, Set.of(getInventory(), circuitInventory, shareInventory), IO.IN, IO.NONE);
         } else {
             return new ItemHandlerProxyRecipeTrait(this, Set.of(getInventory(), circuitInventory), IO.NONE, IO.NONE);
         }
     }
-
 
     @Override
     public void onLoad() {
@@ -222,6 +229,11 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
             configuratorPanel.attachConfigurators(new CircuitFancyConfigurator(circuitInventory.storage));
             configuratorPanel.attachConfigurators(new ButtonConfigurator(new GuiTextureGroup(GuiTextures.BUTTON, new TextTexture("🔙")), this::refundAll)
                     .setTooltips(List.of(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.1"))));
+            configuratorPanel.attachConfigurators(new InventoryFancyConfigurator(
+                    shareInventory.storage, Component.translatable("gui.gtmthings.share_inventory.title"))
+                    .setTooltips(List.of(
+                            Component.translatable("gui.gtmthings.share_inventory.desc.0"),
+                            Component.translatable("gui.gtmthings.share_inventory.desc.1"))));
         }
     }
 

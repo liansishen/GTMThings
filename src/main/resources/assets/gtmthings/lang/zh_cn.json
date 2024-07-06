@@ -461,5 +461,8 @@
   "config.jade.plugin_gtmthings.wireless_energy_hatch_provider":"[gtmthings] 无线能源监视器",
   "itemGroup.gtmthings.creative": "创造物品",
   "itemGroup.gtmthings.wireless": "格雷无线科技",
-  "itemGroup.gtmthings.more_machines": "更多机器"
+  "itemGroup.gtmthings.more_machines": "更多机器",
+  "gui.gtmthings.share_inventory.title": "共享库存",
+  "gui.gtmthings.share_inventory.desc.0": "打开共享库存",
+  "gui.gtmthings.share_inventory.desc.1": "其中的物品可参与合成"
 }
