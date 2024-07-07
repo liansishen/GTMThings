@@ -9,11 +9,6 @@ public interface IDigitalMiner extends IRecipeLogicMachine, IMachineLife  {
     @Override
     DigitalMinerLogic getRecipeLogic();
 
-    @Override
-    default void onMachineRemoved() {
-        getRecipeLogic().onRemove();
-    }
-
     boolean drainInput(boolean simulate);
 
     static int getWorkingArea(int maximumRadius) {

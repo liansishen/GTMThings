@@ -12,7 +12,6 @@ import com.gregtechceu.gtceu.api.misc.IgnoreEnergyRecipeHandler;
 import com.gregtechceu.gtceu.api.misc.ItemRecipeHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
-import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
@@ -29,7 +28,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -85,9 +83,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     @Getter
     @Persisted
     protected int startY = Integer.MAX_VALUE;
-//    @Getter
-//    @Persisted
-//    protected int pipeY = Integer.MAX_VALUE;
     @Getter
     @Persisted
     protected int mineX = Integer.MAX_VALUE;
@@ -161,6 +156,8 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
         this.itemFilter = itemFilter;
+        this.blocksToMine.clear();
+        this.oreAmount = 0;
         this.resetRecipeLogic();
     }
 
@@ -173,7 +170,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     public void inValid() {
         super.inValid();
         this.cachedItemTransfer = null;
-//        this.pipeLength = 0;
     }
 
     private static BlockState findMiningReplacementBlock(Level level) {
@@ -215,11 +211,11 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
             if (getMachine().getOffsetTimer() % this.speed == 0 && !blocksToMine.isEmpty()) {
                 NonNullList<ItemStack> blockDrops = NonNullList.create();
                 BlockState blockState = serverLevel.getBlockState(blocksToMine.getFirst());
-                this.oreAmount = blocksToMine.size();
 
                 // check to make sure the ore is still there,
                 while (!blockState.is(CustomTags.ORE_BLOCKS)) {
                     blocksToMine.removeFirst();
+                    this.oreAmount = blocksToMine.size();
                     if (blocksToMine.isEmpty()) break;
                     blockState = serverLevel.getBlockState(blocksToMine.getFirst());
                 }
@@ -242,6 +238,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
                     }
                     // try to insert them
                     mineAndInsertItems(blockDrops, serverLevel);
+                    this.oreAmount = blocksToMine.size();
                 }
             }
 
@@ -257,6 +254,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
                     this.isDone = true;
                     this.setStatus(Status.IDLE);
                 }
+                this.oreAmount = blocksToMine.size();
             }
         } else {
             // machine isn't working enabled
@@ -416,11 +414,9 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         startX = pos.getX() - currentRadius;
         startZ = pos.getZ() - currentRadius;
         startY = maxHeight;
-//        pipeY = pos.getY() - 1;
         mineX = pos.getX() - currentRadius;
         mineZ = pos.getZ() - currentRadius;
         mineY = maxHeight;
-        onRemove();
     }
 
     /**
@@ -506,7 +502,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
 
             // only count iterations where blocks were found
             if (!blocks.isEmpty())
-                calculated++;
+                calculated = blocks.size();
         }
         return blocks;
     }
@@ -543,16 +539,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         return DIVIDEND / Math.pow(base, POWER);
     }
 
-    /**
-     * Increments the pipe rendering length by one, signaling that the miner's y level has moved down by one
-     */
-//    private void incrementPipeLength() {
-//        this.pipeLength++;
-//        if (getMachine().getLevel() instanceof ServerLevel serverLevel) {
-//            var pos = getMiningPos().relative(Direction.DOWN, this.pipeLength);
-//            serverLevel.setBlockAndUpdate(pos, GTBlocks.MINER_PIPE.getDefaultState());
-//        }
-//    }
 
     /**
      * @return the position to start mining from
@@ -561,14 +547,4 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         return getMachine().getPos();
     }
 
-    public void onRemove() {
-//        pipeLength = 0;
-        if (getMachine().getLevel() instanceof ServerLevel serverLevel) {
-            var pos = getMiningPos().relative(Direction.DOWN);
-            while (serverLevel.getBlockState(pos).is(GTBlocks.MINER_PIPE.get())) {
-                serverLevel.removeBlock(pos, false);
-                pos = pos.relative(Direction.DOWN);
-            }
-        }
-    }
 }

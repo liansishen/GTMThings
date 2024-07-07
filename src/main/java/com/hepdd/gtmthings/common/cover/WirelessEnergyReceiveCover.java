@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
 
-import static com.gregtechceu.gtceu.api.GTValues.MV;
 import static com.gregtechceu.gtceu.api.capability.GTCapabilityHelper.getEnergyContainer;
 
 @ParametersAreNonnullByDefault
@@ -88,8 +87,8 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
         var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
         if (machine instanceof SimpleTieredMachine simpleTieredMachine) {
             this.machineMaxEnergy = GTValues.V[simpleTieredMachine.getTier()] * 64L;
-        } else if (machine instanceof DigitalMiner) {
-            this.machineMaxEnergy = GTValues.V[MV] *64L;
+        } else if (machine instanceof DigitalMiner digitalMiner) {
+            this.machineMaxEnergy = GTValues.V[digitalMiner.getTier()] *64L;
         }
         updateCoverSub();
     }

@@ -99,7 +99,7 @@ public class DigitalMiner extends WorkableTieredMachine
         this.minHeight = 0;
         this.maxHeight = 64;
         this.minerRadius = 32;
-        setWorkingEnabled(false);
+        resetRecipe();
     }
 
     //////////////////////////////////////
@@ -280,16 +280,20 @@ public class DigitalMiner extends WorkableTieredMachine
 
         return group;
     }
+    private void resetRecipe() {
+        setWorkingEnabled(false);
+        getRecipeLogic().resetRecipeLogic(this.minerRadius,this.minHeight,this.maxHeight,this.silkLevel,itemFilter);
+    }
 
     private void filterChange() {
         this.itemFilter = null;
         if (!filterInventory.getStackInSlot(0).isEmpty())
             this.itemFilter = ItemFilter.loadFilter(filterInventory.getStackInSlot(0));
+        resetRecipe();
     }
 
     private void reset(ClickData clickData) {
-        setWorkingEnabled(false);
-        getRecipeLogic().resetRecipeLogic(this.minerRadius,this.minHeight,this.maxHeight,this.silkLevel,itemFilter);
+        resetRecipe();
     }
 
     private void setSilk(ClickData clickData) {
@@ -303,6 +307,7 @@ public class DigitalMiner extends WorkableTieredMachine
 //        fortuneLevel = 1;
 //        this.fortuneButton.setButtonTexture(new TextTexture("时运").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
         energyPerTick = GTValues.V[MV-1] * 4 * silkLevel;
+        resetRecipe();
     }
 
 //    private void setFortune(ClickData clickData) {
