@@ -34,7 +34,7 @@ public class CreativeModeTabs {
             .defaultCreativeTab("more_machines",builder -> builder
                     .displayItems(new GTCreativeModeTabs.RegistrateDisplayItemsGenerator("more_machines", GTMTHINGS_REGISTRATE))
                     .title(GTMTHINGS_REGISTRATE.addLang("itemGroup", GTMThings.id("more_machines"), GTMThings.NAME))
-                    .icon(DIGITAL_MINER::asStack)
+                    .icon(DIGITAL_MINER[2]::asStack)
                     .build())
             .register();
 

@@ -11,8 +11,10 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.client.renderer.machine.MinerRenderer;
+import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
 import java.util.Locale;
@@ -31,13 +33,28 @@ public class CustomMachines {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.MORE_MACHINES);
     }
 
-    public static final MachineDefinition DIGITAL_MINER = GTMTHINGS_REGISTRATE
-            .machine("digital_miner", DigitalMiner::new)
-            .rotationState(RotationState.NON_Y_AXIS)
-            .renderer(() -> new MinerRenderer(MV, GTCEu.id("block/machines/miner")))
+    public static final MachineDefinition[] DIGITAL_MINER = registerTieredMachines("digital_miner",
+            DigitalMiner::new,
+            (tier, builder) -> builder
+            .langValue("%s Digital Miner %s".formatted(VLVH[tier], VLVT[tier]))
+            .rotationState(RotationState.NON_Y_AXIS).tier(tier)
+            .renderer(() -> new MinerRenderer(tier, GTCEu.id("block/machines/miner")))
+            .tooltipBuilder((stack, tooltip) -> {
+                int maxArea = (int) (8 * Math.pow(2, tier));
+                long energyPerTick = GTValues.V[tier - 1];
+                tooltip.add(Component.translatable("gtceu.universal.tooltip.uses_per_tick", energyPerTick)
+                        .append(Component.literal(", ").withStyle(ChatFormatting.GRAY))
+                        .append(Component.literal("§7每个方块需要§f" + (int) (40 / Math.pow(2, tier)) + "§7刻。")));
+                tooltip.add(Component.translatable("gtceu.universal.tooltip.voltage_in",
+                        FormattingUtil.formatNumbers(GTValues.V[tier]),
+                        GTValues.VNF[tier]));
+                tooltip.add(
+                        Component.translatable("gtceu.universal.tooltip.working_area_max", maxArea, maxArea));
+            })
             .recipeTypes(DIGITAL_MINER_RECIPE)
             .compassNode("miner")
-            .register();
+            .register(),
+            LV, MV, HV);
 
     public static final MachineDefinition[] HUGE_ITEM_IMPORT_BUS = registerTieredMachines("huge_item_import_bus",
             (holder,tier) -> new HugeBusPartMachine(holder, tier, IO.IN),

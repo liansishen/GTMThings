@@ -464,5 +464,59 @@ public class GTMTRecipe {
                     .EUt(GTValues.VA[tier])
                     .save(provider);
         }
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("lv_digital_miner"))
+                .inputItems(GTMachines.MINER[GTValues.LV].asStack())
+                .inputItems(GTItems.CONVEYOR_MODULE_LV.asStack(2))
+                .inputItems(GTItems.ROBOT_ARM_LV.asStack(2))
+                .inputItems(GTItems.EMITTER_LV.asStack(1))
+                .inputItems(GTItems.SENSOR_LV.asStack(1))
+                .inputItems(CustomTags.MV_CIRCUITS, 2)
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                .outputItems(CustomMachines.DIGITAL_MINER[GTValues.LV].asStack())
+                .duration(200)
+                .EUt(GTValues.VA[GTValues.LV])
+                .save(provider);
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("mv_digital_miner"))
+                .inputItems(GTMachines.MINER[GTValues.MV].asStack())
+                .inputItems(GTItems.CONVEYOR_MODULE_MV.asStack(2))
+                .inputItems(GTItems.ROBOT_ARM_MV.asStack(2))
+                .inputItems(GTItems.EMITTER_MV.asStack(1))
+                .inputItems(GTItems.SENSOR_MV.asStack(1))
+                .inputItems(CustomTags.HV_CIRCUITS, 2)
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                .outputItems(CustomMachines.DIGITAL_MINER[GTValues.MV].asStack())
+                .duration(200)
+                .EUt(GTValues.VA[GTValues.MV])
+                .save(provider);
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("hv_digital_miner"))
+                .inputItems(GTMachines.MINER[GTValues.HV].asStack())
+                .inputItems(GTItems.CONVEYOR_MODULE_HV.asStack(2))
+                .inputItems(GTItems.ROBOT_ARM_HV.asStack(2))
+                .inputItems(GTItems.EMITTER_HV.asStack(1))
+                .inputItems(GTItems.SENSOR_HV.asStack(1))
+                .inputItems(CustomTags.EV_CIRCUITS, 2)
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                .outputItems(CustomMachines.DIGITAL_MINER[GTValues.HV].asStack())
+                .duration(200)
+                .EUt(GTValues.VA[GTValues.HV])
+                .save(provider);
+        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UHV)) {
+            ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("huge_item_import_bus_" + GTValues.VN[tier].toLowerCase()))
+                    .inputItems(GTMachines.ITEM_IMPORT_BUS[tier].asStack())
+                    .inputItems(tier > GTValues.EV ? GTMachines.QUANTUM_CHEST[tier] : GTMachines.SUPER_CHEST[tier])
+                    .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                    .outputItems(CustomMachines.HUGE_ITEM_IMPORT_BUS[tier].asStack())
+                    .duration(200)
+                    .EUt(GTValues.VA[tier])
+                    .save(provider);
+            ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("huge_item_export_bus_" + GTValues.VN[tier].toLowerCase()))
+                    .inputItems(GTMachines.ITEM_EXPORT_BUS[tier].asStack())
+                    .inputItems(tier > GTValues.EV ? GTMachines.QUANTUM_CHEST[tier] : GTMachines.SUPER_CHEST[tier])
+                    .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                    .outputItems(CustomMachines.HUGE_ITEM_EXPORT_BUS[tier].asStack())
+                    .duration(200)
+                    .EUt(GTValues.VA[tier])
+                    .save(provider);
+        }
     }
 }
