@@ -306,7 +306,7 @@ public class DigitalMiner extends WorkableTieredMachine
         }
 //        fortuneLevel = 1;
 //        this.fortuneButton.setButtonTexture(new TextTexture("时运").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
-        energyPerTick = GTValues.V[MV-1] * 4 * silkLevel;
+        energyPerTick = GTValues.V[MV-1] * 4 * (silkLevel + 1);
         resetRecipe();
     }
 
