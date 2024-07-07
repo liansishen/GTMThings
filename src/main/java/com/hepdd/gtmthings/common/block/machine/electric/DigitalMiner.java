@@ -90,9 +90,9 @@ public class DigitalMiner extends WorkableTieredMachine
     private int silkLevel;
     private int fortuneLevel;
 
-    public DigitalMiner(IMachineBlockEntity holder,Object... args) {
-        super(holder, MV, GTMachines.defaultTankSizeFunction, args);
-        this.energyPerTick = GTValues.V[MV-1];
+    public DigitalMiner(IMachineBlockEntity holder, int tier, Object... args) {
+        super(holder, tier, GTMachines.defaultTankSizeFunction, args);
+        this.energyPerTick = GTValues.V[tier - 1];
         this.filterInventory = createFilterItemHandler();
         this.fortuneLevel = 1;
         this.silkLevel = 0;
@@ -120,7 +120,7 @@ public class DigitalMiner extends WorkableTieredMachine
 
     @Override
     protected RecipeLogic createRecipeLogic(Object... args) {
-        return new DigitalMinerLogic(this, minerRadius,minHeight,maxHeight,silkLevel,itemFilter);
+        return new DigitalMinerLogic(this, minerRadius, minHeight, maxHeight, silkLevel, itemFilter, (int) (40 / Math.pow(2, getTier())));
     }
 
     @Override
@@ -239,7 +239,7 @@ public class DigitalMiner extends WorkableTieredMachine
         // Radius
         group.addWidget(new LabelWidget(99,26,"水平范围:"));
         group.addWidget(new SimpleNumberInputWidget(140,24,24,12,this::getMinerRadius,this::setMinerRadius)
-                .setMin(1).setMax(32));
+                .setMin(1).setMax((int) (8 * Math.pow(2, getTier()))));
 
         // Min height
         group.addWidget(new LabelWidget(99,44,"最小高度:"));

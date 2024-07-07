@@ -122,11 +122,11 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     private ItemFilter itemFilter;
 
 
-    public DigitalMinerLogic(@NotNull IRecipeLogicMachine machine, int maximumRadius, int minHeight, int maxHeight, int silk, ItemFilter itemFilter) {
+    public DigitalMinerLogic(@NotNull IRecipeLogicMachine machine, int maximumRadius, int minHeight, int maxHeight, int silk, ItemFilter itemFilter, int speed) {
         super(machine);
         this.miner = (IDigitalMiner) machine;
         this.silk = silk;
-        this.speed = 10;
+        this.speed = speed;
         this.currentRadius = maximumRadius;
         this.maximumRadius = maximumRadius;
         this.isDone = false;
