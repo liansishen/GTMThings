@@ -48,8 +48,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.gregtechceu.gtceu.api.GTValues.MV;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DigitalMiner extends WorkableTieredMachine
@@ -300,13 +298,12 @@ public class DigitalMiner extends WorkableTieredMachine
         if (silkLevel == 0) {
             silkLevel = 1;
             this.silkButton.setButtonTexture(new TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GREEN.getColor()));
+            energyPerTick = GTValues.V[getTier() - 1] * 4;
         } else {
             silkLevel = 0;
             this.silkButton.setButtonTexture(new TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
+            energyPerTick = GTValues.V[getTier() - 1];
         }
-//        fortuneLevel = 1;
-//        this.fortuneButton.setButtonTexture(new TextTexture("时运").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
-        energyPerTick = GTValues.V[MV-1] * 4 * (silkLevel + 1);
         resetRecipe();
     }
 
