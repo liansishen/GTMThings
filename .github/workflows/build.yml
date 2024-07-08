@@ -7,7 +7,7 @@ on:
       - build.gradle
       - gradle.properties
       - settings.gradle
-  pull_request:
+  pull_request: master
 
 jobs:
   build:
