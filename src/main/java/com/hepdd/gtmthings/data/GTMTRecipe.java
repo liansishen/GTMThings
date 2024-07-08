@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
+import com.gregtechceu.gtceu.common.data.machines.GTAEMachines;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.hepdd.gtmthings.GTMThings;
 import com.tterrag.registrate.util.entry.ItemEntry;
@@ -527,5 +528,14 @@ public class GTMTRecipe {
                     .EUt(GTValues.VA[tier])
                     .save(provider);
         }
+
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("me_export_buffer"))
+                .inputItems(GTAEMachines.ITEM_EXPORT_BUS.asStack())
+                .inputItems(GTAEMachines.FLUID_EXPORT_HATCH.asStack())
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                .outputItems(CustomMachines.ME_EXPORT_BUFFER.asStack())
+                .duration(400)
+                .EUt(GTValues.VA[GTValues.HV])
+                .save(provider);
     }
 }
