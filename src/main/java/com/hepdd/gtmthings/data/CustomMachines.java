@@ -14,6 +14,7 @@ import com.gregtechceu.gtceu.client.renderer.machine.MinerRenderer;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng.MEOutputPartMachine;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
@@ -55,6 +56,15 @@ public class CustomMachines {
             .compassNode("miner")
             .register(),
             LV, MV, HV);
+
+    public static final MachineDefinition ME_EXPORT_BUFFER = GTMTHINGS_REGISTRATE.machine("me_export_buffer"
+            , MEOutputPartMachine::new)
+            .rotationState(RotationState.ALL)
+            .abilities(PartAbility.EXPORT_ITEMS,PartAbility.EXPORT_FLUIDS)
+            .tooltips(Component.translatable("gtmthings.machine.me_export_buffer.tooltip"))
+            .overlayTieredHullRenderer("me.export")
+            .tier(LuV)
+            .register();
 
     public static final MachineDefinition[] HUGE_ITEM_IMPORT_BUS = registerTieredMachines("huge_item_import_bus",
             (holder,tier) -> new HugeBusPartMachine(holder, tier, IO.IN),
