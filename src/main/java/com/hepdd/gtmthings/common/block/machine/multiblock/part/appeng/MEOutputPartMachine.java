@@ -2,6 +2,8 @@ package com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng;
 
 import appeng.api.networking.*;
 import appeng.api.networking.security.IActionSource;
+import appeng.api.stacks.AEFluidKey;
+import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.storage.MEStorage;
 import appeng.api.storage.StorageHelper;
@@ -16,6 +18,7 @@ import com.gregtechceu.gtceu.api.machine.trait.IRecipeHandlerTrait;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.integration.ae2.util.SerializableManagedGridNode;
 import com.hepdd.gtmthings.common.block.machine.trait.MEOutputHandler;
+import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
@@ -32,8 +35,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -53,8 +58,10 @@ public class MEOutputPartMachine extends TieredIOPartMachine
     public ManagedFieldHolder getFieldHolder() {
         return MANAGED_FIELD_HOLDER;
     }
-
-
+    @Getter
+    private boolean isItemFull;
+    @Getter
+    private boolean isFluidFull;
     @Getter
     @Persisted
     @ReadOnlyManaged(
@@ -89,6 +96,8 @@ public class MEOutputPartMachine extends TieredIOPartMachine
 
     public MEOutputPartMachine(IMachineBlockEntity holder) {
         super(holder, GTValues.LuV, IO.OUT);
+        this.isItemFull = false;
+        this.isFluidFull = false;
     }
 
     @Override
@@ -185,6 +194,8 @@ public class MEOutputPartMachine extends TieredIOPartMachine
                 var amount = entry.getLongValue();
                 long inserted = StorageHelper.poweredInsert(
                         getMainNode().getGrid().getEnergyService(), aeNetwork, key, amount, actionSource);
+                if (AEItemKey.is(key)) isItemFull = (inserted == 0);
+                if (AEFluidKey.is(key)) isFluidFull = (inserted == 0);
                 if (inserted >= amount) {
                     iterator.remove();
                 } else {
@@ -192,6 +203,11 @@ public class MEOutputPartMachine extends TieredIOPartMachine
                 }
             }
         }
+    }
+
+    @Override
+    public boolean isWorkingEnabled() {
+        return true;
     }
 
     @Override
@@ -226,10 +242,16 @@ public class MEOutputPartMachine extends TieredIOPartMachine
     public Widget createUIWidget() {
         WidgetGroup group = new WidgetGroup(new Position(0, 0));
         // ME Network status
-        group.addWidget(new LabelWidget(10, 15, () -> this.isOnline ?
+        group.addWidget(new LabelWidget(0, 0, () -> this.isOnline ?
                 "gtceu.gui.me_network.online" :
                 "gtceu.gui.me_network.offline"));
-
+        var componentPanel = new ComponentPanelWidget(0,12,this::addDisplayText);
+        group.addWidget(componentPanel);
         return group;
+    }
+
+    private void addDisplayText(@NotNull List<Component> textList) {
+        if (this.isItemFull) textList.add(Component.translatable("gui.gtmthings.me_export_buffer.item_status.full"));
+        if (this.isFluidFull) textList.add(Component.translatable("gui.gtmthings.me_export_buffer.fluid_status.full"));
     }
 }

@@ -61,7 +61,6 @@ public class CustomMachines {
             , MEOutputPartMachine::new)
             .rotationState(RotationState.ALL)
             .abilities(PartAbility.EXPORT_ITEMS,PartAbility.EXPORT_FLUIDS)
-            .tooltips(Component.translatable("gtmthings.machine.me_export_buffer.tooltip"))
             .overlayTieredHullRenderer("me.export")
             .tier(LuV)
             .register();

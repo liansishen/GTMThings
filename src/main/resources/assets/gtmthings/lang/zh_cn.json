@@ -468,5 +468,7 @@
   "itemGroup.gtmthings.more_machines": "更多机器",
   "gui.gtmthings.share_inventory.title": "共享库存",
   "gui.gtmthings.share_inventory.desc.0": "打开共享库存",
-  "gui.gtmthings.share_inventory.desc.1": "其中的物品可参与合成"
+  "gui.gtmthings.share_inventory.desc.1": "其中的物品可参与合成",
+  "gui.gtmthings.me_export_buffer.item_status.full": "物品存储空间已满",
+  "gui.gtmthings.me_export_buffer.fluid_status.full": "流体存储空间已满"
 }
