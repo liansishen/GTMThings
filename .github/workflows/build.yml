@@ -2,7 +2,7 @@ name: CI For ExampleMod
 on:
   push:
     branches:
-      - 'master'
+      - master
     tags-ignore:
       - 'wip'
     paths:
