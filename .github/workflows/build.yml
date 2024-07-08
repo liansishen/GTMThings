@@ -1,13 +1,17 @@
 name: CI For ExampleMod
 on:
   push:
+    branches:
+      - 'master'
+    tags-ignore:
+      - 'wip'
     paths:
       - .github/workflows/**
       - src/**
       - build.gradle
       - gradle.properties
       - settings.gradle
-  pull_request: master
+  pull_request: 
 
 jobs:
   build:
