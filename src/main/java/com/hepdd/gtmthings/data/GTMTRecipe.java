@@ -21,6 +21,15 @@ import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.ASSEMBLER_RECIPES;
 
 public class GTMTRecipe {
     public static void init(Consumer<FinishedRecipe> provider) {
+        ASSEMBLER_RECIPES.recipeBuilder("cover_maintenance_detector")
+                .inputItems(GTItems.EMITTER_LV)
+                .inputItems(TagPrefix.plate, GTMaterials.Steel)
+                .circuitMeta(1)
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(72))
+                .outputItems(GTItems.COVER_MAINTENANCE_DETECTOR)
+                .EUt(16).duration(100)
+                .save(provider);
+
         ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_monitor"))
                 .inputItems(GTMachines.HULL[1].asStack())
                 .inputItems(GTItems.COVER_SCREEN.asStack())
