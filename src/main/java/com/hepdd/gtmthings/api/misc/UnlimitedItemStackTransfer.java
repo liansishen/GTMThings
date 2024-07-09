@@ -2,6 +2,7 @@ package com.hepdd.gtmthings.api.misc;
 
 import com.lowdragmc.lowdraglib.misc.ItemStackTransfer;
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
+import lombok.Setter;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -9,10 +10,10 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class UnlimitedItemStackTransfer extends ItemStackTransfer {
+import javax.annotation.Nonnull;
+import java.util.function.Function;
 
-    public UnlimitedItemStackTransfer() {
-    }
+public class UnlimitedItemStackTransfer extends ItemStackTransfer {
 
     public UnlimitedItemStackTransfer(int size) {
         super(size);
@@ -26,6 +27,13 @@ public class UnlimitedItemStackTransfer extends ItemStackTransfer {
         super(stack);
     }
 
+    @Setter
+    private Function<ItemStack, Boolean> filter;
+
+    @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+        return filter == null || filter.apply(stack);
+    }
 
     @Override
     @NotNull
@@ -40,7 +48,9 @@ public class UnlimitedItemStackTransfer extends ItemStackTransfer {
         if (existing.isEmpty())
             return ItemStack.EMPTY;
 
-        if (existing.getCount() <= amount) {
+        int toExtract = Math.min(amount, getSlotLimit(slot));
+
+        if (existing.getCount() <= toExtract) {
             if (!simulate) {
                 this.stacks.set(slot, ItemStack.EMPTY);
                 if (notifyChanges) {
@@ -52,22 +62,25 @@ public class UnlimitedItemStackTransfer extends ItemStackTransfer {
             }
         } else {
             if (!simulate) {
-                this.stacks.set(slot, ItemTransferHelper.copyStackWithSize(existing, existing.getCount() - amount));
+                this.stacks.set(slot, ItemTransferHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
                 if (notifyChanges) {
                     onContentsChanged(slot);
                 }
             }
 
-            return ItemTransferHelper.copyStackWithSize(existing, amount);
+             return ItemTransferHelper.copyStackWithSize(existing, toExtract);
         }
     }
 
+    @Override
     public UnlimitedItemStackTransfer copy() {
-        var copy = new UnlimitedItemStackTransfer(getSlots());
+        var copiedStack = NonNullList.withSize(stacks.size(),ItemStack.EMPTY);
         for (int i = 0; i < stacks.size(); i++) {
-            copy.setStackInSlot(i, getStackInSlot(i));
+            copiedStack.set(i, stacks.get(i).copy());
         }
-        return copy;
+        var copied = new UnlimitedItemStackTransfer(copiedStack);
+        copied.setFilter(filter);
+        return copied;
     }
 
     @Override

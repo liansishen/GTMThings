@@ -233,7 +233,8 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
                     shareInventory.storage, Component.translatable("gui.gtmthings.share_inventory.title"))
                     .setTooltips(List.of(
                             Component.translatable("gui.gtmthings.share_inventory.desc.0"),
-                            Component.translatable("gui.gtmthings.share_inventory.desc.1"))));
+                            Component.translatable("gui.gtmthings.share_inventory.desc.1"),
+                            Component.translatable("gui.gtmthings.share_inventory.desc.2"))));
         }
     }
 

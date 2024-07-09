@@ -10,14 +10,12 @@ import com.gregtechceu.gtceu.utils.ItemStackHashStrategy;
 import com.lowdragmc.lowdraglib.misc.ItemStackTransfer;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class CatalystItemStackHandler extends NotifiableItemStackHandler {
 

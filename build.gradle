@@ -117,7 +117,8 @@ dependencies {
     modCompileOnly("mezz.jei:jei-$project.minecraft_version-forge-api:$project.jei_version") { transitive = false }
     modCompileOnly("mezz.jei:jei-$project.minecraft_version-common-api:$project.jei_version") { transitive = false }
 
-    modImplementation("com.gregtechceu.gtceu:gtceu-$project.minecraft_version:$project.gtceu_version") { transitive = false }
+    //modImplementation("com.gregtechceu.gtceu:gtceu-$project.minecraft_version:$project.gtceu_version") { transitive = false }
+    modImplementation("dev:gtceu:1.20.1:1.3.1") { transitive false }
     modImplementation("com.lowdragmc.ldlib:ldlib-forge-$project.minecraft_version:$project.ldlib_version") { transitive = false }
     modImplementation("com.tterrag.registrate:Registrate:$project.registrate_version")
 //    modImplementation("dev.latvian.mods:kubejs-forge:$project.kubejs_version")
@@ -138,12 +139,13 @@ dependencies {
 
     modImplementation 'maven.modrinth:Jade-1.20.1-forge-11.9.2'
     modImplementation 'appeng:appliedenergistics2-forge-15.2.1'
-//    modRuntimeOnly 'dev.emi:emi-1.1.6+1.20.1+forge'
-//    modRuntimeOnly 'dev:jecharacters-1.20.1-forge-4.5.9'
+    modRuntimeOnly 'dev:emi:1.1.6'
+//    modRuntimeOnly 'dev:jecharacters:4.5.9'
 
     modImplementation("dev.architectury:architectury-forge:${project.architectury_version}")
     modImplementation("dev.ftb.mods:ftb-library-forge:${project.ftb_library_version}") { transitive false }
     modImplementation("dev.ftb.mods:ftb-teams-forge:${project.ftb_teams_version}") { transitive false }
+
 }
 
 processResources {
