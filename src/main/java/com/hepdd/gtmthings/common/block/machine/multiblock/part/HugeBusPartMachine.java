@@ -15,6 +15,7 @@ import com.hepdd.gtmthings.api.machine.fancyconfigurator.ButtonConfigurator;
 import com.hepdd.gtmthings.api.machine.fancyconfigurator.InventoryFancyConfigurator;
 import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
 import com.hepdd.gtmthings.api.transfer.UnlimitItemTransferHelper;
+import com.hepdd.gtmthings.common.block.machine.trait.CatalystItemStackHandler;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
@@ -67,7 +68,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
     protected final NotifiableItemStackHandler circuitInventory;
     @Getter
     @Persisted
-    protected final NotifiableItemStackHandler shareInventory;
+    protected final CatalystItemStackHandler shareInventory;
     @Getter
     protected final ItemHandlerProxyRecipeTrait combinedInventory;
 
@@ -75,7 +76,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         super(holder, tier, io);
         this.inventory = createInventory(args);
         this.circuitInventory = createCircuitItemHandler(io);
-        this.shareInventory = new NotifiableItemStackHandler(this, 4, IO.IN, IO.NONE);
+        this.shareInventory = new CatalystItemStackHandler(this, 4, IO.IN, IO.NONE);
         this.combinedInventory = createCombinedItemHandler(io);
     }
 
@@ -145,13 +146,14 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
 
     @Override
     public boolean isDistinct() {
-        return getInventory().isDistinct() && circuitInventory.isDistinct();
+        return getInventory().isDistinct() && circuitInventory.isDistinct() && shareInventory.isDistinct();
     }
 
     @Override
     public void setDistinct(boolean isDistinct) {
         getInventory().setDistinct(isDistinct);
         circuitInventory.setDistinct(isDistinct);
+        shareInventory.setDistinct(isDistinct);
         combinedInventory.setDistinct(isDistinct);
     }
 
@@ -231,7 +233,8 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
                     shareInventory.storage, Component.translatable("gui.gtmthings.share_inventory.title"))
                     .setTooltips(List.of(
                             Component.translatable("gui.gtmthings.share_inventory.desc.0"),
-                            Component.translatable("gui.gtmthings.share_inventory.desc.1"))));
+                            Component.translatable("gui.gtmthings.share_inventory.desc.1"),
+                            Component.translatable("gui.gtmthings.share_inventory.desc.2"))));
         }
     }
 

@@ -466,9 +466,10 @@
   "itemGroup.gtmthings.creative": "创造物品",
   "itemGroup.gtmthings.wireless": "格雷无线科技",
   "itemGroup.gtmthings.more_machines": "更多机器",
-  "gui.gtmthings.share_inventory.title": "共享库存",
-  "gui.gtmthings.share_inventory.desc.0": "打开共享库存",
-  "gui.gtmthings.share_inventory.desc.1": "其中的物品可参与合成",
+  "gui.gtmthings.share_inventory.title": "催化剂",
+  "gui.gtmthings.share_inventory.desc.0": "打开催化剂槽",
+  "gui.gtmthings.share_inventory.desc.1": "在催化剂槽中只有不消耗的物品才能参与合成。",
+  "gui.gtmthings.share_inventory.desc.2": "普通物品请通过在输入总线面前放置容器以自动输入。",
   "gui.gtmthings.me_export_buffer.item_status.full": "物品存储空间已满",
   "gui.gtmthings.me_export_buffer.fluid_status.full": "流体存储空间已满"
 }
