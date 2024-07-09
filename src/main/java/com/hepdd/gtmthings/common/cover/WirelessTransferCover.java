@@ -7,9 +7,17 @@ import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
+import com.gregtechceu.gtceu.api.machine.WorkableTieredMachine;
+import com.gregtechceu.gtceu.common.machine.electric.PumpMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.FluidHatchPartMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.ItemBusPartMachine;
+import com.gregtechceu.gtceu.common.machine.storage.CrateMachine;
+import com.gregtechceu.gtceu.common.machine.storage.DrumMachine;
+import com.gregtechceu.gtceu.common.machine.storage.QuantumChestMachine;
+import com.gregtechceu.gtceu.common.machine.storage.QuantumTankMachine;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
+import com.hepdd.gtmthings.data.CustomItems;
+import com.hepdd.gtmthings.data.WirelessCovers;
 import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper;
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -63,20 +71,9 @@ public class WirelessTransferCover extends CoverBehavior {
     @Override
     public boolean canAttach() {
         var targetMachine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
-
-        if (targetMachine instanceof SimpleTieredMachine simpleTieredMachine) {
-            if ((simpleTieredMachine.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM)
-                    || (simpleTieredMachine.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID)) {
-
-                for (var cover:targetMachine.getCoverContainer().getCovers()) {
-                    if (cover instanceof WirelessTransferCover wirelessTransferCover
-                            && wirelessTransferCover.transferType == this.transferType) return false;
-                }
-                return true;
-            }
-        } else if (targetMachine instanceof DigitalMiner digitalMiner) {
-            if ((digitalMiner.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM)
-                    || (digitalMiner.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID)) {
+        if (targetMachine instanceof WorkableTieredMachine workableTieredMachine) {
+            if ((workableTieredMachine.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM)
+                    || (workableTieredMachine.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID)) {
 
                 for (var cover:targetMachine.getCoverContainer().getCovers()) {
                     if (cover instanceof WirelessTransferCover wirelessTransferCover
@@ -84,6 +81,23 @@ public class WirelessTransferCover extends CoverBehavior {
                 }
                 return true;
             }
+            return false;
+        } else if (targetMachine instanceof PumpMachine || targetMachine instanceof QuantumTankMachine || targetMachine instanceof DrumMachine) {
+            if (this.transferType == TRANSFER_FLUID) {
+                for (var cover:targetMachine.getCoverContainer().getCovers()) {
+                    if (cover instanceof WirelessTransferCover) return false;
+                }
+                return true;
+            }
+            return false;
+        } else if (targetMachine instanceof QuantumChestMachine || targetMachine instanceof CrateMachine) {
+            if (this.transferType == TRANSFER_ITEM) {
+                for (var cover:targetMachine.getCoverContainer().getCovers()) {
+                    if (cover instanceof WirelessTransferCover) return false;
+                }
+                return true;
+            }
+            return false;
         } else if ((targetMachine instanceof ItemBusPartMachine itemBusPartMachine
                 && itemBusPartMachine.getInventory().handlerIO != IO.IN
                 && this.transferType == TRANSFER_ITEM)

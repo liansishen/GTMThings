@@ -2,11 +2,13 @@ package com.hepdd.gtmthings.common.cover;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.ICoverable;
+import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
+import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
 import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
@@ -59,22 +61,16 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
     @Override
     public boolean canAttach() {
         var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
-        if (machine instanceof SimpleTieredMachine simpleTieredMachine) {
-            if (simpleTieredMachine.getTier() < this.tier) return false;
-            var covers = simpleTieredMachine.getCoverContainer().getCovers();
+        if (machine instanceof TieredEnergyMachine tieredEnergyMachine
+                && tieredEnergyMachine.energyContainer.getHandlerIO() == IO.IN
+                && tieredEnergyMachine.getTier() >= this.tier) {
+            var covers = tieredEnergyMachine.getCoverContainer().getCovers();
             for (var cover : covers) {
                 if (cover instanceof WirelessEnergyReceiveCover) return false;
             }
             return true;
         } else if (machine instanceof BatteryBufferMachine batteryBufferMachine) {
             return batteryBufferMachine.getTier() >= this.tier;
-        } else if (machine instanceof DigitalMiner digitalMiner) {
-            if (digitalMiner.getTier() < this.tier) return false;
-            var covers = digitalMiner.getCoverContainer().getCovers();
-            for (var cover : covers) {
-                if (cover instanceof WirelessEnergyReceiveCover) return false;
-            }
-            return true;
         } else {
             return false;
         }
@@ -85,10 +81,8 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
         super.onAttached(itemStack, player);
         this.uuid = player.getUUID();
         var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
-        if (machine instanceof SimpleTieredMachine simpleTieredMachine) {
-            this.machineMaxEnergy = GTValues.V[simpleTieredMachine.getTier()] * 64L;
-        } else if (machine instanceof DigitalMiner digitalMiner) {
-            this.machineMaxEnergy = GTValues.V[digitalMiner.getTier()] *64L;
+        if (machine instanceof TieredEnergyMachine tieredEnergyMachine) {
+            this.machineMaxEnergy = GTValues.V[tieredEnergyMachine.getTier()] * 64L;
         }
         updateCoverSub();
     }
