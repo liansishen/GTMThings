@@ -41,7 +41,7 @@ public class WirelessMachines {
 
     public static final MachineDefinition WIRELESS_ENERGY_INTERFACE = GTMTHINGS_REGISTRATE
             .machine("wireless_energy_interface", WirelessEnergyInterface::new)
-            .rotationState(RotationState.NON_Y_AXIS)
+            .rotationState(RotationState.ALL)
             .compassNodeSelf()
             .overlayTieredHullRenderer("energy_hatch.input")
             .tier(IV)
