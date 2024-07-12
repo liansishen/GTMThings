@@ -4,11 +4,13 @@ import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
+import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.machines.GTAEMachines;
+import com.gregtechceu.gtceu.common.data.machines.GTResearchMachines;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.hepdd.gtmthings.GTMThings;
 import com.tterrag.registrate.util.entry.ItemEntry;
@@ -536,6 +538,28 @@ public class GTMTRecipe {
                 .outputItems(CustomMachines.ME_EXPORT_BUFFER.asStack())
                 .duration(400)
                 .EUt(GTValues.VA[GTValues.HV])
+                .save(provider);
+
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_computation_transmitter_hatch"))
+                .inputItems(GTResearchMachines.COMPUTATION_HATCH_TRANSMITTER.asStack())
+                .inputItems(CustomTags.ZPM_CIRCUITS)
+                .inputItems(GTItems.SENSOR_ZPM)
+                .inputFluids(GTMaterials.Polybenzimidazole.getFluid(288))
+                .outputItems(WirelessMachines.WIRELESS_COMPUTATION_HATCH_TRANSMITTER)
+                .cleanroom(CleanroomType.CLEANROOM)
+                .duration(200)
+                .EUt(GTValues.VA[GTValues.ZPM])
+                .save(provider);
+
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_computation_receiver_hatch"))
+                .inputItems(GTResearchMachines.COMPUTATION_HATCH_TRANSMITTER.asStack())
+                .inputItems(CustomTags.ZPM_CIRCUITS)
+                .inputItems(GTItems.EMITTER_ZPM)
+                .inputFluids(GTMaterials.Polybenzimidazole.getFluid(288))
+                .outputItems(WirelessMachines.WIRELESS_COMPUTATION_HATCH_RECEIVER)
+                .cleanroom(CleanroomType.CLEANROOM)
+                .duration(200)
+                .EUt(GTValues.VA[GTValues.ZPM])
                 .save(provider);
     }
 }
