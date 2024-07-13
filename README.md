@@ -49,8 +49,6 @@ When used as a cover, it draws Fluid from the bind container to the machine.
 
 
 # Machines Planned to be Added
-* Giant Input Bus
-* Giant Output Bus
 * Programmable Circuit Series
 
 ---
@@ -97,6 +95,4 @@ Make GregTech-Modern great again!
 
 # 计划添加的机器
 * 进阶无线传输覆盖板
-* 巨型输入总线
-* 巨型输出总线
 * 可编程电路系列
