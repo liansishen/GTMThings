@@ -42,6 +42,28 @@ public class CustomItems {
                     })))
             .register();
 
+    public static ItemEntry<ComponentItem> ADVANCED_WIRELESS_ITEM_TRANSFER_COVER = GTMTHINGS_REGISTRATE
+            .item("advanced_wireless_item_transfer_cover",ComponentItem::create)
+            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(WirelessCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
+                    new CoverPlaceBehavior(WirelessCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
+                    new WirelessTransferCoverTooltipBehavior(lines->{
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.item.tooltip.1"));
+                        lines.add(Component.translatable("item.gtmthings.advanced_wireless_transfer.tooltip.1"));
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
+                    })))
+            .register();
+
+    public static ItemEntry<ComponentItem> ADVANCED_WIRELESS_FLUID_TRANSFER_COVER = GTMTHINGS_REGISTRATE
+            .item("advanced_wireless_fluid_transfer_cover",ComponentItem::create)
+            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(WirelessCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
+                    new CoverPlaceBehavior(WirelessCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
+                    new WirelessTransferCoverTooltipBehavior(lines->{
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.fluid.tooltip.1"));
+                        lines.add(Component.translatable("item.gtmthings.advanced_wireless_transfer.tooltip.1"));
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
+                    })))
+            .register();
+
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LV =
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_MV =

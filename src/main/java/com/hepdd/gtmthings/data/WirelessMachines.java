@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
-import com.gregtechceu.gtceu.common.machine.multiblock.part.OpticalComputationHatchMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyInterface;
@@ -43,7 +42,7 @@ public class WirelessMachines {
 
     public static final MachineDefinition WIRELESS_ENERGY_INTERFACE = GTMTHINGS_REGISTRATE
             .machine("wireless_energy_interface", WirelessEnergyInterface::new)
-            .rotationState(RotationState.NON_Y_AXIS)
+            .rotationState(RotationState.ALL)
             .compassNodeSelf()
             .overlayTieredHullRenderer("energy_hatch.input")
             .tier(IV)

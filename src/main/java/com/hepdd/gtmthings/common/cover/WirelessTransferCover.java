@@ -15,9 +15,6 @@ import com.gregtechceu.gtceu.common.machine.storage.CrateMachine;
 import com.gregtechceu.gtceu.common.machine.storage.DrumMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumChestMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumTankMachine;
-import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
-import com.hepdd.gtmthings.data.CustomItems;
-import com.hepdd.gtmthings.data.WirelessCovers;
 import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper;
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -48,15 +45,15 @@ public class WirelessTransferCover extends CoverBehavior {
     public static final int TRANSFER_FLUID = 2;
 
     @Persisted
-    private final int transferType;
+    protected final int transferType;
     private TickableSubscription subscription;
-    private ServerLevel targetLever;
+    protected ServerLevel targetLever;
     @Persisted
     private String dimensionId;
     @Persisted
-    private BlockPos targetPos;
+    protected BlockPos targetPos;
     @Persisted
-    private Direction facing;
+    protected Direction facing;
 
     public WirelessTransferCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide,int transferType) {
         super(definition, coverHolder, attachedSide);
@@ -154,7 +151,7 @@ public class WirelessTransferCover extends CoverBehavior {
         super.onAttached(itemStack, player);
     }
 
-    private void GetLevel() {
+    protected void GetLevel() {
         if (this.dimensionId==null)return;
         ResourceLocation resLoc = new ResourceLocation(this.dimensionId);
         ResourceKey<Level> resKey = ResourceKey.create(Registries.DIMENSION, resLoc);
@@ -175,9 +172,6 @@ public class WirelessTransferCover extends CoverBehavior {
                 if (fluidTransfer==null) return;
                 FluidTransferHelper.exportToTarget(fluidTransfer,Integer.MAX_VALUE, f-> true,this.targetLever,this.targetPos,this.facing);
             }
-
         }
     }
-
-
 }

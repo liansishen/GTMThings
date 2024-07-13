@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.client.renderer.cover.ICoverRenderer;
 import com.gregtechceu.gtceu.client.renderer.cover.SimpleCoverRenderer;
 import com.hepdd.gtmthings.GTMThings;
+import com.hepdd.gtmthings.common.cover.AdvancedWirelessTransferCover;
 import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
 import com.hepdd.gtmthings.common.cover.WirelessTransferCover;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
@@ -36,6 +37,14 @@ public class WirelessCovers {
 
     public final static CoverDefinition WIRELESS_FLUID_TRANSFER = register("wireless_fluid_transfer",
             (holder,coverable,side)-> new WirelessTransferCover(holder,coverable,side,WirelessTransferCover.TRANSFER_FLUID)
+            ,new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_wireless_fluid_transfer")));
+
+    public final static CoverDefinition ADVANCED_WIRELESS_ITEM_TRANSFER = register("advanced_wireless_item_transfer",
+            (holder,coverable,side)-> new AdvancedWirelessTransferCover(holder,coverable,side,WirelessTransferCover.TRANSFER_ITEM)
+            ,new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_wireless_item_transfer")));
+
+    public final static CoverDefinition ADVANCED_WIRELESS_FLUID_TRANSFER = register("advanced_wireless_fluid_transfer",
+            (holder,coverable,side)-> new AdvancedWirelessTransferCover(holder,coverable,side,WirelessTransferCover.TRANSFER_FLUID)
             ,new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_wireless_fluid_transfer")));
 
 
