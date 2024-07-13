@@ -561,5 +561,23 @@ public class GTMTRecipe {
                 .duration(200)
                 .EUt(GTValues.VA[GTValues.ZPM])
                 .save(provider);
+
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("advanced_wireless_item_transfer_cover"))
+                .inputItems(CustomItems.WIRELESS_ITEM_TRANSFER_COVER.asStack())
+                .inputItems(CustomTags.MV_CIRCUITS)
+                .outputItems(CustomItems.ADVANCED_WIRELESS_ITEM_TRANSFER_COVER)
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(72))
+                .duration(100)
+                .EUt(GTValues.VA[GTValues.LV])
+                .save(provider);
+
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("advanced_wireless_fluid_transfer_cover"))
+                .inputItems(CustomItems.WIRELESS_FLUID_TRANSFER_COVER.asStack())
+                .inputItems(CustomTags.MV_CIRCUITS)
+                .outputItems(CustomItems.ADVANCED_WIRELESS_FLUID_TRANSFER_COVER)
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(72))
+                .duration(100)
+                .EUt(GTValues.VA[GTValues.LV])
+                .save(provider);
     }
 }

@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
-import com.gregtechceu.gtceu.common.machine.multiblock.part.OpticalComputationHatchMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyInterface;
