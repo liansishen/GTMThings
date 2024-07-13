@@ -8,11 +8,13 @@ import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
+import com.gregtechceu.gtceu.common.machine.multiblock.part.OpticalComputationHatchMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyInterface;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessEnergyHatchPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,6 +47,28 @@ public class WirelessMachines {
             .compassNodeSelf()
             .overlayTieredHullRenderer("energy_hatch.input")
             .tier(IV)
+            .register();
+
+    public static final MachineDefinition WIRELESS_COMPUTATION_HATCH_TRANSMITTER = GTMTHINGS_REGISTRATE
+            .machine("wireless_computation_transmitter_hatch", (holder) -> new WirelessOpticalComputationHatchMachine(holder, true))
+            .rotationState(RotationState.ALL)
+            .compassNodeSelf()
+            .abilities(PartAbility.COMPUTATION_DATA_TRANSMISSION)
+            .overlayTieredHullRenderer("computation_data_hatch")
+            .tooltips(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.1"),
+                    Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.2"))
+            .tier(UV)
+            .register();
+
+    public static final MachineDefinition WIRELESS_COMPUTATION_HATCH_RECEIVER = GTMTHINGS_REGISTRATE
+            .machine("wireless_computation_receiver_hatch", (holder) -> new WirelessOpticalComputationHatchMachine(holder, false))
+            .rotationState(RotationState.ALL)
+            .compassNodeSelf()
+            .abilities(PartAbility.COMPUTATION_DATA_RECEPTION)
+            .overlayTieredHullRenderer("computation_data_hatch")
+            .tooltips(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tooltip.1"),
+                    Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tooltip.2"))
+            .tier(UV)
             .register();
 
     public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH = registerWirelessEnergyHatch(IO.IN,2, PartAbility.INPUT_ENERGY, ALL_TIERS);
