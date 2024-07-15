@@ -11,17 +11,25 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.client.renderer.machine.MinerRenderer;
+import com.gregtechceu.gtceu.common.data.GTCompassSections;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng.MEOutputPartMachine;
+import com.hepdd.gtmthings.common.block.machine.normal.PersonalDimensionStation;
+import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.Locale;
 import java.util.function.BiFunction;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
+import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 import static com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine.INV_MULTIPLE;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 import static com.hepdd.gtmthings.data.GTMTRecipeTypes.DIGITAL_MINER_RECIPE;
@@ -33,6 +41,12 @@ public class CustomMachines {
     static {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.MORE_MACHINES);
     }
+
+    public static final MachineDefinition PERSONAL_DIMENSION_STATION = GTMTHINGS_REGISTRATE.machine("person_dimension_station"
+            ,PersonalDimensionStation::new)
+            .rotationState(RotationState.NON_Y_AXIS)
+            .tier(0)
+            .register();
 
     public static final MachineDefinition[] DIGITAL_MINER = registerTieredMachines("digital_miner",
             DigitalMiner::new,
