@@ -38,6 +38,7 @@ public class CustomMachines {
     public static final MachineDefinition PERSONAL_SPACE_PORTAL = GTMTHINGS_REGISTRATE.machine("personal_space_portal"
             , PersonalSpacePortal::new)
             .rotationState(RotationState.NON_Y_AXIS)
+            .blockProp(p -> p.strength(50.0F,6000000.0F))
             .tier(0)
             .register();
 

@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -52,11 +53,11 @@ public class DimensionHelper {
     }
 
     @SuppressWarnings("deprecation")
-    public static ServerLevel getOrCreateWorld(MinecraftServer server, int index) {
+    public static ServerLevel getOrCreateWorld(MinecraftServer server, int index,Map<Block,Integer> layerMap) {
         return getWorld(server, index).orElseGet(() -> {
             Map<ResourceKey<Level>, ServerLevel> map = server.forgeGetWorldMap();
             ResourceKey<Level> world = getRegistryKey(index);
-            return createAndRegisterWorldAndDimension(server, map, world, index);
+            return createAndRegisterWorldAndDimension(server, map, world, layerMap);
         });
     }
 
@@ -67,7 +68,7 @@ public class DimensionHelper {
 
 
     public static ResourceKey<Level> getRegistryKey(int index) {
-        return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(GTMThings.MOD_ID, String.valueOf(index)));
+        return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(GTMThings.MOD_ID, "DIM" + String.valueOf(index)));
     }
 
     public static int getIndex(ResourceKey<Level> world) {
@@ -78,10 +79,10 @@ public class DimensionHelper {
     }
 
     @SuppressWarnings("deprecation")
-    private static ServerLevel createAndRegisterWorldAndDimension(MinecraftServer server, Map<ResourceKey<Level>, ServerLevel> map, ResourceKey<Level> worldKey, int index) {
+    private static ServerLevel createAndRegisterWorldAndDimension(MinecraftServer server, Map<ResourceKey<Level>, ServerLevel> map, ResourceKey<Level> worldKey, Map<Block,Integer> layerMap) {
         ServerLevel overworld = server.getLevel(Level.OVERWORLD);
         ResourceKey<LevelStem> dimensionKey = ResourceKey.create(Registries.LEVEL_STEM, worldKey.location());
-        LevelStem dimension = createDimension(server);
+        LevelStem dimension = createDimension(server,layerMap);
 
         WorldData worldData = server.getWorldData();
         WorldOptions worldGenSettings = worldData.worldGenOptions();
@@ -127,7 +128,7 @@ public class DimensionHelper {
         return newWorld;
     }
 
-    public static LevelStem createDimension(MinecraftServer server) {
+    public static LevelStem createDimension(MinecraftServer server,Map<Block,Integer> layerMap) {
 
         RegistryAccess access = server.registryAccess();
         Holder<DimensionType> dimType = access.registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(PERSONALDIM_TYPE);
@@ -141,10 +142,16 @@ public class DimensionHelper {
                 );
 
         var lays = flatChunkGeneratorConfig.getLayersInfo();
-        lays.add(new FlatLayerInfo(1, Blocks.BEDROCK));
-        lays.add(new FlatLayerInfo(1, Blocks.SMOOTH_STONE));
-        lays.add(new FlatLayerInfo(20, Blocks.AIR));
-        lays.add(new FlatLayerInfo(3, Blocks.SMOOTH_STONE));
+        for(Block key:layerMap.keySet()) {
+            lays.add(new FlatLayerInfo(layerMap.get(key),key));
+        }
+        if (lays.isEmpty()) {
+            lays.add(new FlatLayerInfo(1, Blocks.AIR));
+        }
+//        lays.add(new FlatLayerInfo(1, Blocks.BEDROCK));
+//        lays.add(new FlatLayerInfo(1, Blocks.SMOOTH_STONE));
+//        lays.add(new FlatLayerInfo(20, Blocks.AIR));
+//        lays.add(new FlatLayerInfo(3, Blocks.SMOOTH_STONE));
         flatChunkGeneratorConfig.updateLayers();
 
 
