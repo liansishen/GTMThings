@@ -110,7 +110,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     private void useEnergy() {
         var currentStored = energyContainer.getEnergyStored();
         var maxStored = energyContainer.getEnergyCapacity();
-        var changeStored = maxStored - currentStored;
+        var changeStored = Math.min(maxStored - currentStored,energyContainer.getInputVoltage() * energyContainer.getInputVoltage());
         if (changeStored <= 0) return;
         if (!WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid,-changeStored)) return;
         energyContainer.setEnergyStored(maxStored);
