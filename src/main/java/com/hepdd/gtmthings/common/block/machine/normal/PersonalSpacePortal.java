@@ -17,13 +17,17 @@ import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.misc.ItemStackTransfer;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
+import com.lowdragmc.lowdraglib.syncdata.annotation.DropSaved;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import com.lowdragmc.lowdraglib.syncdata.payload.FriendlyBufPayload;
+import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -31,6 +35,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -79,10 +84,19 @@ public class PersonalSpacePortal extends MetaMachine
     @Setter @Getter
     @Persisted
     private BlockPos teleportPos;
+    @Persisted
+    @DropSaved
+    private String worldGernater;
+    private Map<Block,Integer> layerMap;
+    private ButtonWidget btnCreate;
+    private TextFieldWidget layerInput;
+    @Persisted
+    private ItemStackTransfer layerItem;
 
     public PersonalSpacePortal(IMachineBlockEntity holder) {
         super(holder);
         this.layerItem = new ItemStackTransfer(10);
+        layerMap = new LinkedHashMap<>();
     }
 
     @Override
@@ -149,6 +163,7 @@ public class PersonalSpacePortal extends MetaMachine
     @Override
     public void onLoad() {
         super.onLoad();
+        if (worldGernater != null) validateInput(worldGernater);
     }
 
     @Override
@@ -162,39 +177,27 @@ public class PersonalSpacePortal extends MetaMachine
 
     @Override
     public ModularUI createUI(Player entityPlayer) {
-        return new ModularUI(176, 166, this, entityPlayer)
+        return new ModularUI(300, 230, this, entityPlayer)
                 .widget(getCreateUI().setBackground(GuiTextures.BACKGROUND.copy()
                 .setColor(Long.decode(ConfigHolder.INSTANCE.client.defaultUIColor).intValue() | 0xFF000000)));
     }
 
-
-
-    @Persisted
-    @Setter @Getter
-    @DescSynced
-    private String worldGernater;
-    private Map<Block,Integer> layerMap = new HashMap<>();
-    private ButtonWidget btnCreate;
-    private TextFieldWidget layerInput;
-    @Persisted
-    private ItemStackTransfer layerItem;
-
     private Widget getCreateUI() {
-        int height = 117;
-        int width = 178;
-        var group = new WidgetGroup(0, 0, width + 8, height + 4);
+        int width = 300;
+        int height = 230;
+        var group = new WidgetGroup(0, 0, width, height);
 
-        group.addWidget(new LabelWidget(4,4,String.format("worldId: %s",worldId)));
+        group.addWidget(new LabelWidget(8,4,String.format("worldId: %s",worldId)));
 
-        layerInput = new TextFieldWidget(4, 16, 80, 12, this::getWorldGernater,this::setWorldGernater)
+        layerInput = new TextFieldWidget(8, 16, 240, 12, () -> worldGernater==null?"":worldGernater,value -> worldGernater = value)
                 .setMaxStringLength(64)
                 .setValidator(this::validateInput);
         group.addWidget(layerInput);
 
         //var layerSLot = new SlotWidget(layerItem,0,90,16,false,false);
-        group.addWidget(new SlotWidget(layerItem,0,90,16,false,false));
-        group.addWidget(new SlotWidget(layerItem,1,90,34,false,false));
-        group.addWidget(new SlotWidget(layerItem,2,90,52,false,false));
+        group.addWidget(new SlotWidget(layerItem,0,250,16,false,false));
+        group.addWidget(new SlotWidget(layerItem,1,250,34,false,false));
+        group.addWidget(new SlotWidget(layerItem,2,250,52,false,false));
 
         btnCreate = new ButtonWidget(4, 32, 30, 12,
                 new GuiTextureGroup(GuiTextures.VANILLA_BUTTON, new TextTexture("create"))
@@ -229,13 +232,12 @@ public class PersonalSpacePortal extends MetaMachine
         }
         if (errFlag) {
             layerMap.clear();
-            btnCreate.setActive(false);
-            layerInput.setTextColor(0xffff0000);
-            layerInput.setHoverTooltips("无效的设置");
+            if (btnCreate != null) {
+                btnCreate.setActive(false);
+                layerInput.setTextColor(0xffff0000);
+                layerInput.setHoverTooltips("无效的设置");
+            }
         } else {
-            btnCreate.setActive(true);
-            layerInput.setTextColor(-1);
-            layerInput.getTooltipTexts().clear();
             if (!layerMap.isEmpty()) {
                 int index = 0;
                 for (Block layer: layerMap.keySet()) {
@@ -243,7 +245,11 @@ public class PersonalSpacePortal extends MetaMachine
                     is.setCount(layerMap.get(layer));
                     layerItem.setStackInSlot(index++,is);
                 }
-
+            }
+            if (btnCreate != null) {
+                btnCreate.setActive(true);
+                layerInput.setTextColor(-1);
+                layerInput.getTooltipTexts().clear();
             }
         }
         return input;
@@ -263,7 +269,6 @@ public class PersonalSpacePortal extends MetaMachine
     }
 
     private void createDim(ClickData clickData) {
-
         if (getLevel() instanceof ServerLevel serverLevel) {
             var player = getLevel().getPlayerByUUID(owner);
             if (player != null && player.canChangeDimensions() && !player.isPassenger() && !player.isVehicle()) {
@@ -272,8 +277,11 @@ public class PersonalSpacePortal extends MetaMachine
                 for (Block key: layerMap.keySet()) {
                     y = y+ layerMap.get(key);
                 }
-                var pos = new BlockPos(0,y + 2,0);
+                if (y == -64) y = 0;
+                var pos = new BlockPos(0,y + 1,0);
                 var dim = DimensionHelper.getOrCreateWorld(serverLevel.getServer(),worldId,layerMap);
+                dim.setSpawnSettings(false,true);
+                dim.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,dim.getServer());
                 createSpawnSpace(dim,pos);
                 player.changeDimension(dim,new ModTeleporter(this.teleportPos, true));
             }

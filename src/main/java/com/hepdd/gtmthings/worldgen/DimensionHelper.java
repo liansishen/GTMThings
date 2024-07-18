@@ -68,7 +68,7 @@ public class DimensionHelper {
 
 
     public static ResourceKey<Level> getRegistryKey(int index) {
-        return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(GTMThings.MOD_ID, "DIM" + String.valueOf(index)));
+        return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(GTMThings.MOD_ID, "dim" + index));
     }
 
     public static int getIndex(ResourceKey<Level> world) {
@@ -148,10 +148,6 @@ public class DimensionHelper {
         if (lays.isEmpty()) {
             lays.add(new FlatLayerInfo(1, Blocks.AIR));
         }
-//        lays.add(new FlatLayerInfo(1, Blocks.BEDROCK));
-//        lays.add(new FlatLayerInfo(1, Blocks.SMOOTH_STONE));
-//        lays.add(new FlatLayerInfo(20, Blocks.AIR));
-//        lays.add(new FlatLayerInfo(3, Blocks.SMOOTH_STONE));
         flatChunkGeneratorConfig.updateLayers();
 
 
