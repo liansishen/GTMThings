@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.data;
 
+import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.registry.registrate.CompassNode;
@@ -82,14 +83,18 @@ public class CustomItems {
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UV,1);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UHV =
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UHV,1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UEV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UEV,1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UIV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UIV,1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UXV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UXV,1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV,1);
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UEV = GTCEuAPI.isHighTier() ?
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UEV,1):
+            null;
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UIV = GTCEuAPI.isHighTier() ?
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UIV,1):
+            null;
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UXV = GTCEuAPI.isHighTier() ?
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UXV,1):
+            null;
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV = GTCEuAPI.isHighTier() ?
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV,1):
+            null;
 
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LV_4A =
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",LV,4);
@@ -109,15 +114,18 @@ public class CustomItems {
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UV,4);
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UHV_4A =
             registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UHV,4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UEV_4A =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UEV,4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UIV_4A =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UIV,4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UXV_4A =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UXV,4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A =
-            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV,4);
-
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UEV_4A = GTCEuAPI.isHighTier() ?
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UEV,4):
+            null;
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UIV_4A = GTCEuAPI.isHighTier() ?
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UIV,4):
+            null;
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UXV_4A = GTCEuAPI.isHighTier() ?
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",UXV,4):
+            null;
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A = GTCEuAPI.isHighTier() ?
+            registerTieredCover("wireless_energy_receive_cover","Wireless Energy Receive Cover",OpV,4):
+            null;
 
     private static ItemEntry<ComponentItem> registerTieredCover(String name, String lang,int tier,int amperage) {
         return GTMTHINGS_REGISTRATE
