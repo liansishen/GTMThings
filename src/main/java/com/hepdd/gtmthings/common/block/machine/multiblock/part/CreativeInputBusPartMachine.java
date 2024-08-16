@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.gregtechceu.gtceu.integration.ae2.util.AEConfigSlot.drawSelectionOverlay;
+import static com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEConfigSlotWidget.drawSelectionOverlay;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawItemStack;
 
 @ParametersAreNonnullByDefault

@@ -330,7 +330,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
 
             var eut = RecipeHelper.getInputEUt(match);
             if (GTUtil.getTierByVoltage(eut) <= getVoltageTier()) {
-                if (match.handleRecipeIO(IO.OUT, this)) {
+                if (match.handleRecipeIO(IO.OUT, this, this.chanceCaches)) {
                     blockDrops.clear();
                     var result = new ArrayList<ItemStack>();
                     for (int i = 0; i < outputItemHandler.storage.getSlots(); ++i) {
