@@ -532,8 +532,8 @@ public class GTMTRecipe {
         }
 
         ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("me_export_buffer"))
-                .inputItems(GTAEMachines.ITEM_EXPORT_BUS.asStack())
-                .inputItems(GTAEMachines.FLUID_EXPORT_HATCH.asStack())
+                .inputItems(GTAEMachines.ITEM_EXPORT_BUS_ME.asStack())
+                .inputItems(GTAEMachines.FLUID_EXPORT_HATCH_ME.asStack())
                 .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
                 .outputItems(CustomMachines.ME_EXPORT_BUFFER.asStack())
                 .duration(400)
