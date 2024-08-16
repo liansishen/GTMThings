@@ -1,6 +1,8 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
+import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
@@ -104,16 +106,15 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         } else {
             addEnergy();
         }
-        updateEnergySubscription();
     }
 
     private void useEnergy() {
         var currentStored = energyContainer.getEnergyStored();
         var maxStored = energyContainer.getEnergyCapacity();
-        var changeStored = Math.min(maxStored - currentStored,energyContainer.getInputVoltage() * energyContainer.getInputVoltage());
+        var changeStored = Math.min(maxStored - currentStored,energyContainer.getInputVoltage() * energyContainer.getInputAmperage());
         if (changeStored <= 0) return;
         if (!WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid,-changeStored)) return;
-        energyContainer.setEnergyStored(maxStored);
+        energyContainer.setEnergyStored(currentStored + changeStored);
     }
 
     private void addEnergy() {
@@ -121,7 +122,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         if (currentStored <= 0) return;
         var changeStored = Math.min(energyContainer.getOutputVoltage() * energyContainer.getOutputAmperage(),currentStored);
         if(!WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid,changeStored)) return;
-        energyContainer.setEnergyStored(0L);
+        energyContainer.setEnergyStored(currentStored - changeStored);
     }
 
     @Override
