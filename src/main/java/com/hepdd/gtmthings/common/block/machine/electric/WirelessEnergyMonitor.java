@@ -22,6 +22,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,8 @@ public class WirelessEnergyMonitor extends MetaMachine
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyMonitor.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
+
+    private static final BigInteger BIG_INTEGER_MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
 
     public WirelessEnergyMonitor(IMachineBlockEntity holder) {
         super(holder);
@@ -103,14 +106,47 @@ public class WirelessEnergyMonitor extends MetaMachine
                 GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
         BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.V[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]),1,RoundingMode.FLOOR);
 
-        if (avgEnergy.compareTo(BigDecimal.valueOf(0)) > 0) {
+        if (avgEnergy.compareTo(BigDecimal.valueOf(0)) >= 0) {
             textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
                     FormattingUtil.formatNumbers(avgEnergy.abs()),voltageAmperage,voltageName).withStyle(ChatFormatting.GRAY));
         } else {
             textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
                     FormattingUtil.formatNumbers(avgEnergy.abs()),voltageAmperage,voltageName).withStyle(ChatFormatting.GRAY));
+            textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
+                    getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger()).multiply(BigInteger.valueOf(20)))).withStyle(ChatFormatting.GRAY));
         }
 
+    }
+
+    private static Component getTimeToFillDrainText(BigInteger timeToFillSeconds) {
+        if (timeToFillSeconds.compareTo(BIG_INTEGER_MAX_LONG) > 0) {
+            // too large to represent in a java Duration
+            timeToFillSeconds = BIG_INTEGER_MAX_LONG;
+        }
+
+        Duration duration = Duration.ofSeconds(timeToFillSeconds.longValue());
+        String key;
+        long fillTime;
+        if (duration.getSeconds() <= 180) {
+            fillTime = duration.getSeconds();
+            key = "gtceu.multiblock.power_substation.time_seconds";
+        } else if (duration.toMinutes() <= 180) {
+            fillTime = duration.toMinutes();
+            key = "gtceu.multiblock.power_substation.time_minutes";
+        } else if (duration.toHours() <= 72) {
+            fillTime = duration.toHours();
+            key = "gtceu.multiblock.power_substation.time_hours";
+        } else if (duration.toDays() <= 730) { // 2 years
+            fillTime = duration.toDays();
+            key = "gtceu.multiblock.power_substation.time_days";
+        } else if (duration.toDays() / 365 < 1_000_000) {
+            fillTime = duration.toDays() / 365;
+            key = "gtceu.multiblock.power_substation.time_years";
+        } else {
+            return Component.translatable("gtceu.multiblock.power_substation.time_forever");
+        }
+
+        return Component.translatable(key, FormattingUtil.formatNumbers(fillTime));
     }
 
     private BigDecimal getAvgUsage(BigInteger now) {
