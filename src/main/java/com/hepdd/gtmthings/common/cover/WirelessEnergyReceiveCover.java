@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
 import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
+import com.gregtechceu.gtceu.common.machine.electric.HullMachine;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
@@ -69,6 +70,8 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
             return true;
         } else if (machine instanceof BatteryBufferMachine batteryBufferMachine) {
             return batteryBufferMachine.getTier() >= this.tier;
+        } else if (machine instanceof HullMachine hullMachine) {
+            return hullMachine.getTier() >= this.tier;
         } else {
             return false;
         }
@@ -113,7 +116,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
         var energyContainer =  getEnergyContainer(coverHolder.getLevel(),coverHolder.getPos(),attachedSide);
         if (energyContainer != null) {
             var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
-            if (machine instanceof BatteryBufferMachine) {
+            if (machine instanceof BatteryBufferMachine || machine instanceof HullMachine) {
                 var changeStored = Math.min(energyContainer.getEnergyCapacity() - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
                 if (!WirelessEnergyManager.addEUToGlobalEnergyMap(this.uuid, -changeStored)) return;
