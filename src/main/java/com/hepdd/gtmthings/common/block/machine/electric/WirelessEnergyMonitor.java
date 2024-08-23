@@ -113,7 +113,7 @@ public class WirelessEnergyMonitor extends MetaMachine
             textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
                     FormattingUtil.formatNumbers(avgEnergy.abs()),voltageAmperage,voltageName).withStyle(ChatFormatting.GRAY));
             textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
-                    getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger()).multiply(BigInteger.valueOf(20)))).withStyle(ChatFormatting.GRAY));
+                    getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
         }
 
     }
