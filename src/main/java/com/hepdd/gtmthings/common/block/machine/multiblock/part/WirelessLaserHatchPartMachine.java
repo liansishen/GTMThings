@@ -111,7 +111,7 @@ public class WirelessLaserHatchPartMachine extends TieredIOPartMachine implement
         var maxStored = energyContainer.getEnergyCapacity();
         var changeStored = Math.min(maxStored - currentStored,energyContainer.getInputVoltage() * energyContainer.getInputAmperage());
         if (changeStored <= 0) return;
-        if (!WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid,-changeStored)) return;
+        if (!WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, -changeStored, this)) return;
         energyContainer.setEnergyStored(currentStored + changeStored);
     }
 
@@ -119,7 +119,7 @@ public class WirelessLaserHatchPartMachine extends TieredIOPartMachine implement
         var currentStored = energyContainer.getEnergyStored();
         if (currentStored <= 0) return;
         var changeStored = Math.min(energyContainer.getOutputVoltage() * energyContainer.getOutputAmperage(),currentStored);
-        if(!WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid,changeStored)) return;
+        if(!WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, changeStored, this)) return;
         energyContainer.setEnergyStored(currentStored - changeStored);
     }
 
