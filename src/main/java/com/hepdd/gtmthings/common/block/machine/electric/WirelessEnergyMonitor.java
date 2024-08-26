@@ -12,7 +12,10 @@ import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
@@ -23,10 +26,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.MachineData;
 import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.getUserEU;
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
@@ -40,6 +42,9 @@ public class WirelessEnergyMonitor extends MetaMachine
             MetaMachine.MANAGED_FIELD_HOLDER);
 
     private static final BigInteger BIG_INTEGER_MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+
+    public static int p;
+    public static BlockPos pPos;
 
     public WirelessEnergyMonitor(IMachineBlockEntity holder) {
         super(holder);
@@ -56,6 +61,8 @@ public class WirelessEnergyMonitor extends MetaMachine
 
     private ArrayList<BigInteger> longArrayList;
 
+    private List<Map.Entry<MetaMachine, Long>> sortedEntries = null;
+
     @Override
     public void onLoad() {
         super.onLoad();
@@ -69,7 +76,13 @@ public class WirelessEnergyMonitor extends MetaMachine
     //////////////////////////////////////
     // *********** GUI ***********//
     //////////////////////////////////////
-    private void handleDisplayClick(String componentData, ClickData clickData) {}
+    private void handleDisplayClick(String componentData, ClickData clickData) {
+        if (!clickData.isRemote) {
+            p = 100;
+            String[] parts = componentData.split(", ");
+            pPos = new BlockPos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+        }
+    }
 
     @Override
     public Widget createUIWidget() {
@@ -115,7 +128,32 @@ public class WirelessEnergyMonitor extends MetaMachine
             textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
                     getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
         }
+        for (Map.Entry<MetaMachine, Long> m : getSortedEntries()) {
+            long eut =  m.getValue();
+            String pos = m.getKey().getPos().toShortString();
+            if (eut > 0) {
+                textList.add(Component.translatable(m.getKey().getBlockState().getBlock().getDescriptionId())
+                        .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", m.getKey().getLevel().dimension().location()).append(" [").append(pos).append("]"))))
+                        .append(" +").append(FormattingUtil.formatNumbers(eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(eut)]).append(")")
+                        .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
+            } else {
+                textList.add(Component.translatable(m.getKey().getBlockState().getBlock().getDescriptionId())
+                        .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", m.getKey().getLevel().dimension().location()).append(" [").append(pos).append("]"))))
+                        .append(" -").append(FormattingUtil.formatNumbers(-eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(-eut)]).append(")")
+                        .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
+            }
+        }
+    }
 
+    private List<Map.Entry<MetaMachine, Long>> getSortedEntries() {
+        if (sortedEntries == null || getOffsetTimer() % 10 == 0) {
+            sortedEntries = MachineData.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .toList();
+            MachineData.clear();
+        }
+        return sortedEntries;
     }
 
     private static Component getTimeToFillDrainText(BigInteger timeToFillSeconds) {

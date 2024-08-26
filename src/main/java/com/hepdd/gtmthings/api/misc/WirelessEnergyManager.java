@@ -1,13 +1,17 @@
 package com.hepdd.gtmthings.api.misc;
 
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
 
 import java.math.BigInteger;
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 import static com.hepdd.gtmthings.utils.TeamUtil.getTeamUUID;
 
 public class WirelessEnergyManager {
+
+    public static WeakHashMap<MetaMachine, Long> MachineData = new WeakHashMap<>();
 
     public static void strongCheckOrAddUser(UUID user_uuid) {
 
@@ -16,7 +20,7 @@ public class WirelessEnergyManager {
         }
     }
 
-    public static boolean addEUToGlobalEnergyMap(UUID user_uuid, BigInteger EU) {
+    public static boolean addEUToGlobalEnergyMap(UUID user_uuid, BigInteger EU, MetaMachine machine) {
         // Mark the data as dirty and in need of saving.
         try {
             WirelessEnergySavaedData.INSTANCE.setDirty(true);
@@ -25,9 +29,9 @@ public class WirelessEnergyManager {
             System.out.println("COULD NOT MARK GLOBAL ENERGY AS DIRTY IN ADD EU");
             exception.printStackTrace();
         }
-
         // Get the team UUID. Users are by default in a team with a UUID equal to their player UUID.
         UUID teamUUID = getTeamUUID(user_uuid);
+        MachineData.put(machine, EU.longValue());
 
         // Get the teams total energy stored. If they are not in the map, return 0 EU.
         BigInteger totalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(teamUUID, BigInteger.ZERO);
@@ -57,12 +61,12 @@ public class WirelessEnergyManager {
         return false;
     }
 
-    public static boolean addEUToGlobalEnergyMap(UUID user_uuid, long EU) {
-        return addEUToGlobalEnergyMap(user_uuid, BigInteger.valueOf(EU));
+    public static boolean addEUToGlobalEnergyMap(UUID user_uuid, long EU, MetaMachine machine) {
+        return addEUToGlobalEnergyMap(user_uuid, BigInteger.valueOf(EU), machine);
     }
 
-    public static boolean addEUToGlobalEnergyMap(UUID user_uuid, int EU) {
-        return addEUToGlobalEnergyMap(user_uuid, BigInteger.valueOf(EU));
+    public static boolean addEUToGlobalEnergyMap(UUID user_uuid, int EU, MetaMachine machine) {
+        return addEUToGlobalEnergyMap(user_uuid, BigInteger.valueOf(EU), machine);
     }
 
     // ------------------------------------------------------------------------------------
