@@ -27,43 +27,22 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
 
     @Override
     protected @Nullable IGTMTJadeIF getCapability(Level level, BlockPos pos, @Nullable Direction side) {
-        if (level.getBlockEntity(pos) instanceof MetaMachineBlockEntity metaMachineBlockEntity){
-            var metaMachine = metaMachineBlockEntity.getMetaMachine();
-            if (metaMachine instanceof WirelessOpticalComputationHatchMachine woc) {
-                if( woc.getTransmitterPos() != null && woc.getReceiverPos() != null) {
-                    return new IGTMTJadeIF() {
-                        @Override
-                        public boolean isbinded() {
-                            return true;
-                        }
-
-                        @Override
-                        public String getPos() {
-                            return woc.isTransmitter()?woc.getTransmitterPos().toShortString():woc.getReceiverPos().toShortString();
-                        }
-                    };
-                } else {
-                    return new IGTMTJadeIF() {
-                        @Override
-                        public boolean isbinded() {
-                            return false;
-                        }
-
-                        @Override
-                        public String getPos() {
-                            return "";
-                        }
-                    };
-                }
-            }
+        if (level.getBlockEntity(pos) instanceof MetaMachineBlockEntity metaMachineBlockEntity &&
+                metaMachineBlockEntity.getMetaMachine() instanceof IGTMTJadeIF jadeIF) {
+            return jadeIF;
         }
         return null;
     }
 
     @Override
     protected void write(CompoundTag data, IGTMTJadeIF capability) {
-        data.putBoolean("isBinded",capability.isbinded());
-        data.putString("pos",capability.getPos());
+        if (capability != null) {
+            data.putBoolean("isBinded",capability.isbinded());
+            data.putString("pos",capability.getBindPos());
+        } else {
+            data.putBoolean("isBinded",false);
+            data.putString("pos","");
+        }
     }
 
     @Override

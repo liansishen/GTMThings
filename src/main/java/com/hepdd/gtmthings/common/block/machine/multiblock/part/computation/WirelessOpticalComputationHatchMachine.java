@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
 import com.gregtechceu.gtceu.common.data.GTItems;
+import com.hepdd.gtmthings.api.capability.IGTMTJadeIF;
 import com.hepdd.gtmthings.common.block.machine.trait.WirelessNotifiableComputationContainer;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
@@ -27,7 +28,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine implements IInteractedMachine {
+public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine
+        implements IInteractedMachine, IGTMTJadeIF {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             WirelessOpticalComputationHatchMachine.class, MultiblockPartMachine.MANAGED_FIELD_HOLDER);
@@ -164,5 +166,20 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
             }
         }
         return InteractionResult.PASS;
+    }
+
+    @Override
+    public boolean isbinded() {
+        return (this.transmitterPos != null || this.receiverPos != null);
+    }
+
+    @Override
+    public String getBindPos() {
+        if (this.isTransmitter() && this.receiverPos != null) {
+            return this.receiverPos.toShortString();
+        } else if(!this.isTransmitter() && this.transmitterPos != null) {
+            return this.transmitterPos.toShortString();
+        }
+        return "";
     }
 }
