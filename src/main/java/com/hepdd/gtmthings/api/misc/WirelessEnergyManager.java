@@ -3,6 +3,8 @@ package com.hepdd.gtmthings.api.misc;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
 
+import com.mojang.datafixers.util.Pair;
+
 import java.math.BigInteger;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -11,7 +13,7 @@ import static com.hepdd.gtmthings.utils.TeamUtil.getTeamUUID;
 
 public class WirelessEnergyManager {
 
-    public static WeakHashMap<MetaMachine, Long> MachineData = new WeakHashMap<>();
+    public static WeakHashMap<Pair<UUID, MetaMachine>, Long> MachineData = new WeakHashMap<>();
 
     public static void strongCheckOrAddUser(UUID user_uuid) {
 
@@ -31,7 +33,7 @@ public class WirelessEnergyManager {
         }
         // Get the team UUID. Users are by default in a team with a UUID equal to their player UUID.
         UUID teamUUID = getTeamUUID(user_uuid);
-        MachineData.put(machine, EU.longValue());
+        MachineData.put(Pair.of(user_uuid, machine), EU.longValue());
 
         // Get the teams total energy stored. If they are not in the map, return 0 EU.
         BigInteger totalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(teamUUID, BigInteger.ZERO);
