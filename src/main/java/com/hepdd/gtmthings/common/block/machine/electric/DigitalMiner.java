@@ -122,9 +122,9 @@ public class DigitalMiner extends WorkableTieredMachine
     }
 
     @Override
-    public void onDrops(List<ItemStack> drops, Player entity) {
-        clearInventory(drops, exportItems.storage);
-        clearInventory(drops, filterInventory);
+    public void onMachineRemoved() {
+        clearInventory(exportItems.storage);
+        clearInventory(filterInventory);
     }
 
     @Override
