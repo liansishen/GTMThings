@@ -145,7 +145,7 @@ public class MEOutputPartMachine extends DualHatchPartMachine
     /////////////////////////////////
 
     protected boolean shouldSubscribe() {
-        return isWorkingEnabled() && isOnline() && !internalBuffer.storage.isEmpty() && !internalTankBuffer.storage.isEmpty();
+        return isWorkingEnabled() && isOnline() && (!internalBuffer.storage.isEmpty() || !internalTankBuffer.storage.isEmpty());
     }
 
     @Override
