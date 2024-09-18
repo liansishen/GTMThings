@@ -3,10 +3,7 @@ on:
   push:
     branches:
       - master
-    tags-ignore:
-      - 'wip'
     paths:
-      - .github/workflows/**
       - src/**
       - build.gradle
       - gradle.properties
