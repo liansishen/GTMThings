@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="[https://www.curseforge.com/minecraft/mc-mods/gtmthings](https://www.curseforge.com/minecraft/mc-mods/gtmthings)"><img src="https://cf.way2muchnoise.eu/1104310.svg?badge_style=for_the_badge" alt="CurseForge"></a>
+  <a href="https://www.curseforge.com/minecraft/mc-mods/gtmthings"><img src="https://cf.way2muchnoise.eu/1104310.svg?badge_style=for_the_badge" alt="CurseForge"></a>
 </h1>
 
 
