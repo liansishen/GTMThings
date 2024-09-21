@@ -141,6 +141,7 @@ public class CustomItems {
 
     public static ItemEntry<ComponentItem> ADVANCED_TERMINAL = GTMTHINGS_REGISTRATE
             .item("advanced_terminal", ComponentItem::create)
+            .properties(p -> p.stacksTo(1))
             .onRegister(attach(new AdvancedTerminalBehavior())).register();
 
     public static <T extends ItemLike> NonNullConsumer<T> compassNode(CompassSection section, CompassNode... preNodes) {

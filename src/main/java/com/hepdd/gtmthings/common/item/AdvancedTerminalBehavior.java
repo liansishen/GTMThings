@@ -42,7 +42,6 @@ import static com.hepdd.gtmthings.api.pattern.AdvancedBlockPattern.getAdvancedBl
 
 public class AdvancedTerminalBehavior extends TerminalBehavior {
 
-    @Persisted
     private AutoBuildSetting autoBuildSetting;
     private ItemStack itemStack;
 
@@ -82,17 +81,17 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
                         .setYScrollBarWidth(2)
                         .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
                         .addWidget(new LabelWidget(40, 5, Component.translatable("item.gtmthings.advanced_terminal.setting.title").getString()))
-                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.1"))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.1").getString())
                                 .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.1.tooltip")))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, autoBuildSetting::getCoilTier,
                                 this::setCoilTier)
                                 .setMin(0).setMax(GTCEuAPI.HEATING_COILS.size() - 1))
-                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.2"))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.2").getString())
                                 .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.2.tooltip")))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, autoBuildSetting::getRepeatCount,
                                 this::setRepeatCount)
                                 .setMin(0).setMax(99))
-                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.3"))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.3").getString())
                                 .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.3.tooltip")))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, autoBuildSetting::getNoHatchMode,
                                 this::setIsBuildHatches).setMin(0).setMax(1)));
@@ -105,18 +104,21 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
         if (!ConfigHolder.INSTANCE.gameplay.enableCompass) {
             ItemStack heldItem = player.getItemInHand(usedHand);
             if (player instanceof ServerPlayer serverPlayer) {
-                if (this.itemStack == null){
-                    this.itemStack = heldItem;
-                    var tag = this.itemStack.getTag();
-                    if (tag!=null && !tag.isEmpty()) {
-                        this.autoBuildSetting.setCoilTier(tag.getInt("CoilTier"));
-                        this.autoBuildSetting.setRepeatCount(tag.getInt("RepeatCount"));
-                        this.autoBuildSetting.setNoHatchMode(tag.getInt("NoHatchMode"));
-                    } else {
-                        this.autoBuildSetting.setCoilTier(0);
-                        this.autoBuildSetting.setRepeatCount(0);
-                        this.autoBuildSetting.setNoHatchMode(0);
-                    }
+                this.itemStack = heldItem;
+                var tag = this.itemStack.getTag();
+                if (tag!=null && !tag.isEmpty()) {
+                    this.autoBuildSetting.setCoilTier(tag.getInt("CoilTier"));
+                    this.autoBuildSetting.setRepeatCount(tag.getInt("RepeatCount"));
+                    this.autoBuildSetting.setNoHatchMode(tag.getInt("NoHatchMode"));
+                } else {
+                    tag = new CompoundTag();
+                    tag.putInt("CoilTier",0);
+                    tag.putInt("RepeatCount",0);
+                    tag.putInt("NoHatchMode",0);
+                    this.itemStack.setTag(tag);
+                    this.autoBuildSetting.setCoilTier(0);
+                    this.autoBuildSetting.setRepeatCount(0);
+                    this.autoBuildSetting.setNoHatchMode(0);
                 }
                 HeldItemUIFactory.INSTANCE.openUI(serverPlayer, usedHand);
             }
@@ -153,7 +155,7 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
     public static class AutoBuildSetting {
 
         final String[] HATCH_NAMES = {"input_hatch","output_hatch","input_bus","output_bus","laser_target","laser_source",
-            "transmitter_hatch","receiver_hatch","maintenance_hatch","parallel_hatch"};
+            "transmitter_hatch","receiver_hatch","maintenance_hatch","parallel_hatch","import_bus","export_bus"};
 
         @Getter
         @Setter
@@ -170,13 +172,13 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
             if (blockInfos != null) {
                 if (Arrays.stream(blockInfos).anyMatch(
                         info -> info.getBlockState().getBlock() instanceof CoilBlock)) {
-                    var tier = Math.max(coilTier, blockInfos.length - 1);
-                    candidates.add(blockInfos[tier].getItemStackForm());
-                    for (int i = 0; i < tier; i++) {
-                        candidates.add(blockInfos[i].getItemStackForm());
-                    }
-                    for (int i = tier + 1; i < blockInfos.length - 1; i++) {
-                        candidates.add(blockInfos[i].getItemStackForm());
+                    var tier = Math.min(coilTier, blockInfos.length - 1);
+                    if (tier == 0) {
+                        for (int i = 0; i < blockInfos.length - 1; i++) {
+                            candidates.add(blockInfos[i].getItemStackForm());
+                        }
+                    } else {
+                        candidates.add(blockInfos[tier].getItemStackForm());
                     }
                     return candidates;
                 }
