@@ -3,8 +3,8 @@ package com.hepdd.gtmthings.client;
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor;
 
-import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
 
+import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.Mod;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import org.joml.Matrix4f;
 
 @Mod.EventBusSubscriber(modid = GTMThings.MOD_ID,
                         bus = Mod.EventBusSubscriber.Bus.FORGE,
@@ -79,7 +80,7 @@ public class ForgeClientEventHandler {
                 RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
                 RenderSystem.lineWidth(3);
 
-                RenderBufferUtils.renderCubeFrame(
+                renderCubeFrame(
                         poseStack,
                         buffer,
                         pose.getX(),
@@ -102,5 +103,33 @@ public class ForgeClientEventHandler {
                 poseStack.popPose();
             }
         }
+    }
+
+    public static void renderCubeFrame(PoseStack poseStack, BufferBuilder buffer, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float r, float g, float b, float a) {
+        Matrix4f mat = poseStack.last().pose();
+        buffer.vertex(mat, minX, minY, minZ).color(r, g, b, a).normal(1.0F, 0.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, minY, minZ).color(r, g, b, a).normal(1.0F, 0.0F, 0.0F).endVertex();
+        buffer.vertex(mat, minX, minY, minZ).color(r, g, b, a).normal(0.0F, 1.0F, 0.0F).endVertex();
+        buffer.vertex(mat, minX, maxY, minZ).color(r, g, b, a).normal(0.0F, 1.0F, 0.0F).endVertex();
+        buffer.vertex(mat, minX, minY, minZ).color(r, g, b, a).normal(0.0F, 0.0F, 1.0F).endVertex();
+        buffer.vertex(mat, minX, minY, maxZ).color(r, g, b, a).normal(0.0F, 0.0F, 1.0F).endVertex();
+        buffer.vertex(mat, minX, maxY, maxZ).color(r, g, b, a).normal(1.0F, 0.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, maxY, maxZ).color(r, g, b, a).normal(1.0F, 0.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, minY, maxZ).color(r, g, b, a).normal(0.0F, 1.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, maxY, maxZ).color(r, g, b, a).normal(0.0F, 1.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, maxY, minZ).color(r, g, b, a).normal(0.0F, 0.0F, 1.0F).endVertex();
+        buffer.vertex(mat, maxX, maxY, maxZ).color(r, g, b, a).normal(0.0F, 0.0F, 1.0F).endVertex();
+        buffer.vertex(mat, minX, maxY, minZ).color(r, g, b, a).normal(0.0F, 0.0F, 1.0F).endVertex();
+        buffer.vertex(mat, minX, maxY, maxZ).color(r, g, b, a).normal(0.0F, 0.0F, 1.0F).endVertex();
+        buffer.vertex(mat, minX, maxY, minZ).color(r, g, b, a).normal(1.0F, 0.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, maxY, minZ).color(r, g, b, a).normal(1.0F, 0.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, minY, minZ).color(r, g, b, a).normal(0.0F, 0.0F, 1.0F).endVertex();
+        buffer.vertex(mat, maxX, minY, maxZ).color(r, g, b, a).normal(0.0F, 0.0F, 1.0F).endVertex();
+        buffer.vertex(mat, maxX, minY, minZ).color(r, g, b, a).normal(0.0F, 1.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, maxY, minZ).color(r, g, b, a).normal(0.0F, 1.0F, 0.0F).endVertex();
+        buffer.vertex(mat, minX, minY, maxZ).color(r, g, b, a).normal(1.0F, 0.0F, 0.0F).endVertex();
+        buffer.vertex(mat, maxX, minY, maxZ).color(r, g, b, a).normal(1.0F, 0.0F, 0.0F).endVertex();
+        buffer.vertex(mat, minX, minY, maxZ).color(r, g, b, a).normal(0.0F, 1.0F, 0.0F).endVertex();
+        buffer.vertex(mat, minX, maxY, maxZ).color(r, g, b, a).normal(0.0F, 1.0F, 0.0F).endVertex();
     }
 }

@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.registry.registrate.CompassNode;
 import com.gregtechceu.gtceu.api.registry.registrate.CompassSection;
 import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
 import com.gregtechceu.gtceu.common.item.TooltipBehavior;
+import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverPlaceBehavior;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverTooltipBehavior;
 import com.tterrag.registrate.util.entry.ItemEntry;
@@ -138,6 +139,11 @@ public class CustomItems {
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3",GTValues.V[tier] * amperage));
                 }), new CoverPlaceBehavior(amperage==1?WirelessCovers.WIRELESS_ENERGY_RECEIVE[tier-1]:WirelessCovers.WIRELESS_ENERGY_RECEIVE_4A[tier-1]))).register();
     }
+
+    public static ItemEntry<ComponentItem> ADVANCED_TERMINAL = GTMTHINGS_REGISTRATE
+            .item("advanced_terminal", ComponentItem::create)
+            .properties(p -> p.stacksTo(1))
+            .onRegister(attach(new AdvancedTerminalBehavior())).register();
 
     public static <T extends ItemLike> NonNullConsumer<T> compassNode(CompassSection section, CompassNode... preNodes) {
         return item -> getOrCreate(section, item::asItem).addPreNode(preNodes);

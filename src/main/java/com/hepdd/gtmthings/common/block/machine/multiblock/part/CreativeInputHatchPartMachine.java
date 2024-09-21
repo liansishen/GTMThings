@@ -61,7 +61,7 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
     }
 
     protected NotifiableFluidTank createTank() {
-        return new NotifiableFluidTank(this,SLOT_COUNT,Integer.MAX_VALUE,IO.IN);
+        return new NotifiableFluidTank(this,SLOT_COUNT,Long.MAX_VALUE,IO.IN);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
             for (int i = 0; i < SLOT_COUNT; i++) {
                 if (fluidMap.containsKey(i)) {
                     var mFluid = this.creativeTanks[i].getFluid().copy();
-                    mFluid.setAmount(Integer.MAX_VALUE);
+                    mFluid.setAmount(Long.MAX_VALUE);
                     this.tank.setFluidInTank(i,mFluid);
                 } else {
                     if (!this.tank.getFluidInTank(i).isEmpty()) {

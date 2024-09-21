@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
+import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.ItemHandlerProxyRecipeTrait;
@@ -50,7 +51,7 @@ import static com.hepdd.gtmthings.utils.FormatUtil.formatNumber;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinctPart {
+public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinctPart, IMachineLife {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(HugeBusPartMachine.class,
             TieredIOPartMachine.MANAGED_FIELD_HOLDER);
@@ -180,6 +181,11 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         updateInventorySubscription();
     }
 
+    @Override
+    public void onMachineRemoved() {
+        clearInventory(shareInventory);
+    }
+
     protected void updateInventorySubscription() {
         if (isWorkingEnabled() && ((io == IO.OUT && !getInventory().isEmpty()) || io == IO.IN) &&
                 ItemTransferHelper.getItemTransfer(getLevel(), getPos().relative(getFrontFacing()),
@@ -271,4 +277,6 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         textList.add(0,Component.translatable("gtmthings.machine.huge_item_bus.tooltip.2" , itemCount, getInventorySize())
                 .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));;
     }
+
+
 }
