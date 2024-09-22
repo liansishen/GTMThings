@@ -207,7 +207,7 @@ public class AdvancedBlockPattern extends BlockPattern {
                                             limit.candidates == null ? null : limit.candidates.get());
                                 }
                                 for (SimplePredicate common : predicate.common) {
-                                    if (predicate.common.size() > 1 && !autoBuildSetting.isPlaceHatch(common.candidates.get())) {
+                                    if (common.candidates != null && predicate.common.size() > 1 && !autoBuildSetting.isPlaceHatch(common.candidates.get())) {
                                         continue;
                                     }
                                     infos = ArrayUtils.addAll(infos,
