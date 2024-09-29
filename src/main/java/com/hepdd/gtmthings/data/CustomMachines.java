@@ -11,9 +11,11 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.client.renderer.machine.MinerRenderer;
+import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeDualHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng.MEOutputPartMachine;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -96,6 +98,22 @@ public class CustomMachines {
                     .compassNode("item_bus")
                     .register(),
             ALL_TIERS);
+
+    public static final MachineDefinition[] HUGE_INPUT_DUAL_HATCH = registerTieredMachines("huge_dual_hatch",
+            (holder, tier) -> new HugeDualHatchPartMachine(holder, tier, IO.IN),
+            (tier, builder) -> {
+                builder.langValue(GTValues.VNF[tier] + " Huge Input Dual Hatch")
+                        .rotationState(RotationState.ALL)
+                        .overlayTieredHullRenderer("dual_hatch.import")
+                        .abilities(GTMachines.DUAL_INPUT_HATCH_ABILITIES)
+                        .compassNode("huge_dual_hatch")
+                        .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"));
+                builder.tooltips(Component.translatable("gtceu.universal.tooltip.item_storage_capacity", tier))
+                        .tooltips(Component.translatable("gtceu.universal.tooltip.fluid_storage_capacity_mult",
+                                tier, FormattingUtil.formatNumbers(Integer.MAX_VALUE)));
+                return builder.register();
+            },
+            GTValues.tiersBetween(GTValues.LV, GTValues.OpV));
 
     public static MachineDefinition[] registerTieredMachines(String name,
                                                              BiFunction<IMachineBlockEntity, Integer, MetaMachine> factory,

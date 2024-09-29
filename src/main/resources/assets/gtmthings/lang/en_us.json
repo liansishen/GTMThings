@@ -136,5 +136,20 @@
   "item.gtmthings.wireless_transfer.item.tooltip.1": "§bTransfer Item§7 to §ebinded container§7 from the machine as §fCover§7.",
   "item.gtmthings.wireless_transfer.fluid.tooltip.1": "§bTransfer Fluid§7 to §ebinded container§7 from the machine as §fCover§7.",
   "itemGroup.gtmthings.creative": "Creative Things",
-  "itemGroup.gtmthings.wireless": "Gregtech Wireless"
+  "itemGroup.gtmthings.wireless": "Gregtech Wireless",
+  "block.gtmthings.zpm_huge_dual_hatch":"§cZPM§rHuge Input Dual Hatch",
+  "block.gtmthings.ev_huge_dual_hatch":"§5EV§rHuge Input Dual Hatch",
+  "block.gtmthings.hv_huge_dual_hatch":"§6HV§rHuge Input Dual Hatch",
+  "block.gtmthings.iv_huge_dual_hatch":"§9IV§rHuge Input Dual Hatch",
+  "block.gtmthings.luv_huge_dual_hatch":"§dLuV§rHuge Input Dual Hatch",
+  "block.gtmthings.lv_huge_dual_hatch":"§7LV§rHuge Input Dual Hatch",
+  "block.gtmthings.max_huge_dual_hatch":"§c§lMAX§rHuge Input Dual Hatch",
+  "block.gtmthings.mv_huge_dual_hatch":"§bMV§rHuge Input Dual Hatch",
+  "block.gtmthings.opv_huge_dual_hatch":"§9§lOpV§rHuge Input Dual Hatch",
+  "block.gtmthings.uev_huge_dual_hatch":"§aUEV§rHuge Input Dual Hatch",
+  "block.gtmthings.uhv_huge_dual_hatch":"§4UHV§rHuge Input Dual Hatch",
+  "block.gtmthings.uiv_huge_dual_hatch":"§2UIV§rHuge Input Dual Hatch",
+  "block.gtmthings.ulv_huge_dual_hatch":"§8ULV§rHuge Input Dual Hatch",
+  "block.gtmthings.uv_huge_dual_hatch":"§3UV§rHuge Input Dual Hatch",
+  "block.gtmthings.uxv_huge_dual_hatch":"§eUXV§rHuge Input Dual Hatch"
 }

@@ -158,7 +158,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         combinedInventory.setDistinct(isDistinct);
     }
 
-    private void refundAll(ClickData clickData) {
+    protected void refundAll(ClickData clickData) {
         if(ItemTransferHelper.getItemTransfer(getLevel(), getPos().relative(getFrontFacing()),
                 getFrontFacing().getOpposite()) != null) {
             setWorkingEnabled(false);
