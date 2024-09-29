@@ -2,7 +2,6 @@ package com.hepdd.gtmthings.api.misc;
 
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
-
 import com.mojang.datafixers.util.Pair;
 
 import java.math.BigInteger;

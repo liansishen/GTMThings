@@ -32,7 +32,14 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class HugeDualHatchPartMachine extends HugeBusPartMachine {
 
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER;
+    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(HugeDualHatchPartMachine.class,
+            HugeBusPartMachine.MANAGED_FIELD_HOLDER);
+
+    @Override
+    public ManagedFieldHolder getFieldHolder() {
+        return MANAGED_FIELD_HOLDER;
+    }
+
     @Persisted
     protected final NotifiableFluidTank tank;
     protected @Nullable ISubscription tankSubs;
@@ -46,11 +53,16 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
     }
 
     protected NotifiableFluidTank createTank(Object... args) {
-        return new NotifiableFluidTank(this, this.getTankInventorySize(), Integer.MAX_VALUE, this.io);
+        return new NotifiableFluidTank(this, this.getTankInventorySize(), Integer.MAX_VALUE, io) {
+            @Override
+            public boolean canCapOutput() {
+                return true;
+            }
+        };
     }
 
     protected int getTankInventorySize() {
-        return this.getTier();
+        return this.getTier() + 1;
     }
 
     @Override
@@ -101,7 +113,7 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
 
     @Override
     protected void autoIO() {
-        if (this.getOffsetTimer() % 5L == 0L) {
+        if (this.getOffsetTimer() % 5 == 0) {
             if (isWorkingEnabled()) {
                 if (this.io == IO.OUT) {
                     if (this.hasItemTransfer) {
@@ -172,23 +184,4 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
                 .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
     }
 
-    @Override
-    public boolean isDistinct() {
-        return super.isDistinct() && this.tank.isDistinct();
-    }
-
-    @Override
-    public void setDistinct(boolean isDistinct) {
-        super.setDistinct(isDistinct);
-        this.tank.setDistinct(isDistinct);
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    static {
-        MANAGED_FIELD_HOLDER = new ManagedFieldHolder(HugeDualHatchPartMachine.class, HugeBusPartMachine.MANAGED_FIELD_HOLDER);
-    }
 }

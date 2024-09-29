@@ -2,9 +2,10 @@ package com.hepdd.gtmthings.client;
 
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor;
-
-
 import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -16,10 +17,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import org.joml.Matrix4f;
 
 @Mod.EventBusSubscriber(modid = GTMThings.MOD_ID,

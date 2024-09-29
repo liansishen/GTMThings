@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
+import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
@@ -90,11 +91,17 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
     }
 
     protected int getInventorySize() {
-        return (1 + getTier()) * INV_MULTIPLE;
+        if (getTier() < GTValues.EV) return 1 + getTier();
+        else return (1 + getTier()) * INV_MULTIPLE;
     }
 
     protected NotifiableItemStackHandler createInventory(Object... args) {
-        return new NotifiableItemStackHandler(this, getInventorySize(), io, io == IO.IN ? IO.BOTH : IO.OUT, UnlimitedItemStackTransfer::new);
+        return new NotifiableItemStackHandler(this, getInventorySize(), io, io, UnlimitedItemStackTransfer::new) {
+            @Override
+            public boolean canCapOutput() {
+                return true;
+            }
+        };
     }
 
     protected NotifiableItemStackHandler createCircuitItemHandler(Object... args) {

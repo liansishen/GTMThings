@@ -32,11 +32,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.lang.reflect.Field;
 
 
 public class AdvancedBlockPattern extends BlockPattern {
