@@ -16,7 +16,6 @@ import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 import com.hepdd.gtmthings.GTMThings;
 import com.tterrag.registrate.util.entry.ItemEntry;
-import net.minecraft.data.recipes.CraftingRecipeBuilder;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -26,8 +25,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
-import static com.gregtechceu.gtceu.common.data.GTItems.TERMINAL;
-import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
+import static com.gregtechceu.gtceu.common.data.GTMaterials.Steel;
+import static com.gregtechceu.gtceu.common.data.GTMaterials.Tin;
 import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.ASSEMBLER_RECIPES;
 import static com.hepdd.gtmthings.data.CustomItems.ADVANCED_TERMINAL;
 
@@ -535,6 +534,17 @@ public class GTMTRecipe {
                     .inputItems(tier > GTValues.EV ? GTMachines.QUANTUM_CHEST[tier] : GTMachines.SUPER_CHEST[tier])
                     .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
                     .outputItems(CustomMachines.HUGE_ITEM_EXPORT_BUS[tier].asStack())
+                    .duration(200)
+                    .EUt(GTValues.VA[tier])
+                    .save(provider);
+        }
+
+        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UHV)) {
+            ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("huge_dual_hatch_" + GTValues.VN[tier].toLowerCase()))
+                    .inputItems(CustomMachines.HUGE_ITEM_IMPORT_BUS[tier].asStack())
+                    .inputItems(tier > GTValues.EV ? GTMachines.QUANTUM_TANK[tier] : GTMachines.SUPER_TANK[tier])
+                    .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                    .outputItems(CustomMachines.HUGE_INPUT_DUAL_HATCH[tier].asStack())
                     .duration(200)
                     .EUt(GTValues.VA[tier])
                     .save(provider);

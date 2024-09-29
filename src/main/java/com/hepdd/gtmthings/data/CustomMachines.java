@@ -104,7 +104,7 @@ public class CustomMachines {
             (tier, builder) -> {
                 builder.langValue(GTValues.VNF[tier] + " Huge Input Dual Hatch")
                         .rotationState(RotationState.ALL)
-                        .overlayTieredHullRenderer("dual_hatch.import")
+                        .overlayTieredHullRenderer("huge_dual_hatch.import")
                         .abilities(GTMachines.DUAL_INPUT_HATCH_ABILITIES)
                         .compassNode("huge_dual_hatch")
                         .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"));
