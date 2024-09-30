@@ -108,7 +108,8 @@ public class CustomMachines {
                         .abilities(GTMachines.DUAL_INPUT_HATCH_ABILITIES)
                         .compassNode("huge_dual_hatch")
                         .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"));
-                builder.tooltips(Component.translatable("gtceu.universal.tooltip.item_storage_capacity", tier))
+                builder.tooltips( Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
+                                (1 + tier)* INV_MULTIPLE))
                         .tooltips(Component.translatable("gtceu.universal.tooltip.fluid_storage_capacity_mult",
                                 tier, FormattingUtil.formatNumbers(Integer.MAX_VALUE)));
                 return builder.register();
