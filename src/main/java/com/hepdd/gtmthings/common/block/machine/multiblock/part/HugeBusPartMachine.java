@@ -74,10 +74,14 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
     protected final ItemHandlerProxyRecipeTrait combinedInventory;
 
     public HugeBusPartMachine(IMachineBlockEntity holder, int tier, IO io, Object... args) {
+        this(holder, tier, io, 4, args);
+    }
+
+    public HugeBusPartMachine(IMachineBlockEntity holder, int tier, IO io, int shareSize, Object... args) {
         super(holder, tier, io);
         this.inventory = createInventory(args);
         this.circuitInventory = createCircuitItemHandler(io);
-        this.shareInventory = new CatalystItemStackHandler(this, 4, IO.IN, IO.NONE);
+        this.shareInventory = new CatalystItemStackHandler(this, shareSize, IO.IN, IO.NONE);
         this.combinedInventory = createCombinedItemHandler(io);
     }
 
