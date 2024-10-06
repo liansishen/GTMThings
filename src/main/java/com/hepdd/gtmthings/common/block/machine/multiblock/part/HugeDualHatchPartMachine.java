@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.FancyTankConfigurator;
+import com.gregtechceu.gtceu.api.machine.trait.FluidHandlerProxyRecipeTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.hepdd.gtmthings.common.block.machine.trait.CatalystFluidStackHandler;
 import com.hepdd.gtmthings.utils.FormatUtil;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -45,16 +47,20 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
     @Getter
     protected final CatalystFluidStackHandler shareTank;
 
+    @Getter
+    protected FluidHandlerProxyRecipeTrait combinedFluidInventory;
+
     private boolean hasFluidTransfer;
     private boolean hasItemTransfer;
 
     public HugeDualHatchPartMachine(IMachineBlockEntity holder, int tier, IO io, Object... args) {
         super(holder, tier, io, 9, args);
-        this.tank = createTank(args);
+        this.tank = createTank();
         this.shareTank = new CatalystFluidStackHandler(this, 9, 16000L, IO.IN, IO.NONE);
+        this.combinedFluidInventory = createCombinedFluidHandler();
     }
 
-    protected NotifiableFluidTank createTank(Object... args) {
+    protected NotifiableFluidTank createTank() {
         return new NotifiableFluidTank(this, this.getTankInventorySize(), Integer.MAX_VALUE, this.io);
     }
 
@@ -73,6 +79,8 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
     public void onLoad() {
         super.onLoad();
         this.tankSubs = this.tank.addChangedListener(this::updateInventorySubscription);
+
+        this.combinedFluidInventory.recomputeEnabledState();
     }
 
     @Override
@@ -198,6 +206,11 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
         super.setDistinct(isDistinct);
         this.tank.setDistinct(isDistinct);
         this.shareTank.setDistinct(isDistinct);
+        combinedFluidInventory.setDistinct(isDistinct);
+    }
+
+    protected FluidHandlerProxyRecipeTrait createCombinedFluidHandler() {
+        return new FluidHandlerProxyRecipeTrait(this, Set.of(this.tank, this.shareTank), IO.IN, IO.NONE);
     }
 
     @Override
