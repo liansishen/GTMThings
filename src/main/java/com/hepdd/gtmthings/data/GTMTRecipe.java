@@ -539,6 +539,17 @@ public class GTMTRecipe {
                     .save(provider);
         }
 
+        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UHV)) {
+            ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("huge_dual_hatch_" + GTValues.VN[tier].toLowerCase()))
+                    .inputItems(CustomMachines.HUGE_ITEM_IMPORT_BUS[tier].asStack())
+                    .inputItems(tier > GTValues.EV ? GTMachines.QUANTUM_TANK[tier] : GTMachines.SUPER_TANK[tier])
+                    .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                    .outputItems(CustomMachines.HUGE_INPUT_DUAL_HATCH[tier].asStack())
+                    .duration(200)
+                    .EUt(GTValues.VA[tier])
+                    .save(provider);
+        }
+
         ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("me_export_buffer"))
                 .inputItems(GTAEMachines.ITEM_EXPORT_BUS_ME.asStack())
                 .inputItems(GTAEMachines.FLUID_EXPORT_HATCH_ME.asStack())

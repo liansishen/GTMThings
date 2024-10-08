@@ -2,8 +2,11 @@ package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
+import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.fancyconfigurator.FancyTankConfigurator;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
+import com.hepdd.gtmthings.common.block.machine.trait.CatalystFluidStackHandler;
 import com.hepdd.gtmthings.utils.FormatUtil;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
@@ -16,6 +19,7 @@ import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import lombok.Getter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -44,12 +48,17 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
     protected final NotifiableFluidTank tank;
     protected @Nullable ISubscription tankSubs;
 
+    @Persisted
+    @Getter
+    protected final CatalystFluidStackHandler shareTank;
+
     private boolean hasFluidTransfer;
     private boolean hasItemTransfer;
 
     public HugeDualHatchPartMachine(IMachineBlockEntity holder, int tier, IO io, Object... args) {
-        super(holder, tier, io, args);
-        this.tank = createTank(args);
+        super(holder, tier, io, 9, args);
+        this.tank = createTank();
+        this.shareTank = new CatalystFluidStackHandler(this, 9, 16000L, IO.IN, IO.NONE);
     }
 
     protected NotifiableFluidTank createTank(Object... args) {
@@ -63,6 +72,13 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
 
     protected int getTankInventorySize() {
         return this.getTier() + 1;
+    }
+
+    @Override
+    public void attachConfigurators(ConfiguratorPanel configuratorPanel) {
+        super.attachConfigurators(configuratorPanel);
+        configuratorPanel.attachConfigurators(new FancyTankConfigurator(shareTank.getStorages(), Component.translatable("gui.gtceu.share_tank.title")).setTooltips(List.of(Component.translatable("gui.gtceu.share_tank.desc.0"),
+                Component.translatable("gui.gtceu.share_inventory.desc.1"))));
     }
 
     @Override
