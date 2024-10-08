@@ -290,7 +290,7 @@
   "gtmthings.machine.huge_item_bus.tooltip.1": "退回所有物品到面前的容器中。",
   "gtmthings.machine.huge_item_bus.tooltip.2": "物品槽位: %s/%s",
   "gtmthings.machine.huge_item_bus.tooltip.3": "空",
-  "gtmthings.machine.huge_dual_hatch.tooltip.2": "流体槽位 %s/%s",
+  "gtmthings.machine.huge_dual_hatch.tooltip.2": "流体槽位: %s/%s",
   "gtmthings.machine.me_export_buffer.tooltip": "直接将产物存入ME网络",
   "gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.1": "从多方块结构输出算力数据",
   "gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.2": "需要使用闪存右键无线算力靶仓和无线算力源仓进行绑定。",

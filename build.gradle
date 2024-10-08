@@ -53,6 +53,13 @@ repositories {
         url "https://maven.firstdarkdev.xyz/snapshots/"
     }
     maven {
+        name = 'GTCEu Maven'
+        url = 'https://maven.gtceu.com'
+        content {
+            includeGroup 'com.gregtechceu.gtceu'
+        }
+    }
+    maven {
         name 'Quilt'
         url 'https://maven.quiltmc.org/repository/release/'
     }
@@ -137,17 +144,17 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    modImplementation 'maven.modrinth:Jade-1.20.1-forge-11.9.2'
+    modCompileOnly 'maven.modrinth:Jade-1.20.1-forge-11.9.2'
     modImplementation('appeng:appliedenergistics2-forge-15.2.13'){ transitive false }
     //modRuntimeOnly 'dev:emi:1.1.12'
     //modRuntimeOnly 'dev:jecharacters:4.5.9'
 
-    modImplementation("dev.architectury:architectury-forge:${project.architectury_version}")
-    modImplementation("dev.ftb.mods:ftb-library-forge:${project.ftb_library_version}") { transitive false }
-    modImplementation("dev.ftb.mods:ftb-teams-forge:${project.ftb_teams_version}") { transitive false }
+    modCompileOnly("dev.architectury:architectury-forge:${project.architectury_version}")
+    modCompileOnly("dev.ftb.mods:ftb-library-forge:${project.ftb_library_version}") { transitive false }
+    modCompileOnly("dev.ftb.mods:ftb-teams-forge:${project.ftb_teams_version}") { transitive false }
 
-    modRuntimeOnly('dev:Glodium-1.20-1.5-forge')
-    modRuntimeOnly('dev:ExtendedAE-1.20-1.1.12-forge')
+    //modRuntimeOnly('dev:Glodium-1.20-1.5-forge')
+    //modRuntimeOnly('dev:ExtendedAE-1.20-1.1.12-forge')
 
 }
 
