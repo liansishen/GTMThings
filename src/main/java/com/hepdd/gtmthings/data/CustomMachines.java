@@ -11,7 +11,6 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.client.renderer.machine.MinerRenderer;
-import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine;
@@ -105,7 +104,7 @@ public class CustomMachines {
                 builder.langValue(GTValues.VNF[tier] + " Huge Input Dual Hatch")
                         .rotationState(RotationState.ALL)
                         .overlayTieredHullRenderer("huge_dual_hatch.import")
-                        .abilities(GTMachines.DUAL_INPUT_HATCH_ABILITIES)
+                        .abilities(PartAbility.IMPORT_ITEMS)
                         .compassNode("huge_dual_hatch")
                         .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"));
                 builder.tooltips( Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
