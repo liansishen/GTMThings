@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.common.item.TooltipBehavior;
 import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverPlaceBehavior;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverTooltipBehavior;
+import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import net.minecraft.network.chat.Component;
@@ -144,6 +145,11 @@ public class CustomItems {
             .item("advanced_terminal", ComponentItem::create)
             .properties(p -> p.stacksTo(1))
             .onRegister(attach(new AdvancedTerminalBehavior())).register();
+
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_BINDING_TOOL = GTMTHINGS_REGISTRATE
+            .item("wireless_energy_binding_tool", ComponentItem::create)
+            .properties(p -> p.stacksTo(1))
+            .onRegister(attach(new WirelessEnergyBindingToolBehavior())).register();
 
     public static <T extends ItemLike> NonNullConsumer<T> compassNode(CompassSection section, CompassNode... preNodes) {
         return item -> getOrCreate(section, item::asItem).addPreNode(preNodes);

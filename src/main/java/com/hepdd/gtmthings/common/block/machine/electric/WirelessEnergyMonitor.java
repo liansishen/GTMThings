@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
+import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
 import com.hepdd.gtmthings.utils.TeamUtil;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
@@ -42,7 +43,6 @@ import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 public class WirelessEnergyMonitor extends MetaMachine
                 implements IFancyUIMachine {
 
-
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyMonitor.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
 
@@ -66,7 +66,7 @@ public class WirelessEnergyMonitor extends MetaMachine
 
     private ArrayList<BigInteger> longArrayList;
 
-    private List<Map.Entry<Pair<UUID, MetaMachine>, Long>> sortedEntries = null;
+    private List<Map.Entry<Pair<UUID, IMachineBlockEntity>, Long>> sortedEntries = null;
 
     private boolean all = false;
 
@@ -118,12 +118,14 @@ public class WirelessEnergyMonitor extends MetaMachine
     }
 
     private void addDisplayText(@NotNull List<Component> textList) {
-
         BigInteger energyTotal = getUserEU(this.userid);
         textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0",
                 GetName(this.holder.level(),this.userid)).withStyle(ChatFormatting.AQUA));
         textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1",
                 FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
+        long rate = GlobalVariableStorage.GlobalRate.getOrDefault(TeamUtil.getTeamUUID(this.userid), Pair.of(null, 0L)).getSecond();
+        textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2",
+                FormattingUtil.formatNumbers(rate), rate / GTValues.V[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
         //average useage
         BigDecimal avgEnergy = getAvgUsage(energyTotal);
         Component voltageName = Component.literal(
@@ -142,21 +144,21 @@ public class WirelessEnergyMonitor extends MetaMachine
         }
         textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.statistics")
                 .append(ComponentPanelWidget.withButton(all ? Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.all") : Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.team"), "all")));
-        for (Map.Entry<Pair<UUID, MetaMachine>, Long> m : getSortedEntries()) {
+        for (Map.Entry<Pair<UUID, IMachineBlockEntity>, Long> m : getSortedEntries()) {
             UUID uuid = m.getKey().getFirst();
             if (all || TeamUtil.getTeamUUID(uuid) == TeamUtil.getTeamUUID(this.userid)) {
-                MetaMachine machine = m.getKey().getSecond();
+                IMachineBlockEntity holder = m.getKey().getSecond();
                 long eut = m.getValue();
-                String pos = machine.getPos().toShortString();
+                String pos = holder.pos().toShortString();
                 if (eut > 0) {
-                    textList.add(Component.translatable(machine.getBlockState().getBlock().getDescriptionId())
-                            .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", machine.getLevel().dimension().location()).append(" [").append(pos).append("] ")
+                    textList.add(Component.translatable(holder.self().getBlockState().getBlock().getDescriptionId())
+                            .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", holder.self().getLevel().dimension().location()).append(" [").append(pos).append("] ")
                                     .append(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(this.holder.level(), uuid))))))
                             .append(" +").append(FormattingUtil.formatNumbers(eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(eut)]).append(")")
                             .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
                 } else {
-                    textList.add(Component.translatable(machine.getBlockState().getBlock().getDescriptionId())
-                            .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", machine.getLevel().dimension().location()).append(" [").append(pos).append("] ")
+                    textList.add(Component.translatable(holder.self().getBlockState().getBlock().getDescriptionId())
+                            .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", holder.self().getLevel().dimension().location()).append(" [").append(pos).append("] ")
                                     .append(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(this.holder.level(), uuid))))))
                             .append(" -").append(FormattingUtil.formatNumbers(-eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(-eut)]).append(")")
                             .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
@@ -165,7 +167,7 @@ public class WirelessEnergyMonitor extends MetaMachine
         }
     }
 
-    private List<Map.Entry<Pair<UUID, MetaMachine>, Long>> getSortedEntries() {
+    private List<Map.Entry<Pair<UUID, IMachineBlockEntity>, Long>> getSortedEntries() {
         if (sortedEntries == null || getOffsetTimer() % 20 == 0) {
             sortedEntries = MachineData.entrySet()
                     .stream()

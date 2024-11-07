@@ -29,6 +29,7 @@ import static com.gregtechceu.gtceu.common.data.GTMaterials.Steel;
 import static com.gregtechceu.gtceu.common.data.GTMaterials.Tin;
 import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.ASSEMBLER_RECIPES;
 import static com.hepdd.gtmthings.data.CustomItems.ADVANCED_TERMINAL;
+import static com.hepdd.gtmthings.data.CustomItems.WIRELESS_ENERGY_BINDING_TOOL;
 
 public class GTMTRecipe {
     public static void init(Consumer<FinishedRecipe> provider) {
@@ -607,5 +608,9 @@ public class GTMTRecipe {
                 'B', new ItemStack(Items.BOOK),
                 'P', new UnificationEntry(plate, Steel),
                 'W', new UnificationEntry(wireGtSingle, Tin));
+
+        VanillaRecipeHelper.addShapedRecipe(provider, true, "wireless_energy_binding_tool", WIRELESS_ENERGY_BINDING_TOOL.asStack(),
+                "A",
+                'A', Items.PAPER);
     }
 }
