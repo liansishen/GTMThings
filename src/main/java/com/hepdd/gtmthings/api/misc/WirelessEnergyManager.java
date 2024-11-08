@@ -22,7 +22,10 @@ public class WirelessEnergyManager {
         }
     }
 
-    public static boolean addEUToGlobalEnergyMap(UUID user_uuid, long EU, MetaMachine machine) {
+    /**
+     * @return The actual energy of change
+     */
+    public static long addEUToGlobalEnergyMap(UUID user_uuid, long EU, MetaMachine machine) {
         // Mark the data as dirty and in need of saving.
         try {
             WirelessEnergySavaedData.INSTANCE.setDirty(true);
@@ -55,16 +58,16 @@ public class WirelessEnergyManager {
 //            GlobalVariableStorage.GlobalEnergy.put(user_uuid, BigInteger.ZERO);
 //        }
 
-            // If there is sufficient EU then complete the operation and return true.
+            // If there is sufficient EU then complete the operation and return.
             if (totalEU.signum() >= 0) {
                 GlobalVariableStorage.GlobalEnergy.put(teamUUID, totalEU);
                 //WirelessEnergySavaedData.INSTANCE.updateEnergy(user_uuid,totalEU.longValue());
-                return true;
+                return EU;
             }
         }
 
-        // There is insufficient EU so cancel the operation and return false.
-        return false;
+        // There is insufficient EU so cancel the operation and return 0.
+        return 0;
     }
 
     // ------------------------------------------------------------------------------------

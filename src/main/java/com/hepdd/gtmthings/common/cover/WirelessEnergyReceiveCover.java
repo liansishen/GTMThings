@@ -119,13 +119,13 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
             if (machine instanceof BatteryBufferMachine || machine instanceof HullMachine) {
                 var changeStored = Math.min(energyContainer.getEnergyCapacity() - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
-                if (!WirelessEnergyManager.addEUToGlobalEnergyMap(this.uuid, -changeStored, machine)) return;
-                energyContainer.acceptEnergyFromNetwork(null,GTValues.V[this.tier],this.amperage);
+                long changeenergy = -WirelessEnergyManager.addEUToGlobalEnergyMap(this.uuid, -changeStored, machine);
+                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, (long) ((double) GTValues.V[this.tier] * changeenergy / changeStored), this.amperage);
             } else {
                 var changeStored = Math.min(this.machineMaxEnergy - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
-                if (!WirelessEnergyManager.addEUToGlobalEnergyMap(this.uuid, -changeStored, machine)) return;
-                energyContainer.addEnergy(changeStored);
+                changeStored = WirelessEnergyManager.addEUToGlobalEnergyMap(this.uuid, -changeStored, machine);
+                if (changeStored < 0) energyContainer.addEnergy(-changeStored);
             }
         }
         updateCoverSub();
