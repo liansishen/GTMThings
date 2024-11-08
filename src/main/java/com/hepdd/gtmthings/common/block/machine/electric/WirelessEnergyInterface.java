@@ -92,8 +92,8 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IBin
     private void updateEnergy() {
         var currentStored = energyContainer.getEnergyStored();
         if (currentStored <= 0) return;
-        if(!WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, currentStored, this)) return;
-        energyContainer.setEnergyStored(0L);
+        long changeEnergy = WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, currentStored, this);
+        if (changeEnergy > 0) energyContainer.setEnergyStored(currentStored - changeEnergy);
     }
 
     @Override

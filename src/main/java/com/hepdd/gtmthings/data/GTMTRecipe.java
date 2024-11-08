@@ -601,7 +601,7 @@ public class GTMTRecipe {
                 .save(provider);
 
 
-        VanillaRecipeHelper.addShapedRecipe(provider, true, "advanced_terminal", ADVANCED_TERMINAL.asStack(),
+        VanillaRecipeHelper.addShapedRecipe(provider, true, GTMThings.id("advanced_terminal"), ADVANCED_TERMINAL.asStack(),
                 "SGS", "PBP", "PWP",
                 'S', new UnificationEntry(screw, Steel),
                 'G', Tags.Items.GLASS_PANES,
@@ -609,8 +609,7 @@ public class GTMTRecipe {
                 'P', new UnificationEntry(plate, Steel),
                 'W', new UnificationEntry(wireGtSingle, Tin));
 
-        VanillaRecipeHelper.addShapedRecipe(provider, true, "wireless_energy_binding_tool", WIRELESS_ENERGY_BINDING_TOOL.asStack(),
-                "A",
-                'A', Items.PAPER);
+        VanillaRecipeHelper.addShapedRecipe(provider, true, GTMThings.id("wireless_energy_binding_tool"), WIRELESS_ENERGY_BINDING_TOOL.asStack(),
+                "A", 'A', Items.PAPER);
     }
 }
