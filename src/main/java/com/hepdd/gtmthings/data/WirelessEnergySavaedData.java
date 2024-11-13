@@ -1,7 +1,5 @@
 package com.hepdd.gtmthings.data;
 
-import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.Registries;
@@ -13,6 +11,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+
+import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
+import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
@@ -38,7 +39,7 @@ public class WirelessEnergySavaedData extends SavedData {
         for (int i = 0; i < allEnergy.size(); i++) {
             CompoundTag engTag = allEnergy.getCompound(i);
             GlobalVariableStorage.GlobalEnergy.put(engTag.getUUID("uuid"),
-                    new BigInteger(engTag.getString("energy").isEmpty()?"0":engTag.getString("energy")));
+                    new BigInteger(engTag.getString("energy").isEmpty() ? "0" : engTag.getString("energy")));
         }
         for (int i = 0; i < allRate.size(); i++) {
             CompoundTag rateTag = allRate.getCompound(i);
@@ -51,14 +52,14 @@ public class WirelessEnergySavaedData extends SavedData {
     public @NotNull CompoundTag save(@NotNull CompoundTag compoundTag) {
         ListTag allEnergy = new ListTag();
         ListTag allRate = new ListTag();
-        for(var entry: GlobalVariableStorage.GlobalEnergy.entrySet()) {
+        for (var entry : GlobalVariableStorage.GlobalEnergy.entrySet()) {
             CompoundTag engTag = new CompoundTag();
-            engTag.putUUID("uuid",entry.getKey());
-            engTag.putString("energy",entry.getValue().toString());
+            engTag.putUUID("uuid", entry.getKey());
+            engTag.putString("energy", entry.getValue().toString());
 
             allEnergy.add(engTag);
         }
-        for(var entry: GlobalVariableStorage.GlobalRate.entrySet()) {
+        for (var entry : GlobalVariableStorage.GlobalRate.entrySet()) {
             CompoundTag rateTag = new CompoundTag();
             rateTag.putUUID("uuid", entry.getKey());
             rateTag.putString("dimension", entry.getValue().getFirst().dimension().location().toString());
@@ -67,8 +68,8 @@ public class WirelessEnergySavaedData extends SavedData {
 
             allRate.add(rateTag);
         }
-        compoundTag.put("allEnergy",allEnergy);
-        compoundTag.put("allRate",allRate);
+        compoundTag.put("allEnergy", allEnergy);
+        compoundTag.put("allRate", allRate);
         return compoundTag;
     }
 

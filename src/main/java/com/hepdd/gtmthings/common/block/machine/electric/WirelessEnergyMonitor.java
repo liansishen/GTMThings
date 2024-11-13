@@ -7,12 +7,11 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
-import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
-import com.hepdd.gtmthings.utils.TeamUtil;
+
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -22,9 +21,12 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
+
+import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
+import com.hepdd.gtmthings.utils.TeamUtil;
+import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -34,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.MachineData;
 import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.getUserEU;
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
@@ -41,7 +45,7 @@ import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WirelessEnergyMonitor extends MetaMachine
-                implements IFancyUIMachine {
+                                   implements IFancyUIMachine {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyMonitor.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
@@ -109,7 +113,7 @@ public class WirelessEnergyMonitor extends MetaMachine
 
     @Override
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
-        if (this.userid==null || !this.userid.equals(player.getUUID())) {
+        if (this.userid == null || !this.userid.equals(player.getUUID())) {
             this.userid = player.getUUID();
             this.longArrayList = new ArrayList<>();
         }
@@ -120,25 +124,25 @@ public class WirelessEnergyMonitor extends MetaMachine
     private void addDisplayText(@NotNull List<Component> textList) {
         BigInteger energyTotal = getUserEU(this.userid);
         textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0",
-                GetName(this.holder.level(),this.userid)).withStyle(ChatFormatting.AQUA));
+                GetName(this.holder.level(), this.userid)).withStyle(ChatFormatting.AQUA));
         textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1",
                 FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
         long rate = GlobalVariableStorage.GlobalRate.getOrDefault(TeamUtil.getTeamUUID(this.userid), Pair.of(null, 0L)).getSecond();
         textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2",
                 FormattingUtil.formatNumbers(rate), rate / GTValues.V[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
-        //average useage
+        // average useage
         BigDecimal avgEnergy = getAvgUsage(energyTotal);
         Component voltageName = Component.literal(
                 GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
-        BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.V[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]),1,RoundingMode.FLOOR);
+        BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.V[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]), 1, RoundingMode.FLOOR);
 
         if (avgEnergy.compareTo(BigDecimal.valueOf(0)) >= 0) {
             textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
-                    FormattingUtil.formatNumbers(avgEnergy.abs()),voltageAmperage,voltageName).withStyle(ChatFormatting.GRAY));
+                    FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
             textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_fill", Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.time_to_fill")).withStyle(ChatFormatting.GRAY));
         } else {
             textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
-                    FormattingUtil.formatNumbers(avgEnergy.abs()),voltageAmperage,voltageName).withStyle(ChatFormatting.GRAY));
+                    FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
             textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
                     getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
         }

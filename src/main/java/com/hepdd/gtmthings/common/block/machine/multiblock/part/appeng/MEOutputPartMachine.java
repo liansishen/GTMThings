@@ -1,12 +1,5 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng;
 
-import appeng.api.config.Actionable;
-import appeng.api.networking.IGridNodeListener;
-import appeng.api.networking.IManagedGridNode;
-import appeng.api.networking.security.IActionSource;
-import appeng.api.stacks.AEFluidKey;
-import appeng.api.stacks.AEItemKey;
-import appeng.api.stacks.AEKey;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
@@ -15,45 +8,57 @@ import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
+import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.DualHatchPartMachine;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.list.AEListGridWidget;
 import com.gregtechceu.gtceu.integration.ae2.machine.feature.IGridConnectedMachine;
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder;
 import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
+
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.misc.FluidStorage;
-import com.lowdragmc.lowdraglib.misc.ItemStackTransfer;
-import com.lowdragmc.lowdraglib.side.fluid.FluidStack;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
+
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
+
+import appeng.api.config.Actionable;
+import appeng.api.networking.IGridNodeListener;
+import appeng.api.networking.IManagedGridNode;
+import appeng.api.networking.security.IActionSource;
+import appeng.api.stacks.AEFluidKey;
+import appeng.api.stacks.AEItemKey;
+import appeng.api.stacks.AEKey;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumSet;
 import java.util.List;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEOutputPartMachine extends DualHatchPartMachine
-        implements IMachineLife, IInteractedMachine,IGridConnectedMachine {
+                                 implements IMachineLife, IInteractedMachine, IGridConnectedMachine {
 
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER =
-            new ManagedFieldHolder(MEOutputPartMachine.class, DualHatchPartMachine.MANAGED_FIELD_HOLDER);
+    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(MEOutputPartMachine.class, DualHatchPartMachine.MANAGED_FIELD_HOLDER);
+
     @Override
     public ManagedFieldHolder getFieldHolder() {
         return MANAGED_FIELD_HOLDER;
     }
+
     @DescSynced
     @Getter
     @Setter
@@ -110,7 +115,7 @@ public class MEOutputPartMachine extends DualHatchPartMachine
     }
 
     @Override
-    protected NotifiableFluidTank createTank(long initialCapacity, int slots, Object... args) {
+    protected NotifiableFluidTank createTank(int initialCapacity, int slots, Object... args) {
         this.internalTankBuffer = new KeyStorage();
         return new InaccessibleInfiniteTank(this);
     }
@@ -154,11 +159,11 @@ public class MEOutputPartMachine extends DualHatchPartMachine
         if (this.updateMEStatus()) {
             var grid = getMainNode().getGrid();
             if (grid != null) {
-                if (!internalBuffer.isEmpty()){
+                if (!internalBuffer.isEmpty()) {
                     internalBuffer.insertInventory(grid.getStorageService().getInventory(), actionSource);
                 }
                 if (!internalTankBuffer.isEmpty()) {
-                    internalTankBuffer.insertInventory(grid.getStorageService().getInventory(),actionSource);
+                    internalTankBuffer.insertInventory(grid.getStorageService().getInventory(), actionSource);
                 }
             }
             this.updateInventorySubscription();
@@ -175,7 +180,7 @@ public class MEOutputPartMachine extends DualHatchPartMachine
     }
 
     @NoArgsConstructor
-    private class ItemStackTransferDelegate extends ItemStackTransfer {
+    private class ItemStackTransferDelegate extends CustomItemStackHandler {
 
         // Necessary for InaccessibleInfiniteHandler
         public ItemStackTransferDelegate(Integer integer) {
@@ -203,7 +208,7 @@ public class MEOutputPartMachine extends DualHatchPartMachine
         }
 
         @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate, boolean notifyChanges) {
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             var key = AEItemKey.of(stack);
             int count = stack.getCount();
             long oldValue = internalBuffer.storage.getOrDefault(key, 0);
@@ -220,27 +225,15 @@ public class MEOutputPartMachine extends DualHatchPartMachine
         }
 
         @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate, boolean notifyChanges) {
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
             return ItemStack.EMPTY;
-        }
-
-        @Override
-        public ItemStackTransfer copy() {
-            // because recipe testing uses copy transfer instead of simulated operations
-            return new ItemStackTransferDelegate() {
-
-                @Override
-                public ItemStack insertItem(int slot, ItemStack stack, boolean simulate, boolean notifyChanges) {
-                    return super.insertItem(slot, stack, true, notifyChanges);
-                }
-            };
         }
     }
 
     // Fluid Part
     private class InaccessibleInfiniteTank extends NotifiableFluidTank {
 
-        FluidStorage storage;
+        CustomFluidTank storage;
 
         public InaccessibleInfiniteTank(MetaMachine holder) {
             super(holder, List.of(new FluidStorageDelegate()), IO.OUT, IO.NONE);
@@ -259,7 +252,7 @@ public class MEOutputPartMachine extends DualHatchPartMachine
         }
 
         @Override
-        public long getTankCapacity(int tank) {
+        public int getTankCapacity(int tank) {
             return storage.getCapacity();
         }
 
@@ -269,15 +262,15 @@ public class MEOutputPartMachine extends DualHatchPartMachine
         }
     }
 
-    private class FluidStorageDelegate extends FluidStorage {
+    private class FluidStorageDelegate extends CustomFluidTank {
 
         public FluidStorageDelegate() {
-            super(0L);
+            super(0);
         }
 
         @Override
-        public long getCapacity() {
-            return Long.MAX_VALUE;
+        public int getCapacity() {
+            return Integer.MAX_VALUE;
         }
 
         @Override
@@ -286,12 +279,12 @@ public class MEOutputPartMachine extends DualHatchPartMachine
         }
 
         @Override
-        public long fill(int tank, FluidStack resource, boolean simulate, boolean notifyChanges) {
+        public int fill(int tank, FluidStack resource, FluidAction action) {
             var key = AEFluidKey.of(resource.getFluid(), resource.getTag());
             long amount = resource.getAmount();
             long oldValue = internalTankBuffer.storage.getOrDefault(key, 0);
-            long changeValue = Math.min(Long.MAX_VALUE - oldValue, amount);
-            if (changeValue > 0 && !simulate) {
+            int changeValue = (int) Math.min(Integer.MAX_VALUE - oldValue, amount);
+            if (changeValue > 0 && !action.simulate()) {
                 internalTankBuffer.storage.put(key, oldValue + changeValue);
                 internalTankBuffer.onChanged();
             }
@@ -309,13 +302,13 @@ public class MEOutputPartMachine extends DualHatchPartMachine
         }
 
         @Override
-        public FluidStorage copy() {
+        public CustomFluidTank copy() {
             // because recipe testing uses copy transfer instead of simulated operations
             return new FluidStorageDelegate() {
 
                 @Override
-                public long fill(int tank, FluidStack resource, boolean simulate, boolean notifyChanges) {
-                    return super.fill(tank, resource, true, notifyChanges);
+                public int fill(int tank, FluidStack resource, FluidAction action) {
+                    return super.fill(tank, resource, FluidAction.SIMULATE);
                 }
             };
         }

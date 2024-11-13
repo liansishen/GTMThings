@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableLaserContainer;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
 import com.gregtechceu.gtceu.utils.GTUtil;
+
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
@@ -22,23 +23,27 @@ import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+
+import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import static net.minecraft.ChatFormatting.*;
 
 @ParametersAreNonnullByDefault
 public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implements IDataInfoProvider {
+
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeLaserHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
 
     @Persisted
@@ -71,7 +76,7 @@ public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implement
         super(holder, GTValues.MAX, IO.IN);
         this.voltage = GTValues.V[setTier];
         this.maxEnergy = voltage * 64L * amps;
-        this.buffer = NotifiableLaserContainer.receiverContainer(this,this.maxEnergy , voltage, amps);
+        this.buffer = NotifiableLaserContainer.receiverContainer(this, this.maxEnergy, voltage, amps);
     }
 
     @Override
@@ -88,7 +93,6 @@ public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implement
         super.onLoad();
         LaserListener = buffer.addChangedListener(this::AddEngerySubscription);
         AddEngerySubscription();
-
     }
 
     protected void AddEngerySubscription() {
@@ -98,7 +102,7 @@ public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implement
     protected void addEng() {
         if (buffer.getInputVoltage() != voltage || buffer.getInputAmperage() != amps) {
             maxEnergy = voltage * 64L * amps;
-            buffer.resetBasicInfo(maxEnergy, voltage, amps,0,0);
+            buffer.resetBasicInfo(maxEnergy, voltage, amps, 0, 0);
             buffer.setEnergyStored(0);
         }
         if (buffer.getEnergyStored() < this.maxEnergy) {

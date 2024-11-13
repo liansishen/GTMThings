@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
 import com.gregtechceu.gtceu.utils.GTUtil;
+
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
@@ -22,24 +23,26 @@ import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+
+import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implements IDataInfoProvider {
-
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeEnergyHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
 
@@ -63,7 +66,7 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     }
 
     //////////////////////////////////////
-    //*****     Initialization    ******//
+    // ***** Initialization ******//
     //////////////////////////////////////
     @Override
     public ManagedFieldHolder getFieldHolder() {
@@ -73,7 +76,7 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     protected NotifiableEnergyContainer createEnergyContainer() {
         NotifiableEnergyContainer container;
         this.maxEnergy = GTValues.V[tier] * 16L * amps;
-        container = NotifiableEnergyContainer.receiverContainer(this, this.maxEnergy , GTValues.V[tier], amps);
+        container = NotifiableEnergyContainer.receiverContainer(this, this.maxEnergy, GTValues.V[tier], amps);
         return container;
     }
 
@@ -100,15 +103,13 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     protected void addEnergy() {
         if (energyContainer.getInputVoltage() != voltage || energyContainer.getInputAmperage() != amps) {
             maxEnergy = voltage * 16L * amps;
-            energyContainer.resetBasicInfo(maxEnergy, voltage, amps,0,0);
+            energyContainer.resetBasicInfo(maxEnergy, voltage, amps, 0, 0);
             energyContainer.setEnergyStored(0);
         }
-        if (energyContainer.getEnergyStored() < this.maxEnergy ) {
-            energyContainer.setEnergyStored(this.maxEnergy );
+        if (energyContainer.getEnergyStored() < this.maxEnergy) {
+            energyContainer.setEnergyStored(this.maxEnergy);
         }
     }
-
-
 
     @Override
     public ModularUI createUI(Player entityPlayer) {
@@ -146,7 +147,7 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     }
 
     //////////////////////////////////////
-    //**********     Misc     **********//
+    // ********** Misc **********//
     //////////////////////////////////////
 
     @Override

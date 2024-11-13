@@ -2,6 +2,7 @@ package com.hepdd.gtmthings.api.misc;
 
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+
 import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
 import com.mojang.datafixers.util.Pair;
 
@@ -16,7 +17,6 @@ public class WirelessEnergyManager {
     public static final WeakHashMap<Pair<UUID, IMachineBlockEntity>, Long> MachineData = new WeakHashMap<>();
 
     public static void strongCheckOrAddUser(UUID user_uuid) {
-
         if (!GlobalVariableStorage.GlobalEnergy.containsKey(user_uuid)) {
             GlobalVariableStorage.GlobalEnergy.put(user_uuid, BigInteger.ZERO);
         }
@@ -52,16 +52,16 @@ public class WirelessEnergyManager {
             totalEU = totalEU.add(BigInteger.valueOf(EU));
 
             // Get personal energy,when > 0, add to team energy and clear personal energy.
-//        BigInteger userTotalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(user_uuid, BigInteger.ZERO);
-//        if (userTotalEU.signum() > 0) {
-//            totalEU = totalEU.add(userTotalEU);
-//            GlobalVariableStorage.GlobalEnergy.put(user_uuid, BigInteger.ZERO);
-//        }
+            // BigInteger userTotalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(user_uuid, BigInteger.ZERO);
+            // if (userTotalEU.signum() > 0) {
+            // totalEU = totalEU.add(userTotalEU);
+            // GlobalVariableStorage.GlobalEnergy.put(user_uuid, BigInteger.ZERO);
+            // }
 
             // If there is sufficient EU then complete the operation and return.
             if (totalEU.signum() >= 0) {
                 GlobalVariableStorage.GlobalEnergy.put(teamUUID, totalEU);
-                //WirelessEnergySavaedData.INSTANCE.updateEnergy(user_uuid,totalEU.longValue());
+                // WirelessEnergySavaedData.INSTANCE.updateEnergy(user_uuid,totalEU.longValue());
                 return EU;
             }
         }
@@ -74,7 +74,7 @@ public class WirelessEnergyManager {
 
     public static BigInteger getUserEU(UUID user_uuid) {
         BigInteger totalEU = GlobalVariableStorage.GlobalEnergy.getOrDefault(getTeamUUID(user_uuid), BigInteger.ZERO);
-        if (totalEU.signum() <0) {
+        if (totalEU.signum() < 0) {
             WirelessEnergySavaedData.INSTANCE.setDirty(true);
             totalEU = BigInteger.ZERO;
             GlobalVariableStorage.GlobalEnergy.put(getTeamUUID(user_uuid), totalEU);
@@ -99,5 +99,4 @@ public class WirelessEnergyManager {
         // Do not use this unless you are 100% certain you know what you are doing.
         GlobalVariableStorage.GlobalEnergy.clear();
     }
-
 }

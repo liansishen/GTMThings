@@ -3,9 +3,7 @@ package com.hepdd.gtmthings.integration.jade.provider;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.integration.jade.provider.CapabilityBlockProvider;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
-import com.hepdd.gtmthings.GTMThings;
-import com.hepdd.gtmthings.api.capability.IGTMTJadeIF;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +12,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import com.hepdd.gtmthings.GTMThings;
+import com.hepdd.gtmthings.api.capability.IGTMTJadeIF;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
@@ -37,11 +39,11 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
     @Override
     protected void write(CompoundTag data, IGTMTJadeIF capability) {
         if (capability != null) {
-            data.putBoolean("isBinded",capability.isbinded());
-            data.putString("pos",capability.getBindPos());
+            data.putBoolean("isBinded", capability.isbinded());
+            data.putString("pos", capability.getBindPos());
         } else {
-            data.putBoolean("isBinded",false);
-            data.putString("pos","");
+            data.putBoolean("isBinded", false);
+            data.putString("pos", "");
         }
     }
 
@@ -52,11 +54,9 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
         if (metaMachine instanceof WirelessOpticalComputationHatchMachine woc) {
             if (capData.getBoolean("isBinded")) {
                 if (woc.isTransmitter()) {
-                    tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.bind"
-                            ,capData.getString("pos")));
+                    tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.bind", capData.getString("pos")));
                 } else {
-                    tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.bind"
-                            ,capData.getString("pos")));
+                    tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.bind", capData.getString("pos")));
                 }
             } else {
                 if (woc.isTransmitter()) {

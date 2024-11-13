@@ -10,10 +10,10 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.common.data.GTItems;
-import com.hepdd.gtmthings.api.capability.IBindable;
-import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,16 +26,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import com.hepdd.gtmthings.api.capability.IBindable;
+import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WirelessEnergyInterface extends TieredIOPartMachine implements IBindable, IInteractedMachine, IMachineLife {
+
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyInterface.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
 
@@ -74,18 +79,18 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IBin
     @Override
     public void onUnload() {
         super.onUnload();
-        if(updEnergySubs!=null) {
+        if (updEnergySubs != null) {
             updEnergySubs.unsubscribe();
             updEnergySubs = null;
         }
     }
 
     private void updateEnergySubscription() {
-        if (this.owner_uuid!=null) {
-            updEnergySubs = subscribeServerTick(updEnergySubs,this::updateEnergy);
+        if (this.owner_uuid != null) {
+            updEnergySubs = subscribeServerTick(updEnergySubs, this::updateEnergy);
         } else if (updEnergySubs != null) {
             updEnergySubs.unsubscribe();
-            updEnergySubs=null;
+            updEnergySubs = null;
         }
     }
 
@@ -108,7 +113,7 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IBin
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
             this.owner_uuid = player.getUUID();
             if (getLevel().isClientSide()) {
-                player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind",GetName(player)));
+                player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind", GetName(player)));
             }
             updateEnergySubscription();
             return InteractionResult.SUCCESS;

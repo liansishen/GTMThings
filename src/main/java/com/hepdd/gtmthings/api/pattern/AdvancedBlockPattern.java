@@ -8,9 +8,9 @@ import com.gregtechceu.gtceu.api.pattern.MultiblockState;
 import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.pattern.predicates.SimplePredicate;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
-import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
+
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
-import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -28,6 +28,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+
+import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
+import com.mojang.datafixers.util.Pair;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +40,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-
 
 public class AdvancedBlockPattern extends BlockPattern {
 
@@ -136,7 +138,7 @@ public class AdvancedBlockPattern extends BlockPattern {
                         TraceabilityPredicate predicate = this.blockMatches[c][b][a];
                         BlockPos pos = setActualRelativeOffset(x, y, z, facing, upwardsFacing, isFlipped)
                                 .offset(centerPos.getX(), centerPos.getY(), centerPos.getZ());
-                        updateWorldState(worldState,pos, predicate);
+                        updateWorldState(worldState, pos, predicate);
                         if (!world.isEmptyBlock(pos)) {
                             blocks.put(pos, world.getBlockState(pos));
                             for (SimplePredicate limit : predicate.limited) {
@@ -150,12 +152,12 @@ public class AdvancedBlockPattern extends BlockPattern {
                                     if (!cacheLayer.containsKey(limit)) {
                                         cacheLayer.put(limit, 1);
                                     } else
-                                    if (cacheLayer.get(limit) < limit.minLayerCount && (limit.maxLayerCount == -1 ||
-                                            cacheLayer.get(limit) < limit.maxLayerCount)) {
-                                        cacheLayer.put(limit, cacheLayer.get(limit) + 1);
-                                    } else {
-                                        continue;
-                                    }
+                                        if (cacheLayer.get(limit) < limit.minLayerCount && (limit.maxLayerCount == -1 ||
+                                                cacheLayer.get(limit) < limit.maxLayerCount)) {
+                                                    cacheLayer.put(limit, cacheLayer.get(limit) + 1);
+                                                } else {
+                                                    continue;
+                                                }
                                 } else {
                                     continue;
                                 }
@@ -170,10 +172,10 @@ public class AdvancedBlockPattern extends BlockPattern {
                                             cacheGlobal.put(limit, 1);
                                         } else if (cacheGlobal.get(limit) < limit.minCount &&
                                                 (limit.maxCount == -1 || cacheGlobal.get(limit) < limit.maxCount)) {
-                                            cacheGlobal.put(limit, cacheGlobal.get(limit) + 1);
-                                        } else {
-                                            continue;
-                                        }
+                                                    cacheGlobal.put(limit, cacheGlobal.get(limit) + 1);
+                                                } else {
+                                                    continue;
+                                                }
                                     } else {
                                         continue;
                                     }
@@ -285,20 +287,20 @@ public class AdvancedBlockPattern extends BlockPattern {
     private void clearWorldState(MultiblockState worldState) {
         try {
             Class<?> clazz = Class.forName("com.gregtechceu.gtceu.api.pattern.MultiblockState");
-            //Object obj = clazz.newInstance();
+            // Object obj = clazz.newInstance();
             Method method = clazz.getDeclaredMethod("clean");
             method.setAccessible(true);
             method.invoke(worldState);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {}
     }
 
-    private void updateWorldState(MultiblockState worldState,BlockPos posIn, TraceabilityPredicate predicate) {
+    private void updateWorldState(MultiblockState worldState, BlockPos posIn, TraceabilityPredicate predicate) {
         try {
             Class<?> clazz = Class.forName("com.gregtechceu.gtceu.api.pattern.MultiblockState");
             Method method = clazz.getDeclaredMethod("update", BlockPos.class, TraceabilityPredicate.class);
             method.setAccessible(true);
-            method.invoke(worldState,posIn,predicate);
-        } catch (Exception ignored) { }
+            method.invoke(worldState, posIn, predicate);
+        } catch (Exception ignored) {}
     }
 
     private BlockPos setActualRelativeOffset(int x, int y, int z, Direction facing, Direction upwardsFacing,
@@ -386,8 +388,8 @@ public class AdvancedBlockPattern extends BlockPattern {
 
     @Nullable
     private static Pair<Integer, IItemHandler> getMatchStackWithHandler(
-            List<ItemStack> candidates,
-            LazyOptional<IItemHandler> cap) {
+                                                                        List<ItemStack> candidates,
+                                                                        LazyOptional<IItemHandler> cap) {
         IItemHandler handler = cap.orElse(null);
         if (handler == null) {
             return null;
@@ -406,8 +408,8 @@ public class AdvancedBlockPattern extends BlockPattern {
                 }
             } else if (candidates.stream().anyMatch(candidate -> ItemStack.isSameItemSameTags(candidate, stack)) &&
                     !stack.isEmpty() && stack.getItem() instanceof BlockItem) {
-                return Pair.of(i, handler);
-            }
+                        return Pair.of(i, handler);
+                    }
         }
         return null;
     }

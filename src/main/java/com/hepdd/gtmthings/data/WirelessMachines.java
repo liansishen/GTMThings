@@ -9,12 +9,14 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
+
+import net.minecraft.network.chat.Component;
+
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyInterface;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessEnergyHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine;
-import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
@@ -26,7 +28,7 @@ import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REG
 public class WirelessMachines {
 
     public static final int[] ALL_TIERS = GTValues.tiersBetween(LV, MAX);
-    public static final int[] WIRELL_ENERGY_HIGH_TIERS = GTValues.tiersBetween(EV,MAX);
+    public static final int[] WIRELL_ENERGY_HIGH_TIERS = GTValues.tiersBetween(EV, MAX);
 
     static {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.WIRELESS_TAB);
@@ -70,25 +72,27 @@ public class WirelessMachines {
             .tier(UV)
             .register();
 
-    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH = registerWirelessEnergyHatch(IO.IN,2, PartAbility.INPUT_ENERGY, ALL_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_4A = registerWirelessEnergyHatch(IO.IN,4,PartAbility.INPUT_ENERGY, ALL_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_16A = registerWirelessEnergyHatch(IO.IN,16,PartAbility.INPUT_ENERGY, ALL_TIERS);
-    //public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_64A = registerWirelessEnergyHatch(IO.IN,64,PartAbility.INPUT_LASER,WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_256A = registerWirelessLaserHatch(IO.IN,256,PartAbility.INPUT_LASER,WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_1024A = registerWirelessLaserHatch(IO.IN,1024,PartAbility.INPUT_LASER,WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_4096A = registerWirelessLaserHatch(IO.IN,4096,PartAbility.INPUT_LASER,WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_16384A = registerWirelessLaserHatch(IO.IN,16384,PartAbility.INPUT_LASER,WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_65536A = registerWirelessLaserHatch(IO.IN,65536,PartAbility.INPUT_LASER,WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH = registerWirelessEnergyHatch(IO.IN, 2, PartAbility.INPUT_ENERGY, ALL_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_4A = registerWirelessEnergyHatch(IO.IN, 4, PartAbility.INPUT_ENERGY, ALL_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_16A = registerWirelessEnergyHatch(IO.IN, 16, PartAbility.INPUT_ENERGY, ALL_TIERS);
+    // public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_64A =
+    // registerWirelessEnergyHatch(IO.IN,64,PartAbility.INPUT_LASER,WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_256A = registerWirelessLaserHatch(IO.IN, 256, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_1024A = registerWirelessLaserHatch(IO.IN, 1024, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_4096A = registerWirelessLaserHatch(IO.IN, 4096, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_16384A = registerWirelessLaserHatch(IO.IN, 16384, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_65536A = registerWirelessLaserHatch(IO.IN, 65536, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
 
-    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH = registerWirelessEnergyHatch(IO.OUT,2,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_4A = registerWirelessEnergyHatch(IO.OUT,4,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_16A = registerWirelessEnergyHatch(IO.OUT,16,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
-    //public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_64A = registerWirelessEnergyHatch(IO.OUT,64,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_256A = registerWirelessLaserHatch(IO.OUT,256,PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_1024A = registerWirelessLaserHatch(IO.OUT,1024,PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_4096A = registerWirelessLaserHatch(IO.OUT,4096,PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_16384A = registerWirelessLaserHatch(IO.OUT,16384,PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
-    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_65536A = registerWirelessLaserHatch(IO.OUT,65536,PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH = registerWirelessEnergyHatch(IO.OUT, 2, PartAbility.OUTPUT_ENERGY, ALL_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_4A = registerWirelessEnergyHatch(IO.OUT, 4, PartAbility.OUTPUT_ENERGY, ALL_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_16A = registerWirelessEnergyHatch(IO.OUT, 16, PartAbility.OUTPUT_ENERGY, ALL_TIERS);
+    // public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_64A =
+    // registerWirelessEnergyHatch(IO.OUT,64,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_256A = registerWirelessLaserHatch(IO.OUT, 256, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_1024A = registerWirelessLaserHatch(IO.OUT, 1024, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_4096A = registerWirelessLaserHatch(IO.OUT, 4096, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_16384A = registerWirelessLaserHatch(IO.OUT, 16384, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
+    public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_65536A = registerWirelessLaserHatch(IO.OUT, 65536, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
 
     public static MachineDefinition[] registerTieredMachines(String name,
                                                              BiFunction<IMachineBlockEntity, Integer, MetaMachine> factory,
@@ -105,7 +109,7 @@ public class WirelessMachines {
         return definitions;
     }
 
-    public static MachineDefinition[] registerWirelessEnergyHatch(IO io, int amperage, PartAbility ability,int[] tiers) {
+    public static MachineDefinition[] registerWirelessEnergyHatch(IO io, int amperage, PartAbility ability, int[] tiers) {
         var name = io == IO.IN ? "input" : "output";
         String finalRender = getRender(amperage);
         return registerTieredMachines(amperage + "a_wireless_energy_" + name + "_hatch",
@@ -114,15 +118,14 @@ public class WirelessMachines {
                         .langValue(VNF[tier] + (io == IO.IN ? " Energy Hatch" : " Dynamo Hatch"))
                         .rotationState(RotationState.ALL)
                         .abilities(ability)
-                        .tooltips(Component.translatable("gtmthings.machine.energy_hatch." + name + ".tooltip")
-                                ,(Component.translatable("gtmthings.machine.wireless_energy_hatch." + name + ".tooltip")))
+                        .tooltips(Component.translatable("gtmthings.machine.energy_hatch." + name + ".tooltip"), (Component.translatable("gtmthings.machine.wireless_energy_hatch." + name + ".tooltip")))
                         .overlayTieredHullRenderer(finalRender)
                         .compassNode("energy_hatch")
                         .register(),
                 tiers);
     }
 
-    public static MachineDefinition[] registerWirelessLaserHatch(IO io, int amperage, PartAbility ability,int[] tiers) {
+    public static MachineDefinition[] registerWirelessLaserHatch(IO io, int amperage, PartAbility ability, int[] tiers) {
         var name = io == IO.IN ? "target" : "source";
         String finalRender = getRender(amperage);
         return registerTieredMachines(amperage + "a_wireless_laser_" + name + "_hatch",
@@ -132,8 +135,7 @@ public class WirelessMachines {
                                 FormattingUtil.toEnglishName(name) + " Hatch")
                         .rotationState(RotationState.ALL)
                         .abilities(ability)
-                        .tooltips(Component.translatable("gtmthings.machine.energy_hatch." + name + ".tooltip")
-                                ,(Component.translatable("gtmthings.machine.wireless_energy_hatch." + name + ".tooltip")))
+                        .tooltips(Component.translatable("gtmthings.machine.energy_hatch." + name + ".tooltip"), (Component.translatable("gtmthings.machine.wireless_energy_hatch." + name + ".tooltip")))
                         .overlayTieredHullRenderer(finalRender)
                         .compassNode("laser_hatch." + name)
                         .register(),
@@ -144,7 +146,7 @@ public class WirelessMachines {
         String render = "wireless_energy_hatch";
         render = switch (amperage) {
             case 2 -> render;
-            case 4 -> render + "_4a" ;
+            case 4 -> render + "_4a";
             case 16 -> render + "_16a";
             case 64 -> render + "_64a";
             default -> "wireless_laser_hatch.target";

@@ -6,31 +6,35 @@ import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.FancyTankConfigurator;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
-import com.hepdd.gtmthings.common.block.machine.trait.CatalystFluidStackHandler;
-import com.hepdd.gtmthings.utils.FormatUtil;
+
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.side.fluid.FluidStack;
 import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper;
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.FluidStack;
+
+import com.hepdd.gtmthings.common.block.machine.trait.CatalystFluidStackHandler;
+import com.hepdd.gtmthings.utils.FormatUtil;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -58,11 +62,12 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
     public HugeDualHatchPartMachine(IMachineBlockEntity holder, int tier, IO io, Object... args) {
         super(holder, tier, io, 9, args);
         this.tank = createTank();
-        this.shareTank = new CatalystFluidStackHandler(this, 9, 16000L, IO.IN, IO.NONE);
+        this.shareTank = new CatalystFluidStackHandler(this, 9, 16000, IO.IN, IO.NONE);
     }
 
     protected NotifiableFluidTank createTank(Object... args) {
         return new NotifiableFluidTank(this, this.getTankInventorySize(), Integer.MAX_VALUE, io) {
+
             @Override
             public boolean canCapOutput() {
                 return true;
@@ -183,9 +188,8 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
             if (!fs.isEmpty()) {
                 textList.add(fs.getDisplayName().copy().setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD))
                         .append(Component.literal(fs.getAmount() < 1000 ? fs.getAmount() + "mB" :
-                                        FormatUtil.formatNumber(fs.getAmount() / 1000L) + "B")
-                                .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)))
-                );
+                                FormatUtil.formatNumber(fs.getAmount() / 1000L) + "B")
+                                .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))));
                 ++tankCount;
             }
         }
@@ -199,5 +203,4 @@ public class HugeDualHatchPartMachine extends HugeBusPartMachine {
         textList.add(1, Component.translatable("gtmthings.machine.huge_dual_hatch.tooltip.2", tankCount, this.getTankInventorySize())
                 .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
     }
-
 }

@@ -14,12 +14,14 @@ import com.gregtechceu.gtceu.common.data.machines.GTAEMachines;
 import com.gregtechceu.gtceu.common.data.machines.GTResearchMachines;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
-import com.hepdd.gtmthings.GTMThings;
-import com.tterrag.registrate.util.entry.ItemEntry;
+
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.Tags;
+
+import com.hepdd.gtmthings.GTMThings;
+import com.tterrag.registrate.util.entry.ItemEntry;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,6 +34,7 @@ import static com.hepdd.gtmthings.data.CustomItems.ADVANCED_TERMINAL;
 import static com.hepdd.gtmthings.data.CustomItems.WIRELESS_ENERGY_BINDING_TOOL;
 
 public class GTMTRecipe {
+
     public static void init(Consumer<FinishedRecipe> provider) {
         ASSEMBLER_RECIPES.recipeBuilder("cover_maintenance_detector")
                 .inputItems(GTItems.EMITTER_LV)
@@ -599,7 +602,6 @@ public class GTMTRecipe {
                 .duration(100)
                 .EUt(GTValues.VA[GTValues.LV])
                 .save(provider);
-
 
         VanillaRecipeHelper.addShapedRecipe(provider, true, GTMThings.id("advanced_terminal"), ADVANCED_TERMINAL.asStack(),
                 "SGS", "PBP", "PWP",

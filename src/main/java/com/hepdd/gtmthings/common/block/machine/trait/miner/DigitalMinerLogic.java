@@ -1,7 +1,5 @@
 package com.hepdd.gtmthings.common.block.machine.trait.miner;
 
-import com.google.common.collect.Table;
-import com.google.common.collect.Tables;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.cover.filter.ItemFilter;
@@ -12,19 +10,16 @@ import com.gregtechceu.gtceu.api.misc.IgnoreEnergyRecipeHandler;
 import com.gregtechceu.gtceu.api.misc.ItemRecipeHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
+import com.gregtechceu.gtceu.api.transfer.item.NotifiableAccountedInvWrapper;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 import com.gregtechceu.gtceu.utils.GTUtil;
-import com.hepdd.gtmthings.api.capability.IDigitalMiner;
-import com.lowdragmc.lowdraglib.misc.ItemTransferList;
-import com.lowdragmc.lowdraglib.side.item.IItemTransfer;
+
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import lombok.Getter;
-import lombok.Setter;
+
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -40,12 +35,20 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.items.IItemHandlerModifiable;
+
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
+import com.hepdd.gtmthings.api.capability.IDigitalMiner;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityHolder  {
+public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityHolder {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(DigitalMinerLogic.class,
             RecipeLogic.MANAGED_FIELD_HOLDER);
@@ -55,7 +58,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     private static final double DIVIDEND = MAX_SPEED * Math.pow(TICK_TOLERANCE, POWER);
     protected final IDigitalMiner miner;
     @Nullable
-    private ItemTransferList cachedItemTransfer = null;
+    private NotifiableAccountedInvWrapper cachedItemTransfer = null;
     @Getter
     private int silk;
     @Getter
@@ -95,9 +98,9 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     @Getter
     private int minBuildHeight = Integer.MAX_VALUE;
     @Getter
-    private int minHeight = Integer.MAX_VALUE;
+    private int minHeight;
     @Getter
-    private int maxHeight = Integer.MAX_VALUE;
+    private int maxHeight;
     @Getter
     @Setter
     @Persisted
@@ -115,7 +118,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     private int oreAmount;
     @Getter
     private ItemFilter itemFilter;
-
 
     public DigitalMinerLogic(@NotNull IRecipeLogicMachine machine, int maximumRadius, int minHeight, int maxHeight, int silk, ItemFilter itemFilter, int speed) {
         super(machine);
@@ -149,7 +151,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         this.setWorkingEnabled(false);
     }
 
-    public void resetRecipeLogic(int maximumRadius,int minHeight,int maxHeight,int silk, ItemFilter itemFilter) {
+    public void resetRecipeLogic(int maximumRadius, int minHeight, int maxHeight, int silk, ItemFilter itemFilter) {
         this.silk = silk;
         this.currentRadius = maximumRadius;
         this.maximumRadius = maximumRadius;
@@ -283,7 +285,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
      */
     protected void onMineOperation() {}
 
-
     /**
      * Should we apply additional processing according to the recipe type.
      */
@@ -362,10 +363,9 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         blockDrops.add(new ItemStack(blockState.getBlock()));
     }
 
-    protected ItemTransferList getCachedItemTransfer() {
+    protected NotifiableAccountedInvWrapper getCachedItemTransfer() {
         if (cachedItemTransfer == null) {
-            cachedItemTransfer = new ItemTransferList(machine.getCapabilitiesProxy()
-                    .get(IO.OUT, ItemRecipeCapability.CAP).stream().map(IItemTransfer.class::cast).toList());
+            cachedItemTransfer = new NotifiableAccountedInvWrapper(machine.getCapabilitiesProxy().get(IO.OUT, ItemRecipeCapability.CAP).stream().map(IItemHandlerModifiable.class::cast).toArray(IItemHandlerModifiable[]::new));
         }
         return cachedItemTransfer;
     }
@@ -459,7 +459,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
 
         // determine how many blocks to retrieve this time
         double quotient = getQuotient(getMeanTickTime(getMachine().getLevel()));
-        //int calcAmount = quotient < 1 ? 1 : (int) (Math.min(quotient, Short.MAX_VALUE));
+        // int calcAmount = quotient < 1 ? 1 : (int) (Math.min(quotient, Short.MAX_VALUE));
         int calcAmount = Short.MAX_VALUE;
         int calculated = 0;
 
@@ -479,7 +479,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
                         if (state.getBlock().defaultDestroyTime() >= 0 &&
                                 getMachine().getLevel().getBlockEntity(blockPos) == null &&
                                 state.is(Tags.Blocks.ORES)) {
-                            if (itemFilter==null) {
+                            if (itemFilter == null) {
                                 blocks.addLast(blockPos);
                             } else if (itemFilter.test(state.getBlock().asItem().getDefaultInstance())) {
                                 blocks.addLast(blockPos);
@@ -539,12 +539,10 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         return DIVIDEND / Math.pow(base, POWER);
     }
 
-
     /**
      * @return the position to start mining from
      */
     public BlockPos getMiningPos() {
         return getMachine().getPos();
     }
-
 }

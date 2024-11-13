@@ -1,17 +1,19 @@
 package com.hepdd.gtmthings.forge;
 
 import com.gregtechceu.gtceu.utils.TaskHandler;
-import com.hepdd.gtmthings.GTMThings;
-import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
-import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior;
-import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
-import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import com.hepdd.gtmthings.GTMThings;
+import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
+import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior;
+import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
+import com.mojang.datafixers.util.Pair;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -49,7 +51,7 @@ public class ForgeCommonEventListener {
     @SubscribeEvent
     public static void serverSetup(LevelEvent.Load event) {
         if (event.getLevel() instanceof ServerLevel serverLevel) {
-            WirelessEnergySavaedData.INSTANCE =  WirelessEnergySavaedData.getOrCreate(serverLevel);
+            WirelessEnergySavaedData.INSTANCE = WirelessEnergySavaedData.getOrCreate(serverLevel);
         }
     }
 }

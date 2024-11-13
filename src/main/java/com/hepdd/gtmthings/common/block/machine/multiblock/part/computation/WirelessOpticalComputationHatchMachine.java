@@ -6,12 +6,10 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
 import com.gregtechceu.gtceu.common.data.GTItems;
-import com.hepdd.gtmthings.api.capability.IGTMTJadeIF;
-import com.hepdd.gtmthings.common.block.machine.trait.WirelessNotifiableComputationContainer;
+
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
-import lombok.Setter;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -24,12 +22,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
+import com.hepdd.gtmthings.api.capability.IGTMTJadeIF;
+import com.hepdd.gtmthings.common.block.machine.trait.WirelessNotifiableComputationContainer;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine
-        implements IInteractedMachine, IGTMTJadeIF {
+                                                    implements IInteractedMachine, IGTMTJadeIF {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             WirelessOpticalComputationHatchMachine.class, MultiblockPartMachine.MANAGED_FIELD_HOLDER);
@@ -42,10 +45,12 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
     @Getter
     private final boolean transmitter;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @Persisted
     private BlockPos transmitterPos;
-    @Getter @Setter
+    @Getter
+    @Setter
     @Persisted
     private BlockPos receiverPos;
     @Getter
@@ -88,14 +93,14 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
                 var tag = is.getTag();
                 if (tag != null) {
                     CompoundTag posTag = new CompoundTag();
-                    posTag.putInt("x",this.transmitterPos.getX());
-                    posTag.putInt("y",this.transmitterPos.getY());
-                    posTag.putInt("z",this.transmitterPos.getZ());
-                    tag.put("transmitterPos",posTag);
+                    posTag.putInt("x", this.transmitterPos.getX());
+                    posTag.putInt("y", this.transmitterPos.getY());
+                    posTag.putInt("z", this.transmitterPos.getZ());
+                    tag.put("transmitterPos", posTag);
                     var bindPos = (CompoundTag) tag.get("receiverPos");
                     if (bindPos != null) {
-                        BlockPos recPos = new BlockPos(bindPos.getInt("x"),bindPos.getInt("y"),bindPos.getInt("z"));
-                        if (MetaMachine.getMachine(getLevel(),recPos) instanceof WirelessOpticalComputationHatchMachine woc && !woc.transmitter) {
+                        BlockPos recPos = new BlockPos(bindPos.getInt("x"), bindPos.getInt("y"), bindPos.getInt("z"));
+                        if (MetaMachine.getMachine(getLevel(), recPos) instanceof WirelessOpticalComputationHatchMachine woc && !woc.transmitter) {
                             woc.setTransmitterPos(this.transmitterPos);
                             this.receiverPos = recPos;
                             tag.remove("transmitterPos");
@@ -113,10 +118,10 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
                 } else {
                     tag = new CompoundTag();
                     CompoundTag posTag = new CompoundTag();
-                    posTag.putInt("x",this.transmitterPos.getX());
-                    posTag.putInt("y",this.transmitterPos.getY());
-                    posTag.putInt("z",this.transmitterPos.getZ());
-                    tag.put("transmitterPos",posTag);
+                    posTag.putInt("x", this.transmitterPos.getX());
+                    posTag.putInt("y", this.transmitterPos.getY());
+                    posTag.putInt("z", this.transmitterPos.getZ());
+                    tag.put("transmitterPos", posTag);
                     is.setTag(tag);
                     if (getLevel().isClientSide()) {
                         player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.tobind"));
@@ -128,14 +133,14 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
                 var tag = is.getTag();
                 if (tag != null) {
                     CompoundTag posTag = new CompoundTag();
-                    posTag.putInt("x",this.receiverPos.getX());
-                    posTag.putInt("y",this.receiverPos.getY());
-                    posTag.putInt("z",this.receiverPos.getZ());
-                    tag.put("receiverPos",posTag);
+                    posTag.putInt("x", this.receiverPos.getX());
+                    posTag.putInt("y", this.receiverPos.getY());
+                    posTag.putInt("z", this.receiverPos.getZ());
+                    tag.put("receiverPos", posTag);
                     var bindPos = (CompoundTag) tag.get("transmitterPos");
-                    if (bindPos!=null) {
-                        BlockPos tranPos = new BlockPos(bindPos.getInt("x"),bindPos.getInt("y"),bindPos.getInt("z"));
-                        if (MetaMachine.getMachine(getLevel(),tranPos) instanceof WirelessOpticalComputationHatchMachine woc && woc.transmitter) {
+                    if (bindPos != null) {
+                        BlockPos tranPos = new BlockPos(bindPos.getInt("x"), bindPos.getInt("y"), bindPos.getInt("z"));
+                        if (MetaMachine.getMachine(getLevel(), tranPos) instanceof WirelessOpticalComputationHatchMachine woc && woc.transmitter) {
                             woc.setReceiverPos(this.receiverPos);
                             this.transmitterPos = tranPos;
                             tag.remove("transmitterPos");
@@ -144,7 +149,7 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
                                 player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_computation_hatch.binded"));
                             }
                         }
-                    }else {
+                    } else {
                         if (getLevel().isClientSide()) {
                             player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tobind"));
                         }
@@ -153,10 +158,10 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
                 } else {
                     tag = new CompoundTag();
                     CompoundTag posTag = new CompoundTag();
-                    posTag.putInt("x",this.receiverPos.getX());
-                    posTag.putInt("y",this.receiverPos.getY());
-                    posTag.putInt("z",this.receiverPos.getZ());
-                    tag.put("receiverPos",posTag);
+                    posTag.putInt("x", this.receiverPos.getX());
+                    posTag.putInt("y", this.receiverPos.getY());
+                    posTag.putInt("z", this.receiverPos.getZ());
+                    tag.put("receiverPos", posTag);
                     is.setTag(tag);
                     if (getLevel().isClientSide()) {
                         player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tobind"));
@@ -177,7 +182,7 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
     public String getBindPos() {
         if (this.isTransmitter() && this.receiverPos != null) {
             return this.receiverPos.toShortString();
-        } else if(!this.isTransmitter() && this.transmitterPos != null) {
+        } else if (!this.isTransmitter() && this.transmitterPos != null) {
             return this.transmitterPos.toShortString();
         }
         return "";

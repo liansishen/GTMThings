@@ -4,11 +4,13 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.data.RotationState;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
+
+import net.minecraft.network.chat.Component;
+
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeEnergyHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputBusPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeLaserHatchPartMachine;
-import net.minecraft.network.chat.Component;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
@@ -23,17 +25,17 @@ public class CreativeMachines {
     }
 
     public static final MachineDefinition CREATIVE_FLUID_INPUT_HATCH = GTMTHINGS_REGISTRATE.machine(
-                    "creative_fluid_input_hatch", CreativeInputHatchPartMachine::new)
+            "creative_fluid_input_hatch", CreativeInputHatchPartMachine::new)
             .rotationState(RotationState.ALL)
             .overlayTieredHullRenderer("fluid_hatch.import_9x")
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
-            .abilities(PartAbility.IMPORT_FLUIDS,PartAbility.IMPORT_FLUIDS_9X)
+            .abilities(PartAbility.IMPORT_FLUIDS, PartAbility.IMPORT_FLUIDS_9X)
             .compassNode("fluid_hatch")
             .tier(MAX)
             .register();
 
     public static final MachineDefinition CREATIVE_ITEM_INPUT_BUS = GTMTHINGS_REGISTRATE.machine(
-                    "creative_item_input_bus", CreativeInputBusPartMachine::new)
+            "creative_item_input_bus", CreativeInputBusPartMachine::new)
             .rotationState(RotationState.ALL)
             .overlayTieredHullRenderer("item_bus.import")
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
@@ -42,9 +44,9 @@ public class CreativeMachines {
             .tier(MAX)
             .register();
 
-    //energy input hatch
+    // energy input hatch
     public static final MachineDefinition CREATIVE_ENERGY_INPUT_HATCH = GTMTHINGS_REGISTRATE.machine(
-            "creative_energy_hatch",CreativeEnergyHatchPartMachine::new)
+            "creative_energy_hatch", CreativeEnergyHatchPartMachine::new)
             .rotationState(RotationState.ALL)
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
             .overlayTieredHullRenderer("energy_hatch.input")
@@ -53,9 +55,9 @@ public class CreativeMachines {
             .tier(MAX)
             .register();
 
-    //laser input hatch
+    // laser input hatch
     public static final MachineDefinition CREATIVE_LASER_INPUT_HATCH = GTMTHINGS_REGISTRATE.machine(
-                    "creative_laser_hatch",CreativeLaserHatchPartMachine::new)
+            "creative_laser_hatch", CreativeLaserHatchPartMachine::new)
             .rotationState(RotationState.ALL)
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
             .overlayTieredHullRenderer("laser_hatch.target")
@@ -63,5 +65,5 @@ public class CreativeMachines {
             .tier(MAX)
             .register();
 
-    public static void init() { }
+    public static void init() {}
 }
