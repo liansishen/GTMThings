@@ -13,11 +13,7 @@ import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.ItemHandlerProxyRecipeTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
-import com.hepdd.gtmthings.api.machine.fancyconfigurator.ButtonConfigurator;
-import com.hepdd.gtmthings.api.machine.fancyconfigurator.InventoryFancyConfigurator;
-import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
-import com.hepdd.gtmthings.api.transfer.UnlimitItemTransferHelper;
-import com.hepdd.gtmthings.common.block.machine.trait.CatalystItemStackHandler;
+
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
@@ -29,7 +25,7 @@ import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -41,12 +37,20 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+
+import com.hepdd.gtmthings.api.machine.fancyconfigurator.ButtonConfigurator;
+import com.hepdd.gtmthings.api.machine.fancyconfigurator.InventoryFancyConfigurator;
+import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
+import com.hepdd.gtmthings.api.transfer.UnlimitItemTransferHelper;
+import com.hepdd.gtmthings.common.block.machine.trait.CatalystItemStackHandler;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.hepdd.gtmthings.utils.FormatUtil.formatNumber;
 
@@ -101,6 +105,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
 
     protected NotifiableItemStackHandler createInventory(Object... args) {
         return new NotifiableItemStackHandler(this, getInventorySize(), io, io, UnlimitedItemStackTransfer::new) {
+
             @Override
             public boolean canCapOutput() {
                 return true;
@@ -143,7 +148,6 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
             inventorySubs.unsubscribe();
             inventorySubs = null;
         }
-
     }
 
     @Override
@@ -170,10 +174,10 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
     }
 
     protected void refundAll(ClickData clickData) {
-        if(ItemTransferHelper.getItemTransfer(getLevel(), getPos().relative(getFrontFacing()),
+        if (ItemTransferHelper.getItemTransfer(getLevel(), getPos().relative(getFrontFacing()),
                 getFrontFacing().getOpposite()) != null) {
             setWorkingEnabled(false);
-            exportToNearby(getInventory(),getFrontFacing());
+            exportToNearby(getInventory(), getFrontFacing());
         }
     }
     //////////////////////////////////////
@@ -212,7 +216,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         if (getOffsetTimer() % 5 == 0) {
             if (isWorkingEnabled()) {
                 if (io == IO.OUT) {
-                    exportToNearby(getInventory(),getFrontFacing());
+                    exportToNearby(getInventory(), getFrontFacing());
                 } else if (io == IO.IN) {
                     getInventory().importFromNearby(getFrontFacing());
                 }
@@ -221,7 +225,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         }
     }
 
-    public void exportToNearby(NotifiableItemStackHandler handler,@NotNull Direction... facings) {
+    public void exportToNearby(NotifiableItemStackHandler handler, @NotNull Direction... facings) {
         if (handler.isEmpty()) return;
         var level = getLevel();
         var pos = getPos();
@@ -230,6 +234,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
                     facing.getOpposite());
         }
     }
+
     @Override
     public void setWorkingEnabled(boolean workingEnabled) {
         super.setWorkingEnabled(workingEnabled);
@@ -261,7 +266,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         int width = 178;
         var group = new WidgetGroup(0, 0, width + 8, height + 4);
 
-        var componentPanel = new ComponentPanelWidget(8,5,this::addDisplayText).setMaxWidthLimit(width - 16);
+        var componentPanel = new ComponentPanelWidget(8, 5, this::addDisplayText).setMaxWidthLimit(width - 16);
         var screen = new DraggableScrollableWidgetGroup(4, 4, width, height)
                 .setBackground(GuiTextures.DISPLAY)
                 .addWidget(componentPanel);
@@ -277,17 +282,15 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
             if (!is.isEmpty()) {
                 textList.add(is.getDisplayName().copy()
                         .setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW))
-                                .append(Component.literal(formatNumber(is.getCount()))
-                                        .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))));
+                        .append(Component.literal(formatNumber(is.getCount()))
+                                .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))));
                 itemCount++;
             }
         }
         if (textList.isEmpty()) {
             textList.add(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.3"));
         }
-        textList.add(0,Component.translatable("gtmthings.machine.huge_item_bus.tooltip.2" , itemCount, getInventorySize())
+        textList.add(0, Component.translatable("gtmthings.machine.huge_item_bus.tooltip.2", itemCount, getInventorySize())
                 .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));;
     }
-
-
 }

@@ -1,6 +1,5 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
-
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
@@ -13,7 +12,7 @@ import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.ItemHandlerProxyRecipeTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
-import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
+
 import com.lowdragmc.lowdraglib.gui.widget.PhantomSlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
@@ -22,20 +21,24 @@ import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
-import lombok.Getter;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
+import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEConfigSlotWidget.drawSelectionOverlay;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawItemStack;
@@ -72,10 +75,10 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
         this.combinedInventory = createCombinedItemHandler();
         this.creativeStorage = transferFactory.apply(this.getInventorySize());
         this.lstItem = new ArrayList<>();
-
     }
+
     public CreativeInputBusPartMachine(IMachineBlockEntity holder) {
-        this(holder,ItemStackTransfer::new);
+        this(holder, ItemStackTransfer::new);
     }
 
     @Override
@@ -91,8 +94,8 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
         return new NotifiableItemStackHandler(this, getInventorySize(), io, io, UnlimitedItemStackTransfer::new) {
 
             @Override
-            public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate, boolean notifyChanges) {
-                var extracted = super.extractItem(slot, amount, simulate, notifyChanges).copy();
+            public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+                var extracted = super.extractItem(slot, amount, simulate).copy();
                 if (!extracted.isEmpty()) {
                     extracted.setCount(Integer.MAX_VALUE);
                 }
@@ -150,7 +153,7 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
                 if (!is.isEmpty()) {
                     var newItem = is.copy();
                     newItem.setCount(Integer.MAX_VALUE);
-                    getInventory().storage.setStackInSlot(i,newItem);
+                    getInventory().storage.setStackInSlot(i, newItem);
                 }
             }
             updateInventorySubscription();
@@ -160,12 +163,11 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     protected void updateInventorySubscription() {
         if (!lstItem.isEmpty()) {
             autoIOSubs = subscribeServerTick(autoIOSubs, this::autoKeep);
-        } else if(autoIOSubs != null) {
+        } else if (autoIOSubs != null) {
             autoIOSubs.unsubscribe();
             autoIOSubs = null;
         }
     }
-
 
     @Override
     public void setWorkingEnabled(boolean workingEnabled) {
@@ -195,6 +197,7 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
                 int finalIndex = index++;
                 container.addWidget(
                         new PhantomSlotWidget(this.creativeStorage, finalIndex, 4 + x * 18, 4 + y * 18) {
+
                             @Override
                             public ItemStack slotClickPhantom(Slot slot, int mouseButton, ClickType clickTypeIn, ItemStack stackHeld) {
                                 ItemStack stack = ItemStack.EMPTY;
@@ -203,29 +206,39 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
                                     stack = stackSlot.copy();
                                 }
 
-                                if(stackHeld.isEmpty() || mouseButton == 2 || mouseButton == 1) {   //held is empty,right click,middle click -> clear slot
+                                if (stackHeld.isEmpty() || mouseButton == 2 || mouseButton == 1) {   // held is
+                                                                                                     // empty,right
+                                                                                                     // click,middle
+                                                                                                     // click -> clear
+                                                                                                     // slot
                                     lstItem.remove(stackSlot.getItem());
-                                    fillPhantomSlot(slot,ItemStack.EMPTY);
-                                    getInventory().setStackInSlot(finalIndex,ItemStack.EMPTY);
+                                    fillPhantomSlot(slot, ItemStack.EMPTY);
+                                    getInventory().setStackInSlot(finalIndex, ItemStack.EMPTY);
                                     updateInventorySubscription();
-                                } else if (stackSlot.isEmpty()) {   //slot is empty
-                                    if (!stackHeld.isEmpty() && !lstItem.contains(stackHeld.getItem())) { //held is not empty and item not in other slot -> add to slot
+                                } else if (stackSlot.isEmpty()) {   // slot is empty
+                                    if (!stackHeld.isEmpty() && !lstItem.contains(stackHeld.getItem())) { // held is not
+                                                                                                          // empty and
+                                                                                                          // item not in
+                                                                                                          // other slot
+                                                                                                          // -> add to
+                                                                                                          // slot
                                         lstItem.add(stackHeld.getItem());
-                                        fillPhantomSlot(slot,stackHeld);
+                                        fillPhantomSlot(slot, stackHeld);
                                         var itemStack = stackHeld.copy();
                                         itemStack.setCount(Integer.MAX_VALUE);
-                                        getInventory().setStackInSlot(finalIndex,itemStack);
+                                        getInventory().setStackInSlot(finalIndex, itemStack);
                                         updateInventorySubscription();
                                     }
                                 } else {
-                                    if (!areItemsEqual(stackSlot,stackHeld)) {  //slot item not equal to held item
-                                        if (!lstItem.contains(stackHeld.getItem())) { //item not in other slot -> change the slot
+                                    if (!areItemsEqual(stackSlot, stackHeld)) {  // slot item not equal to held item
+                                        if (!lstItem.contains(stackHeld.getItem())) { // item not in other slot ->
+                                                                                      // change the slot
                                             lstItem.remove(stackSlot.getItem());
                                             lstItem.add(stackHeld.getItem());
                                             fillPhantomSlot(slot, stackHeld);
                                             var itemStack = stackHeld.copy();
                                             itemStack.setCount(Integer.MAX_VALUE);
-                                            getInventory().setStackInSlot(finalIndex,itemStack);
+                                            getInventory().setStackInSlot(finalIndex, itemStack);
                                             updateInventorySubscription();
                                         }
                                     }
@@ -270,9 +283,8 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
                                 return isMouseOver(position.x, position.y + 18, 18, 18, mouseX, mouseY);
                             }
                         }
-                        .setClearSlotOnRightClick(false)
-                        .setChangeListener(this::markDirty)
-                );
+                                .setClearSlotOnRightClick(false)
+                                .setChangeListener(this::markDirty));
             }
         }
 
@@ -281,10 +293,4 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
 
         return group;
     }
-
-
-
-
-
-
 }

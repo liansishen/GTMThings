@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.machine.trait.MachineTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableComputationContainer;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,9 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-
 public class WirelessNotifiableComputationContainer extends NotifiableComputationContainer {
-
 
     private int currentOutputCwu = 0, lastOutputCwu = 0;
 
@@ -178,14 +177,14 @@ public class WirelessNotifiableComputationContainer extends NotifiableComputatio
                         if (machine instanceof IRecipeLogicMachine rlm) {
                             // first, remove the progress the recipe logic adds.
                             rlm.getRecipeLogic().setProgress(rlm.getRecipeLogic().getProgress() - 1 + drawn);
-//                            rlm.getRecipeLogic().progress -= 1;
-//                            rlm.getRecipeLogic().progress += drawn;
+                            // rlm.getRecipeLogic().progress -= 1;
+                            // rlm.getRecipeLogic().progress += drawn;
                         } else if (machine instanceof IMultiPart multiPart) {
                             for (IMultiController controller : multiPart.getControllers()) {
                                 if (controller instanceof IRecipeLogicMachine rlm) {
                                     rlm.getRecipeLogic().setProgress(rlm.getRecipeLogic().getProgress() - 1 + drawn);
-//                                    rlm.getRecipeLogic().progress -= 1;
-//                                    rlm.getRecipeLogic().progress += drawn;
+                                    // rlm.getRecipeLogic().progress -= 1;
+                                    // rlm.getRecipeLogic().progress += drawn;
                                 }
                             }
                         }
@@ -208,7 +207,7 @@ public class WirelessNotifiableComputationContainer extends NotifiableComputatio
     @Nullable
     private IOpticalComputationProvider getOpticalNetProvider() {
         if (machine instanceof WirelessOpticalComputationHatchMachine woc && woc.getTransmitterPos() != null) {
-            var transmitterMachine = MetaMachine.getMachine(machine.getLevel(),woc.getTransmitterPos());
+            var transmitterMachine = MetaMachine.getMachine(machine.getLevel(), woc.getTransmitterPos());
             if (transmitterMachine instanceof WirelessOpticalComputationHatchMachine transmitter) {
                 return transmitter.getComputationContainer();
             }

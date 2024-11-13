@@ -8,7 +8,7 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
 import com.gregtechceu.gtceu.common.item.TerminalBehavior;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.hepdd.gtmthings.api.gui.widget.TerminalInputWidget;
+
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
@@ -17,8 +17,7 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
-import lombok.Getter;
-import lombok.Setter;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -32,6 +31,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+
+import com.hepdd.gtmthings.api.gui.widget.TerminalInputWidget;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +60,7 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
                     MetaMachine.getMachine(level, blockPos) instanceof IMultiController controller) {
                 if (!controller.isFormed()) {
                     if (!level.isClientSide) {
-                        getAdvancedBlockPattern(controller.getPattern()).autoBuild(context.getPlayer(), controller.getMultiblockState(),autoBuildSetting);
+                        getAdvancedBlockPattern(controller.getPattern()).autoBuild(context.getPlayer(), controller.getMultiblockState(), autoBuildSetting);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
@@ -105,15 +108,15 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
             if (player instanceof ServerPlayer serverPlayer) {
                 this.itemStack = heldItem;
                 var tag = this.itemStack.getTag();
-                if (tag!=null && !tag.isEmpty()) {
+                if (tag != null && !tag.isEmpty()) {
                     this.autoBuildSetting.setCoilTier(tag.getInt("CoilTier"));
                     this.autoBuildSetting.setRepeatCount(tag.getInt("RepeatCount"));
                     this.autoBuildSetting.setNoHatchMode(tag.getInt("NoHatchMode"));
                 } else {
                     tag = new CompoundTag();
-                    tag.putInt("CoilTier",0);
-                    tag.putInt("RepeatCount",0);
-                    tag.putInt("NoHatchMode",0);
+                    tag.putInt("CoilTier", 0);
+                    tag.putInt("RepeatCount", 0);
+                    tag.putInt("NoHatchMode", 0);
                     this.itemStack.setTag(tag);
                     this.autoBuildSetting.setCoilTier(0);
                     this.autoBuildSetting.setRepeatCount(0);
@@ -131,7 +134,7 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
         autoBuildSetting.setCoilTier(coilTier);
         var tag = this.itemStack.getTag();
         if (tag == null) tag = new CompoundTag();
-        tag.putInt("CoilTier",coilTier);
+        tag.putInt("CoilTier", coilTier);
         this.itemStack.setTag(tag);
     }
 
@@ -139,7 +142,7 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
         autoBuildSetting.setRepeatCount(repeatCount);
         var tag = this.itemStack.getTag();
         if (tag == null) tag = new CompoundTag();
-        tag.putInt("RepeatCount",repeatCount);
+        tag.putInt("RepeatCount", repeatCount);
         this.itemStack.setTag(tag);
     }
 
@@ -147,14 +150,14 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
         autoBuildSetting.setNoHatchMode(isBuildHatches);
         var tag = this.itemStack.getTag();
         if (tag == null) tag = new CompoundTag();
-        tag.putInt("NoHatchMode",isBuildHatches);
+        tag.putInt("NoHatchMode", isBuildHatches);
         this.itemStack.setTag(tag);
     }
 
     public static class AutoBuildSetting {
 
-        final String[] HATCH_NAMES = {"input_hatch","output_hatch","input_bus","output_bus","laser_target","laser_source",
-            "transmitter_hatch","receiver_hatch","maintenance_hatch","parallel_hatch","import_bus","export_bus"};
+        final String[] HATCH_NAMES = { "input_hatch", "output_hatch", "input_bus", "output_bus", "laser_target", "laser_source",
+                "transmitter_hatch", "receiver_hatch", "maintenance_hatch", "parallel_hatch", "import_bus", "export_bus" };
 
         @Getter
         @Setter
@@ -189,7 +192,6 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
         }
 
         public boolean isPlaceHatch(BlockInfo[] blockInfos) {
-
             if (this.noHatchMode == 0) return true;
             if (blockInfos != null && blockInfos.length > 0) {
                 var blockInfo = blockInfos[0];
@@ -201,6 +203,5 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
             }
             return true;
         }
-
     }
 }

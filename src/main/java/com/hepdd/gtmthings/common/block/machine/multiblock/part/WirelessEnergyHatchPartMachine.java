@@ -10,11 +10,10 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.common.data.GTItems;
-import com.hepdd.gtmthings.api.capability.IBindable;
-import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,10 +27,15 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import com.hepdd.gtmthings.api.capability.IBindable;
+import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
@@ -89,16 +93,16 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     }
 
     private void updateEnergySubscription() {
-        if (this.owner_uuid!=null) {
-            updEnergySubs = subscribeServerTick(updEnergySubs,this::updateEnergy);
+        if (this.owner_uuid != null) {
+            updEnergySubs = subscribeServerTick(updEnergySubs, this::updateEnergy);
         } else if (updEnergySubs != null) {
             updEnergySubs.unsubscribe();
-            updEnergySubs=null;
+            updEnergySubs = null;
         }
     }
 
     private void updateEnergy() {
-        if (this.owner_uuid==null) return;
+        if (this.owner_uuid == null) return;
         if (io == IO.IN) {
             useEnergy();
         } else {
@@ -109,7 +113,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     private void useEnergy() {
         var currentStored = energyContainer.getEnergyStored();
         var maxStored = energyContainer.getEnergyCapacity();
-        var changeStored = Math.min(maxStored - currentStored,energyContainer.getInputVoltage() * energyContainer.getInputAmperage());
+        var changeStored = Math.min(maxStored - currentStored, energyContainer.getInputVoltage() * energyContainer.getInputAmperage());
         if (changeStored <= 0) return;
         changeStored = WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, -changeStored, this);
         if (changeStored < 0) energyContainer.setEnergyStored(currentStored - changeStored);
@@ -118,7 +122,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     private void addEnergy() {
         var currentStored = energyContainer.getEnergyStored();
         if (currentStored <= 0) return;
-        var changeStored = Math.min(energyContainer.getOutputVoltage() * energyContainer.getOutputAmperage(),currentStored);
+        var changeStored = Math.min(energyContainer.getOutputVoltage() * energyContainer.getOutputAmperage(), currentStored);
         changeStored = WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, changeStored, this);
         if (changeStored > 0) energyContainer.setEnergyStored(currentStored - changeStored);
     }
@@ -135,7 +139,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
             this.owner_uuid = player.getUUID();
             if (getLevel().isClientSide()) {
-                player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind",GetName(player)));
+                player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind", GetName(player)));
             }
             updateEnergySubscription();
             return InteractionResult.SUCCESS;

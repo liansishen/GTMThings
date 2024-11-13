@@ -20,18 +20,15 @@ import com.gregtechceu.gtceu.common.machine.storage.CrateMachine;
 import com.gregtechceu.gtceu.common.machine.storage.DrumMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumChestMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumTankMachine;
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
+
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.side.fluid.FluidStack;
-import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper;
-import com.lowdragmc.lowdraglib.side.fluid.IFluidTransfer;
-import com.lowdragmc.lowdraglib.side.item.IItemTransfer;
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,11 +41,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
+
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Objects;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -85,7 +89,6 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
     @Getter
     protected final FilterHandler<ItemStack, ItemFilter> filterHandlerItem;
 
-
     public AdvancedWirelessTransferCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int transferType) {
         super(definition, coverHolder, attachedSide);
         this.transferType = transferType;
@@ -105,18 +108,12 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
     public boolean canAttach() {
         var targetMachine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
         if (targetMachine instanceof WorkableTieredMachine workableTieredMachine) {
-            return (workableTieredMachine.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM)
-                    || (workableTieredMachine.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID);
+            return (workableTieredMachine.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM) || (workableTieredMachine.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID);
         } else if (targetMachine instanceof PumpMachine || targetMachine instanceof QuantumTankMachine || targetMachine instanceof DrumMachine) {
             return this.transferType == TRANSFER_FLUID;
         } else if (targetMachine instanceof QuantumChestMachine || targetMachine instanceof CrateMachine) {
             return this.transferType == TRANSFER_ITEM;
-        } else return (targetMachine instanceof ItemBusPartMachine itemBusPartMachine
-                && itemBusPartMachine.getInventory().handlerIO != IO.IN
-                && this.transferType == TRANSFER_ITEM)
-                || (targetMachine instanceof FluidHatchPartMachine fluidHatchPartMachine
-                && fluidHatchPartMachine.tank.handlerIO != IO.IN
-                && this.transferType == TRANSFER_FLUID);
+        } else return (targetMachine instanceof ItemBusPartMachine itemBusPartMachine && itemBusPartMachine.getInventory().handlerIO != IO.IN && this.transferType == TRANSFER_ITEM) || (targetMachine instanceof FluidHatchPartMachine fluidHatchPartMachine && fluidHatchPartMachine.tank.handlerIO != IO.IN && this.transferType == TRANSFER_FLUID);
     }
 
     @Override
@@ -127,23 +124,22 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
             var intX = tag.getInt("x");
             var intY = tag.getInt("y");
             var intZ = tag.getInt("z");
-            this.targetPos = new BlockPos(intX,intY,intZ);
+            this.targetPos = new BlockPos(intX, intY, intZ);
             this.facing = Direction.byName(tag.getString("facing"));
             GetLevel();
         }
         var targetMachine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
         if (targetMachine instanceof SimpleTieredMachine simpleTieredMachine) {
-            if (this.transferType==TRANSFER_ITEM) simpleTieredMachine.setAutoOutputItems(false);
-            if (this.transferType==TRANSFER_FLUID) simpleTieredMachine.setAutoOutputFluids(false);
-        } else if (targetMachine instanceof ItemBusPartMachine itemBusPartMachine
-                && this.transferType==TRANSFER_ITEM) {
+            if (this.transferType == TRANSFER_ITEM) simpleTieredMachine.setAutoOutputItems(false);
+            if (this.transferType == TRANSFER_FLUID) simpleTieredMachine.setAutoOutputFluids(false);
+        } else if (targetMachine instanceof ItemBusPartMachine itemBusPartMachine && this.transferType == TRANSFER_ITEM) {
             itemBusPartMachine.setWorkingEnabled(false);
-        } else if (targetMachine instanceof FluidHatchPartMachine fluidHatchPartMachine
-                && this.transferType==TRANSFER_FLUID) {
+        } else if (targetMachine instanceof FluidHatchPartMachine fluidHatchPartMachine && this.transferType == TRANSFER_FLUID) {
             fluidHatchPartMachine.setWorkingEnabled(false);
         }
         super.onAttached(itemStack, player);
     }
+
     @Override
     public List<ItemStack> getAdditionalDrops() {
         var list = super.getAdditionalDrops();
@@ -155,7 +151,6 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
         }
         return list;
     }
-
 
     @Override
     public void onLoad() {
@@ -191,7 +186,8 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
             }
         }
     }
-    protected void moveInventoryItems(IItemTransfer sourceInventory, IItemTransfer targetInventory) {
+
+    protected void moveInventoryItems(IItemHandler sourceInventory, IItemHandler targetInventory) {
         ItemFilter filter = filterHandlerItem.getFilter();
         int itemsLeftToTransfer = Integer.MAX_VALUE;
 
@@ -205,13 +201,13 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
                 continue;
             }
 
-            ItemStack remainder = ItemTransferHelper.insertItem(targetInventory, sourceStack, true);
+            ItemStack remainder = ItemHandlerHelper.insertItemStacked(targetInventory, sourceStack, true);
             int amountToInsert = sourceStack.getCount() - remainder.getCount();
 
             if (amountToInsert > 0) {
                 sourceStack = sourceInventory.extractItem(srcIndex, amountToInsert, false);
                 if (!sourceStack.isEmpty()) {
-                    ItemTransferHelper.insertItem(targetInventory, sourceStack, false);
+                    ItemHandlerHelper.insertItemStacked(targetInventory, sourceStack, false);
                     itemsLeftToTransfer -= sourceStack.getCount();
 
                     if (itemsLeftToTransfer == 0) {
@@ -222,37 +218,38 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
         }
     }
 
-    protected void transferAny(IFluidTransfer source, IFluidTransfer destination) {
-        FluidTransferHelper.transferFluids(source, destination, Integer.MAX_VALUE,
-                filterHandlerFluid.getFilter());
+    protected void transferAny(IFluidHandler source, IFluidHandler destination) {
+        GTTransferUtils.transferFluidsFiltered(source, destination,
+                filterHandlerFluid.getFilter(), Integer.MAX_VALUE);
     }
 
     protected void GetLevel() {
-        if (this.dimensionId==null)return;
+        if (this.dimensionId == null) return;
         ResourceLocation resLoc = new ResourceLocation(this.dimensionId);
         ResourceKey<Level> resKey = ResourceKey.create(Registries.DIMENSION, resLoc);
         this.targetLever = Objects.requireNonNull(coverHolder.getLevel().getServer()).getLevel(resKey);
-
     }
+
     protected void configureFilter() {
         // Do nothing in the base implementation. This is intended to be overridden by subclasses.
     }
-    protected @Nullable IItemTransfer getOwnItemTransfer() {
-        return coverHolder.getItemTransferCap(attachedSide, false);
+
+    protected @Nullable IItemHandler getOwnItemTransfer() {
+        return coverHolder.getItemHandlerCap(attachedSide, false);
     }
 
-    protected @Nullable IItemTransfer getAdjacentItemTransfer() {
+    protected @Nullable IItemHandler getAdjacentItemTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return ItemTransferHelper.getItemTransfer(targetLever, targetPos, facing);
+        return (IItemHandler) GTTransferUtils.getAdjacentItemHandler(targetLever, targetPos, facing);
     }
 
-    protected @Nullable IFluidTransfer getOwnFluidTransfer() {
-        return coverHolder.getFluidTransferCap(attachedSide, false);
+    protected @Nullable IFluidHandler getOwnFluidTransfer() {
+        return coverHolder.getFluidHandlerCap(attachedSide, false);
     }
 
-    protected @Nullable IFluidTransfer getAdjacentFluidTransfer() {
+    protected @Nullable IFluidHandler getAdjacentFluidTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return FluidTransferHelper.getFluidTransfer(targetLever, targetPos, facing);
+        return (IFluidHandler) GTTransferUtils.getAdjacentFluidHandler(targetLever, targetPos, facing);
     }
 
     @Override

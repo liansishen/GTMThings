@@ -10,18 +10,22 @@ import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
 import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.gregtechceu.gtceu.common.machine.electric.HullMachine;
-import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+
+import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.api.capability.GTCapabilityHelper.getEnergyContainer;
 
@@ -50,7 +54,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
         return MANAGED_FIELD_HOLDER;
     }
 
-    public WirelessEnergyReceiveCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int tier,int amperage) {
+    public WirelessEnergyReceiveCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int tier, int amperage) {
         super(definition, coverHolder, attachedSide);
         this.tier = tier;
         this.amperage = amperage;
@@ -60,9 +64,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
     @Override
     public boolean canAttach() {
         var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
-        if (machine instanceof TieredEnergyMachine tieredEnergyMachine
-                && tieredEnergyMachine.energyContainer.getHandlerIO() == IO.IN
-                && tieredEnergyMachine.getTier() >= this.tier) {
+        if (machine instanceof TieredEnergyMachine tieredEnergyMachine && tieredEnergyMachine.energyContainer.getHandlerIO() == IO.IN && tieredEnergyMachine.getTier() >= this.tier) {
             var covers = tieredEnergyMachine.getCoverContainer().getCovers();
             for (var cover : covers) {
                 if (cover instanceof WirelessEnergyReceiveCover) return false;
@@ -103,7 +105,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
     }
 
     private void updateCoverSub() {
-        if (this.uuid!=null) {
+        if (this.uuid != null) {
             subscription = coverHolder.subscribeServerTick(subscription, this::updateEnergy);
         } else if (subscription != null) {
             subscription.unsubscribe();
@@ -112,8 +114,8 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
     }
 
     private void updateEnergy() {
-        if (uuid==null) return;
-        var energyContainer =  getEnergyContainer(coverHolder.getLevel(),coverHolder.getPos(),attachedSide);
+        if (uuid == null) return;
+        var energyContainer = getEnergyContainer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
         if (energyContainer != null) {
             var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
             if (machine instanceof BatteryBufferMachine || machine instanceof HullMachine) {

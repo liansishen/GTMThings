@@ -1,11 +1,13 @@
 package com.hepdd.gtmthings.utils;
 
 import com.lowdragmc.lowdraglib.LDLib;
-import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
-import dev.ftb.mods.ftbteams.api.Team;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+
+import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
+import dev.ftb.mods.ftbteams.api.Team;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -16,7 +18,7 @@ public class TeamUtil {
         if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
             var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
             return team.map(Team::getTeamId).orElse(playerUUID);
-        } else{
+        } else {
             return playerUUID;
         }
     }
@@ -29,7 +31,7 @@ public class TeamUtil {
         }
     }
 
-    public static Component GetName(Level level,UUID playerUUID) {
+    public static Component GetName(Level level, UUID playerUUID) {
         if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
             Component name;
             var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
@@ -43,16 +45,16 @@ public class TeamUtil {
         }
     }
 
-    public static boolean hasOwner(Level level,UUID playerUUID) {
+    public static boolean hasOwner(Level level, UUID playerUUID) {
         if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
             var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
             if (team.isPresent()) {
                 return true;
             } else {
-                return (level.getPlayerByUUID(playerUUID)!=null);
+                return (level.getPlayerByUUID(playerUUID) != null);
             }
         } else {
-            return (level.getPlayerByUUID(playerUUID)!=null);
+            return (level.getPlayerByUUID(playerUUID) != null);
         }
     }
 }
