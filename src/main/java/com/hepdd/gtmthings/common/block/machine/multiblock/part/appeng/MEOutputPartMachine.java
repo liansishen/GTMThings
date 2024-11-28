@@ -15,6 +15,7 @@ import com.gregtechceu.gtceu.integration.ae2.gui.widget.list.AEListGridWidget;
 import com.gregtechceu.gtceu.integration.ae2.machine.feature.IGridConnectedMachine;
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder;
 import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
+import com.gregtechceu.gtceu.utils.GTMath;
 
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -279,14 +280,14 @@ public class MEOutputPartMachine extends DualHatchPartMachine
         }
 
         @Override
-        public int fill(int tank, FluidStack resource, FluidAction action) {
+        public int fill(FluidStack resource, FluidAction action) {
             var key = AEFluidKey.of(resource.getFluid(), resource.getTag());
-            long amount = resource.getAmount();
-            long oldValue = internalTankBuffer.storage.getOrDefault(key, 0);
-            int changeValue = (int) Math.min(Integer.MAX_VALUE - oldValue, amount);
-            if (changeValue > 0 && !action.simulate()) {
-                internalTankBuffer.storage.put(key, oldValue + changeValue);
-                internalTankBuffer.onChanged();
+            int amount = resource.getAmount();
+            int oldValue = GTMath.saturatedCast(internalBuffer.storage.getOrDefault(key, 0));
+            int changeValue = Math.min(Integer.MAX_VALUE - oldValue, amount);
+            if (changeValue > 0 && action.execute()) {
+                internalBuffer.storage.put(key, oldValue + changeValue);
+                internalBuffer.onChanged();
             }
             return changeValue;
         }
@@ -307,8 +308,8 @@ public class MEOutputPartMachine extends DualHatchPartMachine
             return new FluidStorageDelegate() {
 
                 @Override
-                public int fill(int tank, FluidStack resource, FluidAction action) {
-                    return super.fill(tank, resource, FluidAction.SIMULATE);
+                public int fill(FluidStack resource, FluidAction action) {
+                    return super.fill(resource, action);
                 }
             };
         }

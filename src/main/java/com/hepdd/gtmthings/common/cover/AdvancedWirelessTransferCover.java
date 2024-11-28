@@ -240,7 +240,7 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
 
     protected @Nullable IItemHandler getAdjacentItemTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return (IItemHandler) GTTransferUtils.getAdjacentItemHandler(targetLever, targetPos, facing);
+        return GTTransferUtils.getAdjacentItemHandler(targetLever, targetPos, facing).resolve().orElse(null);
     }
 
     protected @Nullable IFluidHandler getOwnFluidTransfer() {
@@ -249,7 +249,7 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
 
     protected @Nullable IFluidHandler getAdjacentFluidTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return (IFluidHandler) GTTransferUtils.getAdjacentFluidHandler(targetLever, targetPos, facing);
+        return GTTransferUtils.getAdjacentFluidHandler(targetLever, targetPos, facing).resolve().orElse(null);
     }
 
     @Override
