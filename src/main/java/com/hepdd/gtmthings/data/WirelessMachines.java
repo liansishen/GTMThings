@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.data;
 
+import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.data.RotationState;
@@ -27,8 +28,8 @@ import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REG
 
 public class WirelessMachines {
 
-    public static final int[] ALL_TIERS = GTValues.tiersBetween(LV, MAX);
-    public static final int[] WIRELL_ENERGY_HIGH_TIERS = GTValues.tiersBetween(EV, MAX);
+    public static final int[] ALL_TIERS = GTValues.tiersBetween(LV, GTCEuAPI.isHighTier() ? MAX : UHV);
+    public static final int[] WIRELL_ENERGY_HIGH_TIERS = GTValues.tiersBetween(EV, GTCEuAPI.isHighTier() ? MAX : UHV);
 
     static {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.WIRELESS_TAB);
