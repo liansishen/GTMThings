@@ -1,6 +1,6 @@
 package com.hepdd.gtmthings.data;
 
-import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.common.data.GTCreativeModeTabs;
 
 import net.minecraft.world.item.CreativeModeTab;
@@ -8,6 +8,8 @@ import net.minecraft.world.item.CreativeModeTab;
 import com.hepdd.gtmthings.GTMThings;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 
+import static com.gregtechceu.gtceu.api.GTValues.MAX;
+import static com.gregtechceu.gtceu.api.GTValues.UHV;
 import static com.gregtechceu.gtceu.common.data.GTMachines.CREATIVE_ENERGY;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 import static com.hepdd.gtmthings.data.CustomMachines.DIGITAL_MINER;
@@ -27,7 +29,7 @@ public class CreativeModeTabs {
             .defaultCreativeTab("wireless", builder -> builder
                     .displayItems(new GTCreativeModeTabs.RegistrateDisplayItemsGenerator("wireless", GTMTHINGS_REGISTRATE))
                     .title(GTMTHINGS_REGISTRATE.addLang("itemGroup", GTMThings.id("wireless"), GTMThings.NAME))
-                    .icon(WIRELESS_ENERGY_INPUT_HATCH[GTValues.MAX - 1]::asStack)
+                    .icon(WIRELESS_ENERGY_INPUT_HATCH[GTCEuAPI.isHighTier() ? MAX : UHV - 1]::asStack)
                     .build())
             .register();
 

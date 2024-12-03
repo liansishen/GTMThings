@@ -321,7 +321,7 @@ public class GTMTRecipe {
                 .EUt(GTValues.VA[GTValues.UV])
                 .save(provider);
 
-        List<ItemEntry<ComponentItem>> WIRELESS_ENERGY_RECEIVE_COVER = List.of(
+        List<ItemEntry<ComponentItem>> WIRELESS_ENERGY_RECEIVE_COVER = new java.util.ArrayList<>(List.of(
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_LV,
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_MV,
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_HV,
@@ -329,14 +329,17 @@ public class GTMTRecipe {
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_IV,
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_LUV,
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_ZPM,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UV,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UHV,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UEV,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UIV,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UXV,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_OPV);
+                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UV));
+        if (GTCEuAPI.isHighTier()) {
+            WIRELESS_ENERGY_RECEIVE_COVER.addAll(List.of(
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UHV,
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UEV,
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UIV,
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UXV,
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_OPV));
+        }
 
-        List<ItemEntry<ComponentItem>> WIRELESS_ENERGY_RECEIVE_COVER_4A = List.of(
+        List<ItemEntry<ComponentItem>> WIRELESS_ENERGY_RECEIVE_COVER_4A = new java.util.ArrayList<>(List.of(
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_LV_4A,
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_MV_4A,
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_HV_4A,
@@ -344,14 +347,17 @@ public class GTMTRecipe {
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_IV_4A,
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_LUV_4A,
                 CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_ZPM_4A,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UV_4A,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UHV_4A,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UEV_4A,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UIV_4A,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UXV_4A,
-                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A);
+                CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UV_4A));
+        if (GTCEuAPI.isHighTier()) {
+            WIRELESS_ENERGY_RECEIVE_COVER_4A.addAll(List.of(
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UHV_4A,
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UEV_4A,
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UIV_4A,
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UXV_4A,
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A));
+        }
 
-        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UHV)) {
+        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV)) {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_input_hatch_" + GTValues.VN[tier].toLowerCase()))
                     .inputItems(GTMachines.ENERGY_INPUT_HATCH[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER.get(tier - 1).asStack())
@@ -373,7 +379,7 @@ public class GTMTRecipe {
                     .save(provider);
         }
 
-        for (int tier : GTValues.tiersBetween(GTValues.EV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UHV)) {
+        for (int tier : GTValues.tiersBetween(GTValues.EV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV)) {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_input_hatch_" + GTValues.VN[tier].toLowerCase() + "_4a"))
                     .inputItems(GTMachines.ENERGY_INPUT_HATCH_4A[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER.get(tier - 1).asStack(2))
@@ -415,7 +421,7 @@ public class GTMTRecipe {
                     .save(provider);
         }
 
-        for (int tier : GTValues.tiersBetween(GTValues.IV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UHV)) {
+        for (int tier : GTValues.tiersBetween(GTValues.IV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV)) {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_input_hatch_" + GTValues.VN[tier].toLowerCase() + "_256a"))
                     .inputItems(GTMachines.LASER_INPUT_HATCH_256[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A.get(tier - 1).asStack(4))
@@ -524,7 +530,7 @@ public class GTMTRecipe {
                 .duration(200)
                 .EUt(GTValues.VA[GTValues.HV])
                 .save(provider);
-        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UHV)) {
+        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV)) {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("huge_item_import_bus_" + GTValues.VN[tier].toLowerCase()))
                     .inputItems(GTMachines.ITEM_IMPORT_BUS[tier].asStack())
                     .inputItems(tier > GTValues.EV ? GTMachines.QUANTUM_CHEST[tier] : GTMachines.SUPER_CHEST[tier])
@@ -543,7 +549,7 @@ public class GTMTRecipe {
                     .save(provider);
         }
 
-        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UHV)) {
+        for (int tier : GTValues.tiersBetween(GTValues.LV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV)) {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("huge_dual_hatch_" + GTValues.VN[tier].toLowerCase()))
                     .inputItems(CustomMachines.HUGE_ITEM_IMPORT_BUS[tier].asStack())
                     .inputItems(tier > GTValues.EV ? GTMachines.QUANTUM_TANK[tier] : GTMachines.SUPER_TANK[tier])
