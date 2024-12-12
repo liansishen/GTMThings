@@ -3,6 +3,7 @@ package com.hepdd.gtmthings.common.item;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
+import com.gregtechceu.gtceu.api.item.component.IItemUIFactory;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
@@ -42,7 +43,7 @@ import java.util.List;
 
 import static com.hepdd.gtmthings.api.pattern.AdvancedBlockPattern.getAdvancedBlockPattern;
 
-public class AdvancedTerminalBehavior extends TerminalBehavior {
+public class AdvancedTerminalBehavior implements IItemUIFactory {
 
     private AutoBuildSetting autoBuildSetting;
     private ItemStack itemStack;
@@ -103,31 +104,23 @@ public class AdvancedTerminalBehavior extends TerminalBehavior {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Item item, Level level, Player player, InteractionHand usedHand) {
-        if (!ConfigHolder.INSTANCE.gameplay.enableCompass) {
-            ItemStack heldItem = player.getItemInHand(usedHand);
-            if (player instanceof ServerPlayer serverPlayer) {
-                this.itemStack = heldItem;
-                var tag = this.itemStack.getTag();
-                if (tag != null && !tag.isEmpty()) {
-                    this.autoBuildSetting.setCoilTier(tag.getInt("CoilTier"));
-                    this.autoBuildSetting.setRepeatCount(tag.getInt("RepeatCount"));
-                    this.autoBuildSetting.setNoHatchMode(tag.getInt("NoHatchMode"));
-                } else {
-                    tag = new CompoundTag();
-                    tag.putInt("CoilTier", 0);
-                    tag.putInt("RepeatCount", 0);
-                    tag.putInt("NoHatchMode", 0);
-                    this.itemStack.setTag(tag);
-                    this.autoBuildSetting.setCoilTier(0);
-                    this.autoBuildSetting.setRepeatCount(0);
-                    this.autoBuildSetting.setNoHatchMode(0);
-                }
-                HeldItemUIFactory.INSTANCE.openUI(serverPlayer, usedHand);
-            }
-            return InteractionResultHolder.success(heldItem);
+        this.itemStack = player.getItemInHand(usedHand);
+        var tag = this.itemStack.getTag();
+        if (tag != null && !tag.isEmpty()) {
+            this.autoBuildSetting.setCoilTier(tag.getInt("CoilTier"));
+            this.autoBuildSetting.setRepeatCount(tag.getInt("RepeatCount"));
+            this.autoBuildSetting.setNoHatchMode(tag.getInt("NoHatchMode"));
+        } else {
+            tag = new CompoundTag();
+            tag.putInt("CoilTier", 0);
+            tag.putInt("RepeatCount", 0);
+            tag.putInt("NoHatchMode", 0);
+            this.itemStack.setTag(tag);
+            this.autoBuildSetting.setCoilTier(0);
+            this.autoBuildSetting.setRepeatCount(0);
+            this.autoBuildSetting.setNoHatchMode(0);
         }
-
-        return super.use(item, level, player, usedHand);
+        return IItemUIFactory.super.use(item, level, player, usedHand);
     }
 
     private void setCoilTier(int coilTier) {
