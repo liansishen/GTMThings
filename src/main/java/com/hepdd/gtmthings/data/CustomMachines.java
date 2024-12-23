@@ -56,7 +56,6 @@ public class CustomMachines {
                                 Component.translatable("gtceu.universal.tooltip.working_area_max", maxArea, maxArea));
                     })
                     .recipeTypes(DIGITAL_MINER_RECIPE)
-                    .compassNode("miner")
                     .register(),
             LV, MV, HV);
 
@@ -79,7 +78,6 @@ public class CustomMachines {
                     .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.import.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
                                     (1 + tier) * INV_MULTIPLE))
-                    .compassNode("item_bus")
                     .register(),
             ALL_TIERS);
 
@@ -95,7 +93,6 @@ public class CustomMachines {
                     .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.export.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
                                     (1 + tier) * INV_MULTIPLE))
-                    .compassNode("item_bus")
                     .register(),
             ALL_TIERS);
 
@@ -106,7 +103,6 @@ public class CustomMachines {
                         .rotationState(RotationState.ALL)
                         .overlayTieredHullRenderer("huge_dual_hatch.import")
                         .abilities(PartAbility.IMPORT_ITEMS)
-                        .compassNode("huge_dual_hatch")
                         .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"));
                 builder.tooltips(Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
                         (1 + tier) * INV_MULTIPLE))

@@ -13,7 +13,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.data.GTItems;
-import com.gregtechceu.gtceu.common.data.GTMachines;
+import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
 
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
@@ -92,7 +92,7 @@ public class DigitalMiner extends WorkableTieredMachine
     private int fortuneLevel;
 
     public DigitalMiner(IMachineBlockEntity holder, int tier, Object... args) {
-        super(holder, tier, GTMachines.defaultTankSizeFunction, args);
+        super(holder, tier, GTMachineUtils.defaultTankSizeFunction, args);
         this.energyPerTick = GTValues.V[tier - 1];
         this.filterInventory = createFilterItemHandler();
         this.fortuneLevel = 1;

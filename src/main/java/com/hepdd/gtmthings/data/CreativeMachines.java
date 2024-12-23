@@ -30,7 +30,6 @@ public class CreativeMachines {
             .overlayTieredHullRenderer("fluid_hatch.import_9x")
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
             .abilities(PartAbility.IMPORT_FLUIDS, PartAbility.IMPORT_FLUIDS_9X)
-            .compassNode("fluid_hatch")
             .tier(MAX)
             .register();
 
@@ -40,7 +39,6 @@ public class CreativeMachines {
             .overlayTieredHullRenderer("item_bus.import")
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
             .abilities(PartAbility.IMPORT_ITEMS)
-            .compassNode("item_bus")
             .tier(MAX)
             .register();
 
@@ -51,7 +49,6 @@ public class CreativeMachines {
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
             .overlayTieredHullRenderer("energy_hatch.input")
             .abilities(PartAbility.INPUT_ENERGY)
-            .compassNode("energy_hatch")
             .tier(MAX)
             .register();
 

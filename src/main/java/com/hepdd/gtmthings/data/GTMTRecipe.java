@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.machines.GTAEMachines;
+import com.gregtechceu.gtceu.common.data.machines.GTMultiMachines;
 import com.gregtechceu.gtceu.common.data.machines.GTResearchMachines;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
@@ -425,7 +426,7 @@ public class GTMTRecipe {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_input_hatch_" + GTValues.VN[tier].toLowerCase() + "_256a"))
                     .inputItems(GTMachines.LASER_INPUT_HATCH_256[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A.get(tier - 1).asStack(4))
-                    .inputItems(GTMachines.ACTIVE_TRANSFORMER.asStack())
+                    .inputItems(GTMultiMachines.ACTIVE_TRANSFORMER.asStack())
                     .inputItems(GTBlocks.SUPERCONDUCTING_COIL.asStack())
                     .inputItems(GTItems.COVER_ENERGY_DETECTOR_ADVANCED.asStack(1))
                     .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
@@ -437,7 +438,7 @@ public class GTMTRecipe {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_input_hatch_" + GTValues.VN[tier].toLowerCase() + "_1024a"))
                     .inputItems(GTMachines.LASER_INPUT_HATCH_1024[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A.get(tier - 1).asStack(8))
-                    .inputItems(GTMachines.ACTIVE_TRANSFORMER.asStack())
+                    .inputItems(GTMultiMachines.ACTIVE_TRANSFORMER.asStack())
                     .inputItems(GTBlocks.SUPERCONDUCTING_COIL.asStack())
                     .inputItems(GTItems.COVER_ENERGY_DETECTOR_ADVANCED.asStack(1))
                     .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
@@ -449,7 +450,7 @@ public class GTMTRecipe {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_input_hatch_" + GTValues.VN[tier].toLowerCase() + "_4096a"))
                     .inputItems(GTMachines.LASER_INPUT_HATCH_4096[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A.get(tier - 1).asStack(16))
-                    .inputItems(GTMachines.ACTIVE_TRANSFORMER.asStack())
+                    .inputItems(GTMultiMachines.ACTIVE_TRANSFORMER.asStack())
                     .inputItems(GTBlocks.SUPERCONDUCTING_COIL.asStack())
                     .inputItems(GTItems.COVER_ENERGY_DETECTOR_ADVANCED.asStack(1))
                     .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
@@ -461,7 +462,7 @@ public class GTMTRecipe {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_output_hatch_" + GTValues.VN[tier].toLowerCase() + "_256a"))
                     .inputItems(GTMachines.LASER_OUTPUT_HATCH_256[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A.get(tier - 1).asStack(4))
-                    .inputItems(GTMachines.ACTIVE_TRANSFORMER.asStack())
+                    .inputItems(GTMultiMachines.ACTIVE_TRANSFORMER.asStack())
                     .inputItems(GTBlocks.SUPERCONDUCTING_COIL.asStack())
                     .inputItems(GTItems.COVER_ENERGY_DETECTOR_ADVANCED.asStack(1))
                     .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
@@ -473,7 +474,7 @@ public class GTMTRecipe {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_output_hatch_" + GTValues.VN[tier].toLowerCase() + "_1024a"))
                     .inputItems(GTMachines.LASER_OUTPUT_HATCH_1024[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A.get(tier - 1).asStack(8))
-                    .inputItems(GTMachines.ACTIVE_TRANSFORMER.asStack())
+                    .inputItems(GTMultiMachines.ACTIVE_TRANSFORMER.asStack())
                     .inputItems(GTBlocks.SUPERCONDUCTING_COIL.asStack())
                     .inputItems(GTItems.COVER_ENERGY_DETECTOR_ADVANCED.asStack(1))
                     .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
@@ -485,7 +486,7 @@ public class GTMTRecipe {
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_output_hatch_" + GTValues.VN[tier].toLowerCase() + "_4096a"))
                     .inputItems(GTMachines.LASER_OUTPUT_HATCH_4096[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A.get(tier - 1).asStack(16))
-                    .inputItems(GTMachines.ACTIVE_TRANSFORMER.asStack())
+                    .inputItems(GTMultiMachines.ACTIVE_TRANSFORMER.asStack())
                     .inputItems(GTBlocks.SUPERCONDUCTING_COIL.asStack())
                     .inputItems(GTItems.COVER_ENERGY_DETECTOR_ADVANCED.asStack(1))
                     .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))

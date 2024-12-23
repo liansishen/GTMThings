@@ -3,25 +3,20 @@ package com.hepdd.gtmthings.data;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
-import com.gregtechceu.gtceu.api.registry.registrate.CompassNode;
-import com.gregtechceu.gtceu.api.registry.registrate.CompassSection;
 import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
 import com.gregtechceu.gtceu.common.item.TooltipBehavior;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.ItemLike;
 
 import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverPlaceBehavior;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverTooltipBehavior;
 import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior;
 import com.tterrag.registrate.util.entry.ItemEntry;
-import com.tterrag.registrate.util.nullness.NonNullConsumer;
 
 import java.util.Locale;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.api.registry.registrate.CompassNode.getOrCreate;
 import static com.gregtechceu.gtceu.common.data.GTItems.attach;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 
@@ -127,10 +122,6 @@ public class CustomItems {
             .item("wireless_energy_binding_tool", ComponentItem::create)
             .properties(p -> p.stacksTo(1))
             .onRegister(attach(new WirelessEnergyBindingToolBehavior())).register();
-
-    public static <T extends ItemLike> NonNullConsumer<T> compassNode(CompassSection section, CompassNode... preNodes) {
-        return item -> getOrCreate(section, item::asItem).addPreNode(preNodes);
-    }
 
     public static void init() {}
 }
