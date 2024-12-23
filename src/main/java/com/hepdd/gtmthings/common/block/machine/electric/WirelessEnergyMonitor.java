@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
+import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.ChatFormatting;
@@ -70,9 +71,10 @@ public class WirelessEnergyMonitor extends MetaMachine
 
     private ArrayList<BigInteger> longArrayList;
 
-    private List<Map.Entry<Pair<UUID, IMachineBlockEntity>, Long>> sortedEntries = null;
+    private List<Map.Entry<Pair<UUID, IMachineBlockEntity>, Long>> sortedEntries;
 
-    private boolean all = false;
+    @Persisted
+    private boolean all;
 
     @Override
     public void onLoad() {
@@ -129,12 +131,12 @@ public class WirelessEnergyMonitor extends MetaMachine
                 FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
         long rate = GlobalVariableStorage.GlobalRate.getOrDefault(TeamUtil.getTeamUUID(this.userid), Pair.of(null, 0L)).getSecond();
         textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2",
-                FormattingUtil.formatNumbers(rate), rate / GTValues.V[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
+                FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
         // average useage
         BigDecimal avgEnergy = getAvgUsage(energyTotal);
         Component voltageName = Component.literal(
                 GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
-        BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.V[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]), 1, RoundingMode.FLOOR);
+        BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.VEX[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]), 1, RoundingMode.FLOOR);
 
         if (avgEnergy.compareTo(BigDecimal.valueOf(0)) >= 0) {
             textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
