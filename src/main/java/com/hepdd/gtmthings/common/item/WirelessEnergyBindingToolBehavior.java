@@ -31,7 +31,7 @@ public class WirelessEnergyBindingToolBehavior implements IInteractionItem {
         Pair<Boolean, Long> rate = getRate(context.getLevel(), pos);
         if (rate.getFirst()) {
             GlobalVariableStorage.GlobalRate.put(TeamUtil.getTeamUUID(context.getPlayer().getUUID()), Pair.of(GlobalPos.of(context.getLevel().dimension(), pos), rate.getSecond()));
-            context.getPlayer().sendSystemMessage(Component.translatable("item.gtmthings.wireless_transfer.tooltip.bind.1", Component.translatable(context.getLevel().getBlockState(pos).getBlock().getDescriptionId()), pos.toShortString()));
+            if (context.getLevel().isClientSide()) context.getPlayer().sendSystemMessage(Component.translatable("item.gtmthings.wireless_transfer.tooltip.bind.1", Component.translatable(context.getLevel().getBlockState(pos).getBlock().getDescriptionId()), pos.toShortString()));
             return InteractionResult.CONSUME;
         }
         return InteractionResult.PASS;

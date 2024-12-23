@@ -1,7 +1,5 @@
 package com.hepdd.gtmthings.forge;
 
-import com.gregtechceu.gtceu.utils.TaskHandler;
-
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.TickEvent;
@@ -21,13 +19,6 @@ import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = GTMThings.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeCommonEventListener {
-
-    @SubscribeEvent
-    public static void levelTick(TickEvent.LevelTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
-            TaskHandler.onTickUpdate(serverLevel);
-        }
-    }
 
     @SubscribeEvent
     public static void onServerTickEvent(TickEvent.ServerTickEvent event) {
