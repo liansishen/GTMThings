@@ -58,7 +58,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
         super(definition, coverHolder, attachedSide);
         this.tier = tier;
         this.amperage = amperage;
-        this.energyPerTick = GTValues.V[tier] * amperage;
+        this.energyPerTick = GTValues.VEX[tier] * amperage;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
         this.uuid = player.getUUID();
         var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
         if (machine instanceof TieredEnergyMachine tieredEnergyMachine) {
-            this.machineMaxEnergy = GTValues.V[tieredEnergyMachine.getTier()] * 64L;
+            this.machineMaxEnergy = GTValues.VEX[tieredEnergyMachine.getTier()] * 64L;
         }
         updateCoverSub();
     }
@@ -122,7 +122,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
                 var changeStored = Math.min(energyContainer.getEnergyCapacity() - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
                 long changeenergy = -WirelessEnergyManager.addEUToGlobalEnergyMap(this.uuid, -changeStored, machine);
-                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, (long) ((double) GTValues.V[this.tier] * changeenergy / changeStored), this.amperage);
+                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, (long) ((double) GTValues.VEX[this.tier] * changeenergy / changeStored), this.amperage);
             } else {
                 var changeStored = Math.min(this.machineMaxEnergy - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;

@@ -93,7 +93,7 @@ public class DigitalMiner extends WorkableTieredMachine
 
     public DigitalMiner(IMachineBlockEntity holder, int tier, Object... args) {
         super(holder, tier, GTMachineUtils.defaultTankSizeFunction, args);
-        this.energyPerTick = GTValues.V[tier - 1];
+        this.energyPerTick = GTValues.VEX[tier - 1];
         this.filterInventory = createFilterItemHandler();
         this.fortuneLevel = 1;
         this.silkLevel = 0;
@@ -302,11 +302,11 @@ public class DigitalMiner extends WorkableTieredMachine
         if (silkLevel == 0) {
             silkLevel = 1;
             this.silkButton.setButtonTexture(new TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GREEN.getColor()));
-            energyPerTick = GTValues.V[getTier() - 1] * 4;
+            energyPerTick = GTValues.VEX[getTier() - 1] * 4;
         } else {
             silkLevel = 0;
             this.silkButton.setButtonTexture(new TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
-            energyPerTick = GTValues.V[getTier() - 1];
+            energyPerTick = GTValues.VEX[getTier() - 1];
         }
         resetRecipe();
     }
@@ -326,7 +326,7 @@ public class DigitalMiner extends WorkableTieredMachine
     // silkLevel = 0;
     // this.silkButton.setButtonTexture(new
     // TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GRAY.getColor()));
-    // energyPerTick = GTValues.V[MV-1] * 4 * energyMulti;
+    // energyPerTick = GTValues.VEX[MV-1] * 4 * energyMulti;
     // }
 
     private void addDisplayText(@NotNull List<Component> textList) {

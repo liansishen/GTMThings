@@ -109,7 +109,7 @@ public class CustomItems {
                 .onRegister(attach(new TooltipBehavior(lines -> {
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.1"));
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.2"));
-                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3", GTValues.V[tier] * amperage));
+                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3", GTValues.VEX[tier] * amperage));
                 }), new CoverPlaceBehavior(amperage == 1 ? WirelessCovers.WIRELESS_ENERGY_RECEIVE[tier - 1] : WirelessCovers.WIRELESS_ENERGY_RECEIVE_4A[tier - 1]))).register();
     }
 

@@ -45,12 +45,12 @@ public class CustomMachines {
                     .renderer(() -> new MinerRenderer(tier, GTCEu.id("block/machines/miner")))
                     .tooltipBuilder((stack, tooltip) -> {
                         int maxArea = (int) (8 * Math.pow(2, tier));
-                        long energyPerTick = GTValues.V[tier - 1];
+                        long energyPerTick = GTValues.VEX[tier - 1];
                         tooltip.add(Component.translatable("gtceu.universal.tooltip.uses_per_tick", energyPerTick)
                                 .append(Component.literal(", ").withStyle(ChatFormatting.GRAY))
                                 .append(Component.literal("§7每个方块需要§f" + (int) (40 / Math.pow(2, tier)) + "§7刻。")));
                         tooltip.add(Component.translatable("gtceu.universal.tooltip.voltage_in",
-                                FormattingUtil.formatNumbers(GTValues.V[tier]),
+                                FormattingUtil.formatNumbers(GTValues.VEX[tier]),
                                 GTValues.VNF[tier]));
                         tooltip.add(
                                 Component.translatable("gtceu.universal.tooltip.working_area_max", maxArea, maxArea));

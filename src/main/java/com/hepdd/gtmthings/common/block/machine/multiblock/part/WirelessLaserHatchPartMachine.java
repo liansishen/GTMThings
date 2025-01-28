@@ -68,11 +68,11 @@ public class WirelessLaserHatchPartMachine extends TieredIOPartMachine implement
     protected NotifiableLaserContainer createEnergyContainer(Object... args) {
         NotifiableLaserContainer container;
         if (io == IO.OUT) {
-            container = NotifiableLaserContainer.emitterContainer(this, GTValues.V[tier] * 64L * amperage,
-                    GTValues.V[tier], amperage);
+            container = NotifiableLaserContainer.emitterContainer(this, GTValues.VEX[tier] * 64L * amperage,
+                    GTValues.VEX[tier], amperage);
         } else {
-            container = NotifiableLaserContainer.receiverContainer(this, GTValues.V[tier] * 64L * amperage,
-                    GTValues.V[tier], amperage);
+            container = NotifiableLaserContainer.receiverContainer(this, GTValues.VEX[tier] * 64L * amperage,
+                    GTValues.VEX[tier], amperage);
         }
         return container;
     }
@@ -144,7 +144,7 @@ public class WirelessLaserHatchPartMachine extends TieredIOPartMachine implement
             updateEnergySubscription();
             return InteractionResult.SUCCESS;
         } else if (is.is(Items.STICK)) {
-            if (io == IO.OUT) energyContainer.setEnergyStored(GTValues.V[tier] * 64L * amperage);
+            if (io == IO.OUT) energyContainer.setEnergyStored(GTValues.VEX[tier] * 64L * amperage);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;

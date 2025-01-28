@@ -68,11 +68,11 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     protected NotifiableEnergyContainer createEnergyContainer(Object... args) {
         NotifiableEnergyContainer container;
         if (io == IO.OUT) {
-            container = NotifiableEnergyContainer.emitterContainer(this, GTValues.V[tier] * 64L * amperage,
-                    GTValues.V[tier], amperage);
+            container = NotifiableEnergyContainer.emitterContainer(this, GTValues.VEX[tier] * 64L * amperage,
+                    GTValues.VEX[tier], amperage);
         } else {
-            container = NotifiableEnergyContainer.receiverContainer(this, GTValues.V[tier] * 16L * amperage,
-                    GTValues.V[tier], amperage);
+            container = NotifiableEnergyContainer.receiverContainer(this, GTValues.VEX[tier] * 16L * amperage,
+                    GTValues.VEX[tier], amperage);
         }
         return container;
     }
@@ -144,7 +144,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
             updateEnergySubscription();
             return InteractionResult.SUCCESS;
         } else if (is.is(Items.STICK)) {
-            if (io == IO.OUT) energyContainer.setEnergyStored(GTValues.V[tier] * 64L * amperage);
+            if (io == IO.OUT) energyContainer.setEnergyStored(GTValues.VEX[tier] * 64L * amperage);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;

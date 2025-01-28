@@ -63,7 +63,7 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IBin
         NotifiableEnergyContainer container;
 
         container = NotifiableEnergyContainer.receiverContainer(this, Long.MAX_VALUE,
-                GTValues.V[tier], 67108864);
+                GTValues.VEX[tier], 67108864);
         container.setSideInputCondition(s -> s == getFrontFacing() && isWorkingEnabled());
         container.setCapabilityValidator(s -> s == null || s == getFrontFacing());
 
