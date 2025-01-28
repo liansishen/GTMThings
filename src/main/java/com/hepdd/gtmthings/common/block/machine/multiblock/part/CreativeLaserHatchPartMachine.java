@@ -74,7 +74,7 @@ public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implement
 
     public CreativeLaserHatchPartMachine(IMachineBlockEntity holder) {
         super(holder, GTValues.MAX, IO.IN);
-        this.voltage = GTValues.V[setTier];
+        this.voltage = GTValues.VEX[setTier];
         this.maxEnergy = voltage * 64L * amps;
         this.buffer = NotifiableLaserContainer.receiverContainer(this, this.maxEnergy, voltage, amps);
     }
@@ -148,7 +148,7 @@ public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implement
                 .widget(new SelectorWidget(7, 7, 30, 20, Arrays.stream(VNF).toList(), -1)
                         .setOnChanged(tier -> {
                             setTier = ArrayUtils.indexOf(VNF, tier) + 5;
-                            voltage = GTValues.V[setTier];
+                            voltage = GTValues.VEX[setTier];
                         })
                         .setSupplier(() -> VNF[setTier - 5])
                         .setButtonBackground(ResourceBorderTexture.BUTTON_COMMON)

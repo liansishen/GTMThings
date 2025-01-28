@@ -27,6 +27,7 @@ public class WirelessEnergyBindingToolBehavior implements IInteractionItem {
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        if (context.getLevel().isClientSide()) return InteractionResult.PASS;
         BlockPos pos = context.getClickedPos();
         Pair<Boolean, Long> rate = getRate(context.getLevel(), pos);
         if (rate.getFirst()) {
@@ -47,7 +48,7 @@ public class WirelessEnergyBindingToolBehavior implements IInteractionItem {
             for (int i = 0; i < inv.getSlots(); i++) {
                 IElectricItem electricItem = GTCapabilityHelper.getElectricItem(inv.getStackInSlot(i));
                 if (electricItem != null) {
-                    rate += GTValues.V[electricItem.getTier()];
+                    rate += GTValues.VEX[electricItem.getTier()];
                 }
             }
         } else if (machine instanceof PowerSubstationMachine powerSubstationMachine) {

@@ -75,8 +75,8 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     protected NotifiableEnergyContainer createEnergyContainer() {
         NotifiableEnergyContainer container;
-        this.maxEnergy = GTValues.V[tier] * 16L * amps;
-        container = NotifiableEnergyContainer.receiverContainer(this, this.maxEnergy, GTValues.V[tier], amps);
+        this.maxEnergy = GTValues.VEX[tier] * 16L * amps;
+        container = NotifiableEnergyContainer.receiverContainer(this, this.maxEnergy, GTValues.VEX[tier], amps);
         return container;
     }
 
@@ -138,7 +138,7 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
                 .widget(new SelectorWidget(7, 7, 30, 20, Arrays.stream(GTValues.VNF).toList(), -1)
                         .setOnChanged(tier -> {
                             setTier = ArrayUtils.indexOf(GTValues.VNF, tier);
-                            voltage = GTValues.V[setTier];
+                            voltage = GTValues.VEX[setTier];
                         })
                         .setSupplier(() -> GTValues.VNF[setTier])
                         .setButtonBackground(ResourceBorderTexture.BUTTON_COMMON)
