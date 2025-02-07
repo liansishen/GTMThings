@@ -1,6 +1,5 @@
 package com.hepdd.gtmthings.data;
 
-import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.data.RotationState;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
@@ -16,9 +15,6 @@ import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 
 public class CreativeMachines {
-
-    public static final int[] ALL_TIERS = GTValues.tiersBetween(LV, MAX);
-    public static final int[] HIGH_TIERS = GTValues.tiersBetween(IV, MAX);
 
     static {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.CREATIVE_TAB);

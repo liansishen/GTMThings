@@ -29,8 +29,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.hepdd.gtmthings.api.capability.IBindable;
-import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -41,7 +43,7 @@ import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implements IInteractedMachine, IBindable, IExplosionMachine, IMachineLife {
+public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implements IInteractedMachine, IBindable, IExplosionMachine, IMachineLife, IWirelessEnergyContainerHolder {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             WirelessEnergyHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
@@ -51,8 +53,13 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         return MANAGED_FIELD_HOLDER;
     }
 
+    @Getter
+    @Setter
+    private WirelessEnergyContainer WirelessEnergyContainerCache;
+
     @Persisted
     public UUID owner_uuid;
+
     @Persisted
     public final NotifiableEnergyContainer energyContainer;
     @Getter
@@ -115,15 +122,15 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         var maxStored = energyContainer.getEnergyCapacity();
         var changeStored = Math.min(maxStored - currentStored, energyContainer.getInputVoltage() * energyContainer.getInputAmperage());
         if (changeStored <= 0) return;
-        changeStored = WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, -changeStored, this);
-        if (changeStored < 0) energyContainer.setEnergyStored(currentStored - changeStored);
+        changeStored = getWirelessEnergyContainer().removeEnergy(changeStored, this);
+        if (changeStored > 0) energyContainer.setEnergyStored(currentStored + changeStored);
     }
 
     private void addEnergy() {
         var currentStored = energyContainer.getEnergyStored();
         if (currentStored <= 0) return;
         var changeStored = Math.min(energyContainer.getOutputVoltage() * energyContainer.getOutputAmperage(), currentStored);
-        changeStored = WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, changeStored, this);
+        changeStored = getWirelessEnergyContainer().addEnergy(changeStored, this);
         if (changeStored > 0) energyContainer.setEnergyStored(currentStored - changeStored);
     }
 

@@ -1,5 +1,7 @@
 package com.hepdd.gtmthings.client;
 
+import com.gregtechceu.gtceu.api.GTValues;
+
 import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
 
 import net.minecraft.client.Camera;
@@ -20,9 +22,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 
-@Mod.EventBusSubscriber(modid = GTMThings.MOD_ID,
-                        bus = Mod.EventBusSubscriber.Bus.FORGE,
-                        value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = GTMThings.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 @OnlyIn(Dist.CLIENT)
 public class ForgeClientEventHandler {
 
@@ -34,72 +34,40 @@ public class ForgeClientEventHandler {
             if (level == null) return;
 
             if (WirelessEnergyMonitor.p > 0) {
-                if (level.getGameTime() % 20 == 0) {
+                if (GTValues.CLIENT_TIME % 20 == 0) {
                     WirelessEnergyMonitor.p--;
                 }
                 PoseStack poseStack = event.getPoseStack();
                 Camera camera = event.getCamera();
                 BlockPos pose = WirelessEnergyMonitor.pPos;
                 if (pose == null) return;
-                Vec3 pos = camera.getPosition();
-
-                poseStack.pushPose();
-                poseStack.translate(-pos.x, -pos.y, -pos.z);
-
-                RenderSystem.disableDepthTest();
-                RenderSystem.enableBlend();
-                RenderSystem.disableCull();
-                RenderSystem.blendFunc(
-                        GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-                Tesselator tesselator = Tesselator.getInstance();
-                BufferBuilder buffer = tesselator.getBuilder();
-
-                buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
-                RenderBufferUtils.renderCubeFace(
-                        poseStack,
-                        buffer,
-                        pose.getX(),
-                        pose.getY(),
-                        pose.getZ(),
-                        pose.getX() + 1,
-                        pose.getY() + 1,
-                        pose.getZ() + 1,
-                        0.2f,
-                        0.2f,
-                        1f,
-                        0.25f,
-                        true);
-
-                tesselator.end();
-
-                buffer.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
-                RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
-                RenderSystem.lineWidth(3);
-
-                RenderBufferUtils.drawCubeFrame(
-                        poseStack,
-                        buffer,
-                        pose.getX(),
-                        pose.getY(),
-                        pose.getZ(),
-                        pose.getX() + 1,
-                        pose.getY() + 1,
-                        pose.getZ() + 1,
-                        0.0f,
-                        0.0f,
-                        1f,
-                        0.5f);
-
-                tesselator.end();
-
-                RenderSystem.enableCull();
-
-                RenderSystem.disableBlend();
-                RenderSystem.enableDepthTest();
-                poseStack.popPose();
+                highlightBlock(camera, poseStack, pose, pose);
             }
         }
+    }
+
+    public static void highlightBlock(Camera camera, PoseStack poseStack, BlockPos... poses) {
+        Vec3 pos = camera.getPosition();
+        poseStack.pushPose();
+        poseStack.translate(-pos.x, -pos.y, -pos.z);
+        RenderSystem.disableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.disableCull();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder buffer = tesselator.getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderBufferUtils.renderCubeFace(poseStack, buffer, poses[0].getX(), poses[0].getY(), poses[0].getZ(), poses[1].getX() + 1, poses[1].getY() + 1, poses[1].getZ() + 1, 0.2f, 0.2f, 1.0f, 0.25f, true);
+        tesselator.end();
+        buffer.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+        RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+        RenderSystem.lineWidth(3);
+        RenderBufferUtils.drawCubeFrame(poseStack, buffer, poses[0].getX(), poses[0].getY(), poses[0].getZ(), poses[1].getX() + 1, poses[1].getY() + 1, poses[1].getZ() + 1, 0.0f, 0.0f, 1.0f, 0.5f);
+        tesselator.end();
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.enableDepthTest();
+        poseStack.popPose();
     }
 }
