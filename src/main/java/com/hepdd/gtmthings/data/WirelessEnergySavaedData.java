@@ -12,64 +12,48 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 
-import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
-import com.mojang.datafixers.util.Pair;
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 public class WirelessEnergySavaedData extends SavedData {
 
     public static WirelessEnergySavaedData INSTANCE;
-    private ServerLevel serverLevel;
 
     public static WirelessEnergySavaedData getOrCreate(ServerLevel serverLevel) {
-        return serverLevel.getDataStorage().computeIfAbsent(tag -> new WirelessEnergySavaedData(serverLevel, tag),
-                () -> new WirelessEnergySavaedData(serverLevel), "gtceu_wireless_energy");
+        return serverLevel.getDataStorage().computeIfAbsent(WirelessEnergySavaedData::new, WirelessEnergySavaedData::new, "gtceu_wireless_energy");
     }
 
-    public WirelessEnergySavaedData(ServerLevel serverLevel) {
-        this.serverLevel = serverLevel;
-    }
+    public WirelessEnergySavaedData() {}
 
-    public WirelessEnergySavaedData(ServerLevel serverLevel, CompoundTag tag) {
-        this(serverLevel);
+    public WirelessEnergySavaedData(CompoundTag tag) {
         ListTag allEnergy = tag.getList("allEnergy", Tag.TAG_COMPOUND);
-        ListTag allRate = tag.getList("allRate", Tag.TAG_COMPOUND);
         for (int i = 0; i < allEnergy.size(); i++) {
             CompoundTag engTag = allEnergy.getCompound(i);
-            GlobalVariableStorage.GlobalEnergy.put(engTag.getUUID("uuid"),
-                    new BigInteger(engTag.getString("energy").isEmpty() ? "0" : engTag.getString("energy")));
-        }
-        for (int i = 0; i < allRate.size(); i++) {
-            CompoundTag rateTag = allRate.getCompound(i);
-            GlobalVariableStorage.GlobalRate.put(rateTag.getUUID("uuid"),
-                    Pair.of(readGlobalPos(rateTag.getString("dimension"), rateTag.getLong("pos")), rateTag.getLong("rate")));
+            UUID uuid = engTag.getUUID("uuid");
+            BigInteger energy = new BigInteger(engTag.getString("energy").isEmpty() ? "0" : engTag.getString("energy"));
+            long rate = engTag.getLong("rate");
+            GlobalPos bindPos = readGlobalPos(engTag.getString("dimension"), engTag.getLong("pos"));
+            WirelessEnergyContainer.GLOBAL_CACHE.put(uuid, new WirelessEnergyContainer(uuid, energy, rate, bindPos));
         }
     }
 
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag compoundTag) {
         ListTag allEnergy = new ListTag();
-        ListTag allRate = new ListTag();
-        for (var entry : GlobalVariableStorage.GlobalEnergy.entrySet()) {
+        for (var entry : WirelessEnergyContainer.GLOBAL_CACHE.entrySet()) {
             CompoundTag engTag = new CompoundTag();
             engTag.putUUID("uuid", entry.getKey());
-            engTag.putString("energy", entry.getValue().toString());
-
+            WirelessEnergyContainer container = entry.getValue();
+            engTag.putString("energy", container.getStorage().toString());
+            engTag.putLong("rate", container.getRate());
+            engTag.putString("dimension", container.getBindPos().dimension().location().toString());
+            engTag.putLong("pos", container.getBindPos().pos().asLong());
             allEnergy.add(engTag);
         }
-        for (var entry : GlobalVariableStorage.GlobalRate.entrySet()) {
-            CompoundTag rateTag = new CompoundTag();
-            rateTag.putUUID("uuid", entry.getKey());
-            rateTag.putString("dimension", entry.getValue().getFirst().dimension().location().toString());
-            rateTag.putLong("pos", entry.getValue().getFirst().pos().asLong());
-            rateTag.putLong("rate", entry.getValue().getSecond());
-
-            allRate.add(rateTag);
-        }
         compoundTag.put("allEnergy", allEnergy);
-        compoundTag.put("allRate", allRate);
         return compoundTag;
     }
 

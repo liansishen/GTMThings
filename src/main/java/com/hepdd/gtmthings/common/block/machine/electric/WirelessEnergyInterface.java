@@ -28,7 +28,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.hepdd.gtmthings.api.capability.IBindable;
-import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -39,7 +42,7 @@ import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WirelessEnergyInterface extends TieredIOPartMachine implements IBindable, IInteractedMachine, IMachineLife {
+public class WirelessEnergyInterface extends TieredIOPartMachine implements IBindable, IInteractedMachine, IMachineLife, IWirelessEnergyContainerHolder {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyInterface.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
@@ -49,12 +52,18 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IBin
     }
 
     private TickableSubscription updEnergySubs;
+
+    @Getter
+    @Setter
+    private WirelessEnergyContainer WirelessEnergyContainerCache;
+
     @Persisted
     public UUID owner_uuid;
+
     @Persisted
     public final NotifiableEnergyContainer energyContainer;
 
-    public WirelessEnergyInterface(IMachineBlockEntity holder, Object... args) {
+    public WirelessEnergyInterface(IMachineBlockEntity holder) {
         super(holder, GTValues.MAX, IO.IN);
         this.energyContainer = createEnergyContainer();
     }
@@ -97,7 +106,7 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IBin
     private void updateEnergy() {
         var currentStored = energyContainer.getEnergyStored();
         if (currentStored <= 0) return;
-        long changeEnergy = WirelessEnergyManager.addEUToGlobalEnergyMap(this.owner_uuid, currentStored, this);
+        long changeEnergy = getWirelessEnergyContainer().addEnergy(currentStored, this);
         if (changeEnergy > 0) energyContainer.setEnergyStored(currentStored - changeEnergy);
     }
 

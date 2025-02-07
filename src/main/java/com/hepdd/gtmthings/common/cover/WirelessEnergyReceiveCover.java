@@ -19,25 +19,33 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
-import com.hepdd.gtmthings.api.misc.WirelessEnergyManager;
+import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
+import com.hepdd.gtmthings.api.machine.WirelessEnergyReceiveCoverHolder;
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.api.capability.GTCapabilityHelper.getEnergyContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WirelessEnergyReceiveCover extends CoverBehavior {
+public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirelessEnergyContainerHolder {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyReceiveCover.class,
             CoverBehavior.MANAGED_FIELD_HOLDER);
 
     private TickableSubscription subscription;
+
     @Getter
+    @Setter
+    private WirelessEnergyContainer WirelessEnergyContainerCache;
+
     @Persisted
     private UUID uuid;
     @Persisted
@@ -63,7 +71,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
 
     @Override
     public boolean canAttach() {
-        var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        var machine = getMachine();
         if (machine instanceof TieredEnergyMachine tieredEnergyMachine && tieredEnergyMachine.energyContainer.getHandlerIO() == IO.IN && tieredEnergyMachine.getTier() >= this.tier) {
             var covers = tieredEnergyMachine.getCoverContainer().getCovers();
             for (var cover : covers) {
@@ -74,6 +82,8 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
             return batteryBufferMachine.getTier() >= this.tier;
         } else if (machine instanceof HullMachine hullMachine) {
             return hullMachine.getTier() >= this.tier;
+        } else if (machine instanceof WirelessEnergyReceiveCoverHolder holder) {
+            return holder.getTier() >= this.tier;
         } else {
             return false;
         }
@@ -83,9 +93,9 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
     public void onAttached(ItemStack itemStack, ServerPlayer player) {
         super.onAttached(itemStack, player);
         this.uuid = player.getUUID();
-        var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        var machine = getMachine();
         if (machine instanceof TieredEnergyMachine tieredEnergyMachine) {
-            this.machineMaxEnergy = GTValues.VEX[tieredEnergyMachine.getTier()] * 64L;
+            this.machineMaxEnergy = GTValues.VEX[tieredEnergyMachine.getTier()] << 6;
         }
         updateCoverSub();
     }
@@ -117,19 +127,29 @@ public class WirelessEnergyReceiveCover extends CoverBehavior {
         if (uuid == null) return;
         var energyContainer = getEnergyContainer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
         if (energyContainer != null) {
-            var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
-            if (machine instanceof BatteryBufferMachine || machine instanceof HullMachine) {
+            var machine = getMachine();
+            if (machine instanceof BatteryBufferMachine || machine instanceof HullMachine || machine instanceof WirelessEnergyReceiveCoverHolder) {
                 var changeStored = Math.min(energyContainer.getEnergyCapacity() - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
-                long changeenergy = -WirelessEnergyManager.addEUToGlobalEnergyMap(this.uuid, -changeStored, machine);
-                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, (long) ((double) GTValues.VEX[this.tier] * changeenergy / changeStored), this.amperage);
+                long changeenergy = getWirelessEnergyContainer().removeEnergy(changeStored, machine);
+                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, changeenergy / this.amperage, this.amperage);
             } else {
                 var changeStored = Math.min(this.machineMaxEnergy - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
-                changeStored = WirelessEnergyManager.addEUToGlobalEnergyMap(this.uuid, -changeStored, machine);
-                if (changeStored < 0) energyContainer.addEnergy(-changeStored);
+                long changeenergy = getWirelessEnergyContainer().removeEnergy(changeStored, machine);
+                if (changeenergy > 0) energyContainer.addEnergy(changeenergy);
             }
         }
         updateCoverSub();
+    }
+
+    @Override
+    public UUID getUUID() {
+        return uuid;
+    }
+
+    @Nullable
+    private MetaMachine getMachine() {
+        return MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
     }
 }

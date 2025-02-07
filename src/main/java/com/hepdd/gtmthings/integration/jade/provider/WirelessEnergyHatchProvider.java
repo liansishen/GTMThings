@@ -68,7 +68,7 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
                 var covers = simpleTieredMachine.getCoverContainer().getCovers();
                 for (var cover : covers) {
                     if (cover instanceof WirelessEnergyReceiveCover wirelessEnergyReceiveCover) {
-                        UUID uuid = wirelessEnergyReceiveCover.getUuid();
+                        UUID uuid = wirelessEnergyReceiveCover.getUUID();
                         return new IBindable() {
 
                             @Override

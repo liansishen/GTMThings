@@ -29,10 +29,10 @@ import lombok.Setter;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@Getter
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine
-                                                    implements IInteractedMachine, IGTMTJadeIF {
+public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine implements IInteractedMachine, IGTMTJadeIF {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             WirelessOpticalComputationHatchMachine.class, MultiblockPartMachine.MANAGED_FIELD_HOLDER);
@@ -42,18 +42,14 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
         return MANAGED_FIELD_HOLDER;
     }
 
-    @Getter
     private final boolean transmitter;
 
-    @Getter
     @Setter
     @Persisted
     private BlockPos transmitterPos;
-    @Getter
     @Setter
     @Persisted
     private BlockPos receiverPos;
-    @Getter
     protected WirelessNotifiableComputationContainer computationContainer;
 
     public WirelessOpticalComputationHatchMachine(IMachineBlockEntity holder, boolean transmitter) {

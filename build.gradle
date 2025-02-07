@@ -145,7 +145,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    modCompileOnly 'maven.modrinth:Jade-1.20.1-forge-11.9.2'
+    modImplementation 'maven.modrinth:Jade-1.20.1-forge-11.9.2'
     modImplementation('appeng:appliedenergistics2-forge-15.2.13'){ transitive false }
     //modRuntimeOnly 'dev:emi:1.1.12'
     //modRuntimeOnly 'dev:jecharacters:4.5.9'

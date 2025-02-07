@@ -23,35 +23,31 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 
-import com.hepdd.gtmthings.api.misc.GlobalVariableStorage;
+import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
+import com.hepdd.gtmthings.api.misc.ITransferData;
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
+import com.hepdd.gtmthings.utils.BigIntegerUtils;
 import com.hepdd.gtmthings.utils.TeamUtil;
-import com.mojang.datafixers.util.Pair;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.MachineData;
-import static com.hepdd.gtmthings.api.misc.WirelessEnergyManager.getUserEU;
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WirelessEnergyMonitor extends MetaMachine
-                                   implements IFancyUIMachine {
+public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachine, IWirelessEnergyContainerHolder {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyMonitor.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
-
-    private static final BigInteger BIG_INTEGER_MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
 
     public static int p;
     public static BlockPos pPos;
@@ -65,39 +61,34 @@ public class WirelessEnergyMonitor extends MetaMachine
         return MANAGED_FIELD_HOLDER;
     }
 
-    private UUID userid;
+    @Getter
+    private UUID UUID;
+
+    @Getter
+    @Setter
+    private WirelessEnergyContainer WirelessEnergyContainerCache;
 
     private BigInteger beforeEnergy;
 
     private ArrayList<BigInteger> longArrayList;
 
-    private List<Map.Entry<Pair<UUID, IMachineBlockEntity>, Long>> sortedEntries;
+    private List<Component> textListCache;
 
     @Persisted
     private boolean all;
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-    }
 
     //////////////////////////////////////
     // *********** GUI ***********//
     //////////////////////////////////////
     private void handleDisplayClick(String componentData, ClickData clickData) {
-        if (!clickData.isRemote) {
-            if (componentData.equals("all")) {
+        if (componentData.equals("all")) {
+            if (!clickData.isRemote) {
                 all = !all;
-            } else {
-                p = 100;
-                String[] parts = componentData.split(", ");
-                pPos = new BlockPos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
             }
+        } else if (clickData.isRemote) {
+            p = 100;
+            String[] parts = componentData.split(", ");
+            pPos = new BlockPos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
         }
     }
 
@@ -115,79 +106,72 @@ public class WirelessEnergyMonitor extends MetaMachine
 
     @Override
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
-        if (this.userid == null || !this.userid.equals(player.getUUID())) {
-            this.userid = player.getUUID();
+        if (this.UUID == null || !this.UUID.equals(player.getUUID())) {
+            this.UUID = player.getUUID();
             this.longArrayList = new ArrayList<>();
         }
-        this.beforeEnergy = getUserEU(this.userid);
+        this.beforeEnergy = getWirelessEnergyContainer().getStorage();
         return true;
     }
 
     private void addDisplayText(@NotNull List<Component> textList) {
-        BigInteger energyTotal = getUserEU(this.userid);
-        textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0",
-                GetName(this.holder.level(), this.userid)).withStyle(ChatFormatting.AQUA));
-        textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1",
-                FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
-        long rate = GlobalVariableStorage.GlobalRate.getOrDefault(TeamUtil.getTeamUUID(this.userid), Pair.of(null, 0L)).getSecond();
-        textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2",
-                FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
-        // average useage
-        BigDecimal avgEnergy = getAvgUsage(energyTotal);
-        Component voltageName = Component.literal(
-                GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
-        BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.VEX[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]), 1, RoundingMode.FLOOR);
+        if (isRemote()) return;
+        if (textListCache == null || getOffsetTimer() % 10 == 0) {
+            textListCache = new ArrayList<>();
+            BigInteger energyTotal = getWirelessEnergyContainer().getStorage();
+            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), this.UUID)).withStyle(ChatFormatting.AQUA));
+            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1", FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
+            long rate = WirelessEnergyContainer.getOrCreateContainer(UUID).getRate();
+            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2", FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
+            // average useage
+            BigDecimal avgEnergy = getAvgUsage(energyTotal);
+            Component voltageName = Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
+            BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.VEX[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]), 1, RoundingMode.FLOOR);
 
-        if (avgEnergy.compareTo(BigDecimal.valueOf(0)) >= 0) {
-            textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
-                    FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
-            textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_fill", Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.time_to_fill")).withStyle(ChatFormatting.GRAY));
-        } else {
-            textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
-                    FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
-            textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
-                    getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
-        }
-        textList.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.statistics")
-                .append(ComponentPanelWidget.withButton(all ? Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.all") : Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.team"), "all")));
-        for (Map.Entry<Pair<UUID, IMachineBlockEntity>, Long> m : getSortedEntries()) {
-            UUID uuid = m.getKey().getFirst();
-            if (all || TeamUtil.getTeamUUID(uuid) == TeamUtil.getTeamUUID(this.userid)) {
-                IMachineBlockEntity holder = m.getKey().getSecond();
-                long eut = m.getValue();
-                String pos = holder.pos().toShortString();
-                if (eut > 0) {
-                    textList.add(Component.translatable(holder.self().getBlockState().getBlock().getDescriptionId())
-                            .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", holder.self().getLevel().dimension().location()).append(" [").append(pos).append("] ")
-                                    .append(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(this.holder.level(), uuid))))))
-                            .append(" +").append(FormattingUtil.formatNumbers(eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(eut)]).append(")")
-                            .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
-                } else {
-                    textList.add(Component.translatable(holder.self().getBlockState().getBlock().getDescriptionId())
-                            .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", holder.self().getLevel().dimension().location()).append(" [").append(pos).append("] ")
-                                    .append(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(this.holder.level(), uuid))))))
-                            .append(" -").append(FormattingUtil.formatNumbers(-eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(-eut)]).append(")")
-                            .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
+            if (avgEnergy.compareTo(BigDecimal.valueOf(0)) >= 0) {
+                textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
+                        FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
+                textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_fill", Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.time_to_fill")).withStyle(ChatFormatting.GRAY));
+            } else {
+                textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
+                        FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
+                textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
+                        getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
+            }
+            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.statistics").append(ComponentPanelWidget.withButton(all ? Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.all") : Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.team"), "all")));
+            WirelessEnergyContainer.observed = true;
+            List<Map.Entry<MetaMachine, ITransferData>> sortedEntries = WirelessEnergyContainer.TRANSFER_DATA.entrySet()
+                    .stream()
+                    .sorted(Comparator.comparingLong(entry -> entry.getValue().Throughput()))
+                    .toList();
+            WirelessEnergyContainer.TRANSFER_DATA.clear();
+            for (Map.Entry<MetaMachine, ITransferData> m : sortedEntries) {
+                UUID uuid = m.getValue().UUID();
+                if (all || uuid.equals(TeamUtil.getTeamUUID(this.UUID))) {
+                    MetaMachine machine = m.getKey();
+                    long eut = m.getValue().Throughput();
+                    String pos = machine.getPos().toShortString();
+                    if (eut > 0) {
+                        textListCache.add(Component.translatable(machine.getBlockState().getBlock().getDescriptionId())
+                                .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", machine.getLevel().dimension().location()).append(" [").append(pos).append("] ").append(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), uuid))))))
+                                .append(" +").append(FormattingUtil.formatNumbers(eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(eut)]).append(")")
+                                .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
+                    } else {
+                        textListCache.add(Component.translatable(machine.getBlockState().getBlock().getDescriptionId())
+                                .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", machine.getLevel().dimension().location()).append(" [").append(pos).append("] ").append(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), uuid))))))
+                                .append(" -").append(FormattingUtil.formatNumbers(-eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(-eut)]).append(")")
+                                .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
+                    }
                 }
             }
         }
-    }
-
-    private List<Map.Entry<Pair<UUID, IMachineBlockEntity>, Long>> getSortedEntries() {
-        if (sortedEntries == null || getOffsetTimer() % 20 == 0) {
-            sortedEntries = MachineData.entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue())
-                    .toList();
-            MachineData.clear();
-        }
-        return sortedEntries;
+        textList.addAll(textListCache);
     }
 
     private static Component getTimeToFillDrainText(BigInteger timeToFillSeconds) {
-        if (timeToFillSeconds.compareTo(BIG_INTEGER_MAX_LONG) > 0) {
+        if (timeToFillSeconds.compareTo(BigIntegerUtils.BIG_INTEGER_MAX_LONG) > 0) {
             // too large to represent in a java Duration
-            timeToFillSeconds = BIG_INTEGER_MAX_LONG;
+            timeToFillSeconds = BigIntegerUtils.BIG_INTEGER_MAX_LONG;
         }
 
         Duration duration = Duration.ofSeconds(timeToFillSeconds.longValue());
