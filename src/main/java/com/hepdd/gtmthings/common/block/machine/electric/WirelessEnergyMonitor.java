@@ -70,8 +70,6 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
 
     private BigInteger beforeEnergy;
 
-    private ArrayList<BigInteger> longArrayList;
-
     private List<Component> textListCache;
 
     @Persisted
@@ -108,7 +106,6 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
         if (this.UUID == null || !this.UUID.equals(player.getUUID())) {
             this.UUID = player.getUUID();
-            this.longArrayList = new ArrayList<>();
         }
         this.beforeEnergy = getWirelessEnergyContainer().getStorage();
         return true;
@@ -202,20 +199,6 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
     private BigDecimal getAvgUsage(BigInteger now) {
         BigInteger changed = now.subtract(this.beforeEnergy);
         this.beforeEnergy = now;
-        if (this.longArrayList.size() >= 20) {
-            this.longArrayList.remove(0);
-        }
-        this.longArrayList.add(changed);
-
-        return calculateAverage(this.longArrayList);
-    }
-
-    private static BigDecimal calculateAverage(ArrayList<BigInteger> bigIntegers) {
-        BigInteger sum = BigInteger.ZERO;
-        for (BigInteger bi : bigIntegers) {
-            sum = sum.add(bi);
-        }
-        // 使用BigDecimal进行除法运算以获得精确的平均值
-        return new BigDecimal(sum).divide(new BigDecimal(bigIntegers.size()), RoundingMode.HALF_UP);
+        return new BigDecimal(changed).divide(BigDecimal.valueOf(10), RoundingMode.HALF_UP);
     }
 }

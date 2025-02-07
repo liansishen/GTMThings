@@ -23,7 +23,7 @@ public class ForgeCommonEventListener {
                 WirelessEnergyContainer.GLOBAL_CACHE.values().forEach(container -> {
                     long rate = 0;
                     GlobalPos pos = container.getBindPos();
-                    if (pos != null) {
+                    if (pos != null && event.getServer().getLevel(pos.dimension()) != null) {
                         rate = WirelessEnergyBindingToolBehavior.getRate(event.getServer().getLevel(pos.dimension()), pos.pos());
                     }
                     container.setRate(rate);
