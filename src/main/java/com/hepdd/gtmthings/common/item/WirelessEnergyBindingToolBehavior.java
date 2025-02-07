@@ -25,7 +25,6 @@ public class WirelessEnergyBindingToolBehavior implements IInteractionItem {
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-        if (context.getLevel().isClientSide()) return InteractionResult.PASS;
         BlockPos pos = context.getClickedPos();
         long rate = getRate(context.getLevel(), pos);
         if (rate > 0) {
