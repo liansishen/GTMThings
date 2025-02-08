@@ -28,7 +28,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import lombok.Getter;
@@ -43,7 +42,7 @@ import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implements IInteractedMachine, IBindable, IExplosionMachine, IMachineLife, IWirelessEnergyContainerHolder {
+public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implements IInteractedMachine, IExplosionMachine, IMachineLife, IWirelessEnergyContainerHolder {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             WirelessEnergyHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
@@ -122,7 +121,9 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         var maxStored = energyContainer.getEnergyCapacity();
         var changeStored = Math.min(maxStored - currentStored, energyContainer.getInputVoltage() * energyContainer.getInputAmperage());
         if (changeStored <= 0) return;
-        changeStored = getWirelessEnergyContainer().removeEnergy(changeStored, this);
+        WirelessEnergyContainer container = getWirelessEnergyContainer();
+        if (container == null) return;
+        changeStored = container.removeEnergy(changeStored, this);
         if (changeStored > 0) energyContainer.setEnergyStored(currentStored + changeStored);
     }
 
@@ -130,7 +131,9 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         var currentStored = energyContainer.getEnergyStored();
         if (currentStored <= 0) return;
         var changeStored = Math.min(energyContainer.getOutputVoltage() * energyContainer.getOutputAmperage(), currentStored);
-        changeStored = getWirelessEnergyContainer().addEnergy(changeStored, this);
+        WirelessEnergyContainer container = getWirelessEnergyContainer();
+        if (container == null) return;
+        changeStored = container.addEnergy(changeStored, this);
         if (changeStored > 0) energyContainer.setEnergyStored(currentStored - changeStored);
     }
 
@@ -183,11 +186,6 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     @Override
     public UUID getUUID() {
         return this.owner_uuid;
-    }
-
-    @Override
-    public void setUUID(UUID uuid) {
-        this.owner_uuid = uuid;
     }
 
     //////////////////////////////////////

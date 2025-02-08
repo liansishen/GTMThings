@@ -1,19 +1,19 @@
 package com.hepdd.gtmthings.api.machine;
 
+import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 
-import java.util.UUID;
+import javax.annotation.Nullable;
 
-public interface IWirelessEnergyContainerHolder {
-
-    UUID getUUID();
+public interface IWirelessEnergyContainerHolder extends IBindable {
 
     void setWirelessEnergyContainerCache(WirelessEnergyContainer container);
 
     WirelessEnergyContainer getWirelessEnergyContainerCache();
 
+    @Nullable
     default WirelessEnergyContainer getWirelessEnergyContainer() {
-        if (getWirelessEnergyContainerCache() == null) {
+        if (getUUID() != null && getWirelessEnergyContainerCache() == null) {
             WirelessEnergyContainer container = WirelessEnergyContainer.getOrCreateContainer(getUUID());
             setWirelessEnergyContainerCache(container);
         }

@@ -104,10 +104,11 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
 
     @Override
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
-        if (this.UUID == null || !this.UUID.equals(player.getUUID())) {
+        if (this.UUID == null) {
             this.UUID = player.getUUID();
         }
-        this.beforeEnergy = getWirelessEnergyContainer().getStorage();
+        WirelessEnergyContainer container = getWirelessEnergyContainer();
+        if (container != null) this.beforeEnergy = container.getStorage();
         return true;
     }
 
@@ -115,10 +116,12 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
         if (isRemote()) return;
         if (textListCache == null || getOffsetTimer() % 10 == 0) {
             textListCache = new ArrayList<>();
-            BigInteger energyTotal = getWirelessEnergyContainer().getStorage();
+            WirelessEnergyContainer container = getWirelessEnergyContainer();
+            if (container == null) return;
+            BigInteger energyTotal = container.getStorage();
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), this.UUID)).withStyle(ChatFormatting.AQUA));
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1", FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
-            long rate = WirelessEnergyContainer.getOrCreateContainer(UUID).getRate();
+            long rate = container.getRate();
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2", FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
             // average useage
             BigDecimal avgEnergy = getAvgUsage(energyTotal);
@@ -134,6 +137,10 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
                         FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
                 textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
                         getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
+            }
+            if (container.getBindPos() != null) {
+                String pos = container.getBindPos().pos().toShortString();
+                textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.2", Component.translatable("recipe.condition.dimension.tooltip", container.getBindPos().dimension().location().toString()).append(" [").append(pos).append("] ")).withStyle(ChatFormatting.GRAY));
             }
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.statistics").append(ComponentPanelWidget.withButton(all ? Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.all") : Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.team"), "all")));
             WirelessEnergyContainer.observed = true;

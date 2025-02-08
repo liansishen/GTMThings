@@ -49,8 +49,8 @@ public class WirelessEnergyContainer {
     }
 
     public long addEnergy(long energy, @Nullable MetaMachine machine) {
-        if (energy <= 0) return 0;
         long change = Math.min(rate, energy);
+        if (change <= 0) return 0;
         storage = storage.add(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
         if (observed && machine != null) {
@@ -60,8 +60,8 @@ public class WirelessEnergyContainer {
     }
 
     public long removeEnergy(long energy, @Nullable MetaMachine machine) {
-        if (energy <= 0) return 0;
         long change = Math.min(BigIntegerUtils.getLongValue(storage), Math.min(rate, energy));
+        if (change <= 0) return 0;
         storage = storage.subtract(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
         if (observed && machine != null) {
