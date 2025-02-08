@@ -6,10 +6,7 @@ import com.gregtechceu.gtceu.api.data.chemical.material.stack.UnificationEntry;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
-import com.gregtechceu.gtceu.common.data.GTBlocks;
-import com.gregtechceu.gtceu.common.data.GTItems;
-import com.gregtechceu.gtceu.common.data.GTMachines;
-import com.gregtechceu.gtceu.common.data.GTMaterials;
+import com.gregtechceu.gtceu.common.data.*;
 import com.gregtechceu.gtceu.common.data.machines.GTAEMachines;
 import com.gregtechceu.gtceu.common.data.machines.GTMultiMachines;
 import com.gregtechceu.gtceu.common.data.machines.GTResearchMachines;
@@ -21,6 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.Tags;
 
+import appeng.core.definitions.AEBlocks;
+import appeng.core.definitions.AEItems;
 import com.hepdd.gtmthings.GTMThings;
 import com.tterrag.registrate.util.entry.ItemEntry;
 
@@ -37,6 +36,25 @@ import static com.hepdd.gtmthings.data.CustomItems.WIRELESS_ENERGY_BINDING_TOOL;
 public class GTMTRecipe {
 
     public static void init(Consumer<FinishedRecipe> provider) {
+        GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("virtual_item_provider"))
+                .inputItems(GTItems.PROGRAMMED_CIRCUIT.asStack())
+                .inputItems(new ItemStack(AEBlocks.QUARTZ_VIBRANT_GLASS.block().asItem()))
+                .inputItems(TagPrefix.foil, GTMaterials.PolyvinylChloride, 8)
+                .outputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
+                .EUt(480)
+                .duration(200)
+                .save(provider);
+
+        GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("virtual_item_provider_cell"))
+                .inputItems(new ItemStack(AEItems.ITEM_CELL_256K.asItem()))
+                .inputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
+                .inputItems(GTItems.CONVEYOR_MODULE_HV.asStack(2))
+                .inputFluids(GTMaterials.Polyethylene.getFluid(288))
+                .outputItems(CustomItems.VIRTUAL_ITEM_PROVIDER_CELL.asStack())
+                .EUt(480)
+                .duration(800)
+                .save(provider);
+
         ASSEMBLER_RECIPES.recipeBuilder("cover_maintenance_detector")
                 .inputItems(GTItems.EMITTER_LV)
                 .inputItems(TagPrefix.plate, GTMaterials.Steel)
@@ -380,7 +398,28 @@ public class GTMTRecipe {
                     .save(provider);
         }
 
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("programmablec_hatch_" + GTValues.VN[GTValues.MAX].toLowerCase() + "_4a"))
+                .inputItems(GTMachines.DUAL_IMPORT_HATCH[GTValues.MAX].asStack())
+                .inputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
+                .inputItems(CustomTags.CIRCUITS_ARRAY[GTValues.MAX], 4)
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                .outputItems(CustomMachines.PROGRAMMABLEC_HATCH[GTValues.MAX].asStack())
+                .duration(400)
+                .EUt(GTValues.VA[GTValues.MAX])
+                .save(provider);
+
         for (int tier : GTValues.tiersBetween(GTValues.EV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV)) {
+            if (tier > GTValues.IV) {
+                ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("programmablec_hatch_" + GTValues.VN[tier].toLowerCase() + "_4a"))
+                        .inputItems(GTMachines.DUAL_IMPORT_HATCH[tier].asStack())
+                        .inputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
+                        .inputItems(CustomTags.CIRCUITS_ARRAY[tier], 4)
+                        .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                        .outputItems(CustomMachines.PROGRAMMABLEC_HATCH[tier].asStack())
+                        .duration(400)
+                        .EUt(GTValues.VA[tier])
+                        .save(provider);
+            }
             ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("wireless_energy_input_hatch_" + GTValues.VN[tier].toLowerCase() + "_4a"))
                     .inputItems(GTMachines.ENERGY_INPUT_HATCH_4A[tier].asStack())
                     .inputItems(WIRELESS_ENERGY_RECEIVE_COVER.get(tier - 1).asStack(2))
