@@ -27,7 +27,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import lombok.Getter;
@@ -42,7 +41,7 @@ import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WirelessEnergyInterface extends TieredIOPartMachine implements IBindable, IInteractedMachine, IMachineLife, IWirelessEnergyContainerHolder {
+public class WirelessEnergyInterface extends TieredIOPartMachine implements IInteractedMachine, IMachineLife, IWirelessEnergyContainerHolder {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyInterface.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
@@ -106,7 +105,9 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IBin
     private void updateEnergy() {
         var currentStored = energyContainer.getEnergyStored();
         if (currentStored <= 0) return;
-        long changeEnergy = getWirelessEnergyContainer().addEnergy(currentStored, this);
+        WirelessEnergyContainer container = getWirelessEnergyContainer();
+        if (container == null) return;
+        long changeEnergy = container.addEnergy(currentStored, this);
         if (changeEnergy > 0) energyContainer.setEnergyStored(currentStored - changeEnergy);
     }
 
@@ -156,11 +157,6 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IBin
     @Override
     public UUID getUUID() {
         return this.owner_uuid;
-    }
-
-    @Override
-    public void setUUID(UUID uuid) {
-        this.owner_uuid = uuid;
     }
 
     //////////////////////////////////////

@@ -1,7 +1,7 @@
 package com.hepdd.gtmthings.integration.jade;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 
 import com.hepdd.gtmthings.integration.jade.provider.WirelessEnergyHatchProvider;
 import com.hepdd.gtmthings.integration.jade.provider.WirelessOpticalComputationHatchProvider;
@@ -15,13 +15,13 @@ public class GTJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
-        registration.registerBlockDataProvider(new WirelessEnergyHatchProvider(), BlockEntity.class);
-        registration.registerBlockDataProvider(new WirelessOpticalComputationHatchProvider(), BlockEntity.class);
+        registration.registerBlockDataProvider(new WirelessEnergyHatchProvider(), MetaMachineBlockEntity.class);
+        registration.registerBlockDataProvider(new WirelessOpticalComputationHatchProvider(), MetaMachineBlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        registration.registerBlockComponent(new WirelessEnergyHatchProvider(), Block.class);
-        registration.registerBlockComponent(new WirelessOpticalComputationHatchProvider(), Block.class);
+        registration.registerBlockComponent(new WirelessEnergyHatchProvider(), MetaMachineBlock.class);
+        registration.registerBlockComponent(new WirelessOpticalComputationHatchProvider(), MetaMachineBlock.class);
     }
 }

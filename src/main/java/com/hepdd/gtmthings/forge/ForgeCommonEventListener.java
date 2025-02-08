@@ -2,6 +2,7 @@ package com.hepdd.gtmthings.forge;
 
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,23 +19,26 @@ public class ForgeCommonEventListener {
     @SubscribeEvent
     public static void onServerTickEvent(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            WirelessEnergyContainer.observed = false;
             if (event.getServer().getTickCount() % 200 == 0) {
                 WirelessEnergyContainer.GLOBAL_CACHE.values().forEach(container -> {
                     long rate = 0;
                     GlobalPos pos = container.getBindPos();
-                    if (pos != null && event.getServer().getLevel(pos.dimension()) != null) {
+                    if (pos != null) {
                         rate = WirelessEnergyBindingToolBehavior.getRate(event.getServer().getLevel(pos.dimension()), pos.pos());
                     }
                     container.setRate(rate);
                 });
             }
+        } else {
+            WirelessEnergyContainer.observed = false;
         }
     }
 
     @SubscribeEvent
     public static void serverSetup(LevelEvent.Load event) {
-        if (event.getLevel() instanceof ServerLevel serverLevel) {
+        if (event.getLevel() instanceof ServerLevel level) {
+            ServerLevel serverLevel = level.getServer().getLevel(Level.OVERWORLD);
+            if (serverLevel == null) return;
             WirelessEnergySavaedData.INSTANCE = WirelessEnergySavaedData.getOrCreate(serverLevel);
         }
     }

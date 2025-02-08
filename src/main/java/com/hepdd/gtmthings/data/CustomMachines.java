@@ -11,6 +11,8 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.client.renderer.machine.MinerRenderer;
+import com.gregtechceu.gtceu.client.renderer.machine.OverlayTieredMachineRenderer;
+import com.gregtechceu.gtceu.common.machine.multiblock.part.DualHatchPartMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.ChatFormatting;
@@ -19,12 +21,15 @@ import net.minecraft.network.chat.Component;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeDualHatchPartMachine;
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.ProgrammableHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng.MEOutputPartMachine;
 
 import java.util.Locale;
 import java.util.function.BiFunction;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
+import static com.gregtechceu.gtceu.api.capability.recipe.IO.IN;
+import static com.gregtechceu.gtceu.common.data.machines.GTMachineUtils.*;
 import static com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine.INV_MULTIPLE;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 import static com.hepdd.gtmthings.data.GTMTRecipeTypes.DIGITAL_MINER_RECIPE;
@@ -111,6 +116,20 @@ public class CustomMachines {
                 return builder.register();
             },
             ALL_TIERS);
+
+    public static final MachineDefinition[] PROGRAMMABLEC_HATCH = registerTieredMachines(
+            "programmablec_hatch", (holder, tier) -> new ProgrammableHatchPartMachine(holder, tier, IN),
+            (tier, builder) -> builder
+                    .langValue("%s Programmablec Hatch".formatted(VNF[tier]))
+                    .rotationState(RotationState.ALL)
+                    .abilities(PartAbility.IMPORT_ITEMS)
+                    .renderer(() -> new OverlayTieredMachineRenderer(tier, GTCEu.id("block/machine/part/dual_hatch.import")))
+                    .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"),
+                            Component.translatable("gtceu.universal.tooltip.item_storage_capacity", (int) Math.pow((tier - 4), 2)),
+                            Component.translatable("gtceu.universal.tooltip.fluid_storage_capacity_mult", (tier - 4), DualHatchPartMachine.getTankCapacity(DualHatchPartMachine.INITIAL_TANK_CAPACITY, tier)),
+                            Component.translatable("gtceu.universal.enabled"))
+                    .register(),
+            DUAL_HATCH_TIERS);
 
     public static MachineDefinition[] registerTieredMachines(String name,
                                                              BiFunction<IMachineBlockEntity, Integer, MetaMachine> factory,

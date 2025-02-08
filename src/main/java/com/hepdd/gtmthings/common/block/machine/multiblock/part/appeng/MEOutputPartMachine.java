@@ -3,18 +3,14 @@ package com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
-import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
-import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.DualHatchPartMachine;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.list.AEListGridWidget;
 import com.gregtechceu.gtceu.integration.ae2.machine.feature.IGridConnectedMachine;
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.GridNodeHolder;
 import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
-import com.gregtechceu.gtceu.utils.GTMath;
 
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -26,24 +22,19 @@ import com.lowdragmc.lowdraglib.utils.Position;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGridNodeListener;
 import appeng.api.networking.IManagedGridNode;
 import appeng.api.networking.security.IActionSource;
-import appeng.api.stacks.AEFluidKey;
-import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
+import com.hepdd.gtmthings.api.machine.trait.InaccessibleInfiniteHandler;
+import com.hepdd.gtmthings.api.machine.trait.InaccessibleInfiniteTank;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
-import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -110,13 +101,13 @@ public class MEOutputPartMachine extends DualHatchPartMachine implements IIntera
     @Override
     protected NotifiableItemStackHandler createInventory(Object... args) {
         this.internalBuffer = new KeyStorage();
-        return new InaccessibleInfiniteHandler(this);
+        return new InaccessibleInfiniteHandler(this, internalBuffer);
     }
 
     @Override
     protected NotifiableFluidTank createTank(int initialCapacity, int slots, Object... args) {
         this.internalTankBuffer = new KeyStorage();
-        return new InaccessibleInfiniteTank(this);
+        return new InaccessibleInfiniteTank(this, internalTankBuffer);
     }
 
     @Override
@@ -166,150 +157,6 @@ public class MEOutputPartMachine extends DualHatchPartMachine implements IIntera
                 }
             }
             this.updateInventorySubscription();
-        }
-    }
-
-    // Item Part
-    private class InaccessibleInfiniteHandler extends NotifiableItemStackHandler {
-
-        public InaccessibleInfiniteHandler(MetaMachine holder) {
-            super(holder, 1, IO.OUT, IO.NONE, ItemStackTransferDelegate::new);
-            internalBuffer.setOnContentsChanged(this::onContentsChanged);
-        }
-    }
-
-    @NoArgsConstructor
-    private class ItemStackTransferDelegate extends CustomItemStackHandler {
-
-        // Necessary for InaccessibleInfiniteHandler
-        public ItemStackTransferDelegate(Integer integer) {
-            super();
-        }
-
-        @Override
-        public int getSlots() {
-            return Short.MAX_VALUE;
-        }
-
-        @Override
-        public int getSlotLimit(int slot) {
-            return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public ItemStack getStackInSlot(int slot) {
-            return ItemStack.EMPTY;
-        }
-
-        @Override
-        public void setStackInSlot(int slot, ItemStack stack) {
-            // NO-OP
-        }
-
-        @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            var key = AEItemKey.of(stack);
-            int count = stack.getCount();
-            long oldValue = internalBuffer.storage.getOrDefault(key, 0);
-            long changeValue = Math.min(Long.MAX_VALUE - oldValue, count);
-            if (changeValue > 0) {
-                if (!simulate) {
-                    internalBuffer.storage.put(key, oldValue + changeValue);
-                    internalBuffer.onChanged();
-                }
-                return stack.copyWithCount((int) (count - changeValue));
-            } else {
-                return ItemStack.EMPTY;
-            }
-        }
-
-        @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return ItemStack.EMPTY;
-        }
-    }
-
-    // Fluid Part
-    private class InaccessibleInfiniteTank extends NotifiableFluidTank {
-
-        CustomFluidTank storage;
-
-        public InaccessibleInfiniteTank(MetaMachine holder) {
-            super(holder, List.of(new FluidStorageDelegate()), IO.OUT, IO.NONE);
-            internalTankBuffer.setOnContentsChanged(this::onContentsChanged);
-            storage = getStorages()[0];
-        }
-
-        @Override
-        public int getTanks() {
-            return 128;
-        }
-
-        @Override
-        public FluidStack getFluidInTank(int tank) {
-            return storage.getFluid();
-        }
-
-        @Override
-        public int getTankCapacity(int tank) {
-            return storage.getCapacity();
-        }
-
-        @Override
-        public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-            return storage.isFluidValid(stack);
-        }
-    }
-
-    private class FluidStorageDelegate extends CustomFluidTank {
-
-        public FluidStorageDelegate() {
-            super(0);
-        }
-
-        @Override
-        public int getCapacity() {
-            return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public void setFluid(FluidStack fluid) {
-            // NO-OP
-        }
-
-        @Override
-        public int fill(FluidStack resource, FluidAction action) {
-            var key = AEFluidKey.of(resource.getFluid(), resource.getTag());
-            int amount = resource.getAmount();
-            int oldValue = GTMath.saturatedCast(internalBuffer.storage.getOrDefault(key, 0));
-            int changeValue = Math.min(Integer.MAX_VALUE - oldValue, amount);
-            if (changeValue > 0 && action.execute()) {
-                internalBuffer.storage.put(key, oldValue + changeValue);
-                internalBuffer.onChanged();
-            }
-            return changeValue;
-        }
-
-        @Override
-        public boolean supportsFill(int tank) {
-            return false;
-        }
-
-        @Override
-        public boolean supportsDrain(int tank) {
-            return false;
-        }
-
-        @Override
-        public CustomFluidTank copy() {
-            // because recipe testing uses copy transfer instead of simulated operations
-            return new FluidStorageDelegate() {
-
-                @Override
-                public int fill(FluidStack resource, FluidAction action) {
-                    return super.fill(resource, action);
-                }
-            };
         }
     }
 

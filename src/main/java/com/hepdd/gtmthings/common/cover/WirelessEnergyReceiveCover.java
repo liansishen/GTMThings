@@ -131,12 +131,16 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
             if (machine instanceof BatteryBufferMachine || machine instanceof HullMachine || machine instanceof WirelessEnergyReceiveCoverHolder) {
                 var changeStored = Math.min(energyContainer.getEnergyCapacity() - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
-                long changeenergy = getWirelessEnergyContainer().removeEnergy(changeStored, machine);
+                WirelessEnergyContainer container = getWirelessEnergyContainer();
+                if (container == null) return;
+                long changeenergy = container.removeEnergy(changeStored, machine);
                 if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, changeenergy / this.amperage, this.amperage);
             } else {
                 var changeStored = Math.min(this.machineMaxEnergy - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
-                long changeenergy = getWirelessEnergyContainer().removeEnergy(changeStored, machine);
+                WirelessEnergyContainer container = getWirelessEnergyContainer();
+                if (container == null) return;
+                long changeenergy = container.removeEnergy(changeStored, machine);
                 if (changeenergy > 0) energyContainer.addEnergy(changeenergy);
             }
         }
@@ -144,6 +148,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
     }
 
     @Override
+    @Nullable
     public UUID getUUID() {
         return uuid;
     }

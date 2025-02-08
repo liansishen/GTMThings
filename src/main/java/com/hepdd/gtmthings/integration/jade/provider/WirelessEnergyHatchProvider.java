@@ -1,6 +1,7 @@
 package com.hepdd.gtmthings.integration.jade.provider;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.gregtechceu.gtceu.integration.jade.provider.CapabilityBlockProvider;
@@ -19,7 +20,6 @@ import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.api.capability.IBindable;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessEnergyHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessLaserHatchPartMachine;
-import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
@@ -38,47 +38,15 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
 
     @Override
     protected @Nullable IBindable getCapability(Level level, BlockPos pos, @Nullable Direction side) {
-        if (level.getBlockEntity(pos) instanceof MetaMachineBlockEntity metaMachineBlockEntity) {
-            var metaMachine = metaMachineBlockEntity.getMetaMachine();
-            if (metaMachine instanceof WirelessEnergyHatchPartMachine we && we.owner_uuid != null) {
-                UUID uuid = we.owner_uuid;
-                return new IBindable() {
-
-                    @Override
-                    public UUID getUUID() {
-                        return uuid;
-                    }
-
-                    @Override
-                    public void setUUID(UUID uuid1) {}
-                };
-            } else if (metaMachine instanceof WirelessLaserHatchPartMachine wl && wl.owner_uuid != null) {
-                UUID uuid = wl.owner_uuid;
-                return new IBindable() {
-
-                    @Override
-                    public UUID getUUID() {
-                        return uuid;
-                    }
-
-                    @Override
-                    public void setUUID(UUID uuid1) {}
-                };
-            } else if (metaMachine instanceof SimpleTieredMachine simpleTieredMachine) {
-                var covers = simpleTieredMachine.getCoverContainer().getCovers();
+        var metaMachine = MetaMachine.getMachine(level, pos);
+        if (metaMachine != null) {
+            if (metaMachine instanceof IBindable bindable) {
+                return bindable;
+            } else {
+                var covers = metaMachine.getCoverContainer().getCovers();
                 for (var cover : covers) {
-                    if (cover instanceof WirelessEnergyReceiveCover wirelessEnergyReceiveCover) {
-                        UUID uuid = wirelessEnergyReceiveCover.getUUID();
-                        return new IBindable() {
-
-                            @Override
-                            public UUID getUUID() {
-                                return uuid;
-                            }
-
-                            @Override
-                            public void setUUID(UUID uuid1) {}
-                        };
+                    if (cover instanceof IBindable bindable) {
+                        return bindable;
                     }
                 }
             }
