@@ -37,6 +37,7 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
     @Override
     protected void write(CompoundTag data, IGTMTJadeIF capability) {
         if (capability == null) return;
+        data.putBoolean("isGTMTJadeIF", true);
         data.putBoolean("isTransmitter", capability.isTransmitter());
         data.putBoolean("isBinded", capability.isbinded());
         data.putString("pos", capability.getBindPos());
@@ -44,17 +45,18 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
 
     @Override
     protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block, BlockEntity blockEntity, IPluginConfig config) {
+        if (!capData.getBoolean("isGTMTJadeIF")) return;
         if (capData.getBoolean("isBinded")) {
             if (capData.getBoolean("isTransmitter")) {
-                tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.bind", capData.getString("pos")));
+                tooltip.add(Component.translatable("gtmthings.transmitter_hatch.bind", capData.getString("pos")));
             } else {
-                tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.bind", capData.getString("pos")));
+                tooltip.add(Component.translatable("gtmthings.machine.receiver_hatch.bind", capData.getString("pos")));
             }
         } else {
             if (capData.getBoolean("isTransmitter")) {
-                tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.unbind"));
+                tooltip.add(Component.translatable("gtmthings.machine.transmitter_hatch.unbind"));
             } else {
-                tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.unbind"));
+                tooltip.add(Component.translatable("gtmthings.machine.receiver_hatch.unbind"));
             }
         }
     }

@@ -52,6 +52,7 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
     @Override
     protected void write(CompoundTag data, IBindable capability) {
         if (capability.getUUID() != null) {
+            data.putBoolean("isBindable", true);
             data.putUUID("uuid", capability.getUUID());
             data.putBoolean("cover", capability.cover());
         }
@@ -59,6 +60,7 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
 
     @Override
     protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block, BlockEntity blockEntity, IPluginConfig config) {
+        if (!capData.getBoolean("isBindable")) return;
         boolean cover = capData.getBoolean("cover");
         if (!capData.hasUUID("uuid")) {
             if (cover) {
