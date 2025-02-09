@@ -1,9 +1,6 @@
 package com.hepdd.gtmthings.integration.jade.provider;
 
-import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
-import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.gregtechceu.gtceu.integration.jade.provider.CapabilityBlockProvider;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -18,8 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.api.capability.IBindable;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessEnergyHatchPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessLaserHatchPartMachine;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
@@ -40,12 +35,12 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
     protected @Nullable IBindable getCapability(Level level, BlockPos pos, @Nullable Direction side) {
         var metaMachine = MetaMachine.getMachine(level, pos);
         if (metaMachine != null) {
-            if (metaMachine instanceof IBindable bindable) {
+            if (metaMachine instanceof IBindable bindable && bindable.display()) {
                 return bindable;
             } else {
                 var covers = metaMachine.getCoverContainer().getCovers();
                 for (var cover : covers) {
-                    if (cover instanceof IBindable bindable) {
+                    if (cover instanceof IBindable bindable && bindable.display()) {
                         return bindable;
                     }
                 }
@@ -58,43 +53,32 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
     protected void write(CompoundTag data, IBindable capability) {
         if (capability.getUUID() != null) {
             data.putUUID("uuid", capability.getUUID());
+            data.putBoolean("cover", capability.cover());
         }
     }
 
     @Override
-    protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block,
-                              BlockEntity blockEntity, IPluginConfig config) {
-        int machineType;
-        if (!(blockEntity instanceof MetaMachineBlockEntity metaMachineBlockEntity)) return;
-        var metaMachine = metaMachineBlockEntity.getMetaMachine();
-        if (metaMachine instanceof WirelessEnergyHatchPartMachine || metaMachine instanceof WirelessLaserHatchPartMachine) {
-            machineType = 1;
-        } else if (metaMachine instanceof SimpleTieredMachine || metaMachine instanceof BatteryBufferMachine) {
-            if (!capData.hasUUID("uuid")) return;
-            machineType = 2;
-        } else {
-            return;
-        }
-
+    protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block, BlockEntity blockEntity, IPluginConfig config) {
+        boolean cover = capData.getBoolean("cover");
         if (!capData.hasUUID("uuid")) {
-            if (machineType == 1) {
-                tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.1"));
-            } else {
+            if (cover) {
                 tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_cover.tooltip.1"));
+            } else {
+                tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.1"));
             }
         } else {
             UUID uuid = capData.getUUID("uuid");
             if (hasOwner(block.getLevel(), uuid)) {
-                if (machineType == 1) {
-                    tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.2", GetName(block.getLevel(), uuid)));
-                } else {
+                if (cover) {
                     tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_cover.tooltip.2", GetName(block.getLevel(), uuid)));
+                } else {
+                    tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.2", GetName(block.getLevel(), uuid)));
                 }
             } else {
-                if (machineType == 1) {
-                    tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.3", uuid));
-                } else {
+                if (cover) {
                     tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_cover.tooltip.3", uuid));
+                } else {
+                    tooltip.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.3", uuid));
                 }
             }
         }

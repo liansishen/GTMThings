@@ -153,6 +153,11 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
         return uuid;
     }
 
+    @Override
+    public boolean cover() {
+        return true;
+    }
+
     @Nullable
     private MetaMachine getMachine() {
         return MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
