@@ -208,4 +208,9 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
         this.beforeEnergy = now;
         return new BigDecimal(changed).divide(BigDecimal.valueOf(10), RoundingMode.HALF_UP);
     }
+
+    @Override
+    public boolean display() {
+        return false;
+    }
 }

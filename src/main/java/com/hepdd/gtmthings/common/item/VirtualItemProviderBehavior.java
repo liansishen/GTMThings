@@ -136,7 +136,8 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
 
         @Override
         public @NotNull ItemStack extractItem(int i, int j, boolean bl) {
-            return ItemStack.EMPTY;
+            if (getItem().getOrCreateTag().getBoolean("marked")) return ItemStack.EMPTY;
+            return getStackInSlot(0);
         }
 
         @Override

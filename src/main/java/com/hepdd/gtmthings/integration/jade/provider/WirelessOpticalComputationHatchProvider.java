@@ -1,6 +1,6 @@
 package com.hepdd.gtmthings.integration.jade.provider;
 
-import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.integration.jade.provider.CapabilityBlockProvider;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.api.capability.IGTMTJadeIF;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
@@ -29,8 +28,7 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
 
     @Override
     protected @Nullable IGTMTJadeIF getCapability(Level level, BlockPos pos, @Nullable Direction side) {
-        if (level.getBlockEntity(pos) instanceof MetaMachineBlockEntity metaMachineBlockEntity &&
-                metaMachineBlockEntity.getMetaMachine() instanceof IGTMTJadeIF jadeIF) {
+        if (MetaMachine.getMachine(level, pos) instanceof IGTMTJadeIF jadeIF) {
             return jadeIF;
         }
         return null;
@@ -38,32 +36,27 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
 
     @Override
     protected void write(CompoundTag data, IGTMTJadeIF capability) {
-        if (capability != null) {
-            data.putBoolean("isBinded", capability.isbinded());
-            data.putString("pos", capability.getBindPos());
-        } else {
-            data.putBoolean("isBinded", false);
-            data.putString("pos", "");
-        }
+        if (capability == null) return;
+        data.putBoolean("isGTMTJadeIF", true);
+        data.putBoolean("isTransmitter", capability.isTransmitter());
+        data.putBoolean("isBinded", capability.isbinded());
+        data.putString("pos", capability.getBindPos());
     }
 
     @Override
     protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block, BlockEntity blockEntity, IPluginConfig config) {
-        if (!(blockEntity instanceof MetaMachineBlockEntity metaMachineBlockEntity)) return;
-        var metaMachine = metaMachineBlockEntity.getMetaMachine();
-        if (metaMachine instanceof WirelessOpticalComputationHatchMachine woc) {
-            if (capData.getBoolean("isBinded")) {
-                if (woc.isTransmitter()) {
-                    tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.bind", capData.getString("pos")));
-                } else {
-                    tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.bind", capData.getString("pos")));
-                }
+        if (!capData.getBoolean("isGTMTJadeIF")) return;
+        if (capData.getBoolean("isBinded")) {
+            if (capData.getBoolean("isTransmitter")) {
+                tooltip.add(Component.translatable("gtmthings.transmitter_hatch.bind", capData.getString("pos")));
             } else {
-                if (woc.isTransmitter()) {
-                    tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.unbind"));
-                } else {
-                    tooltip.add(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.unbind"));
-                }
+                tooltip.add(Component.translatable("gtmthings.machine.receiver_hatch.bind", capData.getString("pos")));
+            }
+        } else {
+            if (capData.getBoolean("isTransmitter")) {
+                tooltip.add(Component.translatable("gtmthings.machine.transmitter_hatch.unbind"));
+            } else {
+                tooltip.add(Component.translatable("gtmthings.machine.receiver_hatch.unbind"));
             }
         }
     }
