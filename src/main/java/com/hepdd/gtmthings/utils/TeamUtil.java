@@ -9,7 +9,7 @@ import net.minecraft.world.level.Level;
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.api.Team;
 
-import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 public class TeamUtil {
@@ -25,24 +25,22 @@ public class TeamUtil {
 
     public static Component GetName(Player player) {
         if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
-            return FTBTeamsAPI.api().getManager().getTeamForPlayerID(player.getUUID()).get().getName();
-        } else {
-            return player.getName();
+            Optional<Team> team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(player.getUUID());
+            if (team.isPresent()) return team.get().getName();
         }
+        return player.getName();
     }
 
     public static Component GetName(Level level, UUID playerUUID) {
         if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
-            Component name;
             var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
             if (team.isPresent()) {
                 return team.get().getName();
-            } else {
-                return Objects.requireNonNull(level.getPlayerByUUID(playerUUID)).getName();
             }
-        } else {
-            return Objects.requireNonNull(level.getPlayerByUUID(playerUUID)).getName();
         }
+        Player player = level.getPlayerByUUID(playerUUID);
+        if (player != null) return player.getName();
+        return Component.literal(playerUUID.toString());
     }
 
     public static boolean hasOwner(Level level, UUID playerUUID) {
