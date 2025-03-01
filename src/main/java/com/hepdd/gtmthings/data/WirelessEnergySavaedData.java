@@ -15,6 +15,8 @@ import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,20 +28,22 @@ public class WirelessEnergySavaedData extends SavedData {
         return serverLevel.getDataStorage().computeIfAbsent(WirelessEnergySavaedData::new, WirelessEnergySavaedData::new, "gtceu_wireless_energy");
     }
 
+    public final Map<UUID, WirelessEnergyContainer> containerMap = new HashMap<>();
+
     public WirelessEnergySavaedData() {}
 
     public WirelessEnergySavaedData(CompoundTag tag) {
         ListTag allEnergy = tag.getList("allEnergy", Tag.TAG_COMPOUND);
         for (int i = 0; i < allEnergy.size(); i++) {
             WirelessEnergyContainer container = readTag(allEnergy.getCompound(i));
-            WirelessEnergyContainer.GLOBAL_CACHE.put(container.getUuid(), container);
+            containerMap.put(container.getUuid(), container);
         }
     }
 
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag compoundTag) {
         ListTag allEnergy = new ListTag();
-        for (WirelessEnergyContainer container : WirelessEnergyContainer.GLOBAL_CACHE.values()) {
+        for (WirelessEnergyContainer container : containerMap.values()) {
             CompoundTag engTag = toTag(container);
             if (engTag.isEmpty()) continue;
             allEnergy.add(engTag);

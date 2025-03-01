@@ -20,7 +20,7 @@ public class ForgeCommonEventListener {
     public static void onServerTickEvent(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             if (event.getServer().getTickCount() % 200 == 0) {
-                WirelessEnergyContainer.GLOBAL_CACHE.values().forEach(container -> {
+                WirelessEnergySavaedData.INSTANCE.containerMap.values().forEach(container -> {
                     long rate = 0;
                     GlobalPos pos = container.getBindPos();
                     if (pos != null) {

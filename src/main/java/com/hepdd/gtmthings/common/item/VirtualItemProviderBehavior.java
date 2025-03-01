@@ -131,12 +131,13 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
         public @NotNull ItemStack insertItem(int i, @NotNull ItemStack arg, boolean bl) {
             if (arg.is(CustomItems.VIRTUAL_ITEM_PROVIDER.get())) return arg;
             entityPlayer.setItemInHand(hand, setVirtualItem(getItem(), arg.copyWithCount(1)));
-            return ItemStack.EMPTY;
+            return arg.copyWithCount(arg.getCount() - 1);
         }
 
         @Override
         public @NotNull ItemStack extractItem(int i, int j, boolean bl) {
             if (getItem().getOrCreateTag().getBoolean("marked")) return ItemStack.EMPTY;
+            setVirtualItem(getItem(), ItemStack.EMPTY);
             return getStackInSlot(0);
         }
 
