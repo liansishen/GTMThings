@@ -11,7 +11,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -22,10 +21,8 @@ public class WirelessEnergyContainer {
 
     public static final WeakHashMap<MetaMachine, ITransferData> TRANSFER_DATA = new WeakHashMap<>();
 
-    public static final HashMap<UUID, WirelessEnergyContainer> GLOBAL_CACHE = new HashMap<>();
-
     public static WirelessEnergyContainer getOrCreateContainer(UUID uuid) {
-        return GLOBAL_CACHE.computeIfAbsent(TeamUtil.getTeamUUID(uuid), WirelessEnergyContainer::new);
+        return WirelessEnergySavaedData.INSTANCE.containerMap.computeIfAbsent(TeamUtil.getTeamUUID(uuid), WirelessEnergyContainer::new);
     }
 
     private BigInteger storage;
