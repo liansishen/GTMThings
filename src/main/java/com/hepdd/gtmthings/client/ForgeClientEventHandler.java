@@ -46,7 +46,7 @@ public class ForgeClientEventHandler {
         }
     }
 
-    public static void highlightBlock(Camera camera, PoseStack poseStack, BlockPos... poses) {
+    private static void highlightBlock(Camera camera, PoseStack poseStack, BlockPos... poses) {
         Vec3 pos = camera.getPosition();
         poseStack.pushPose();
         poseStack.translate(-pos.x, -pos.y, -pos.z);

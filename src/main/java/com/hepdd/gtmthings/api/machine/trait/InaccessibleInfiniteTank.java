@@ -52,7 +52,7 @@ public class InaccessibleInfiniteTank extends NotifiableFluidTank {
             storage.internalBuffer.onChanged();
             return null;
         }
-        return super.handleRecipe(io, recipe, left, slotName, simulate);
+        return null;
     }
 
     @Override

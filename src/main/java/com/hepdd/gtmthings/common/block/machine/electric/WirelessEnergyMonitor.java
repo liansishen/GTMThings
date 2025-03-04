@@ -17,8 +17,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
@@ -128,11 +126,13 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
             Component voltageName = Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
             BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.VEX[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]), 1, RoundingMode.FLOOR);
 
-            if (avgEnergy.compareTo(BigDecimal.valueOf(0)) >= 0) {
+            int compare = avgEnergy.compareTo(BigDecimal.valueOf(0));
+            if (compare > 0) {
                 textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
                         FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
-                textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_fill", Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.time_to_fill")).withStyle(ChatFormatting.GRAY));
-            } else {
+                textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_fill",
+                        container.getCapacity() == null ? Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.time_to_fill") : getTimeToFillDrainText((container.getCapacity().subtract(energyTotal)).divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
+            } else if (compare < 0) {
                 textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
                         FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
                 textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
@@ -152,20 +152,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
             for (Map.Entry<MetaMachine, ITransferData> m : sortedEntries) {
                 UUID uuid = m.getValue().UUID();
                 if (all || uuid.equals(TeamUtil.getTeamUUID(this.UUID))) {
-                    MetaMachine machine = m.getKey();
-                    long eut = m.getValue().Throughput();
-                    String pos = machine.getPos().toShortString();
-                    if (eut > 0) {
-                        textListCache.add(Component.translatable(machine.getBlockState().getBlock().getDescriptionId())
-                                .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", machine.getLevel().dimension().location()).append(" [").append(pos).append("] ").append(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), uuid))))))
-                                .append(" +").append(FormattingUtil.formatNumbers(eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(eut)]).append(")")
-                                .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
-                    } else {
-                        textListCache.add(Component.translatable(machine.getBlockState().getBlock().getDescriptionId())
-                                .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("recipe.condition.dimension.tooltip", machine.getLevel().dimension().location()).append(" [").append(pos).append("] ").append(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), uuid))))))
-                                .append(" -").append(FormattingUtil.formatNumbers(-eut)).append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(-eut)]).append(")")
-                                .append(ComponentPanelWidget.withButton(Component.literal(" [ ] "), pos)));
-                    }
+                    textListCache.add(m.getValue().getInfo());
                 }
             }
         }
