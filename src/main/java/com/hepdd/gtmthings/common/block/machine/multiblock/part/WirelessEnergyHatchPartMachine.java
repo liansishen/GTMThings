@@ -52,6 +52,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         return MANAGED_FIELD_HOLDER;
     }
 
+    @Nullable
     @Getter
     @Setter
     private WirelessEnergyContainer WirelessEnergyContainerCache;
@@ -144,13 +145,13 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     @Override
     public InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (isRemote()) return InteractionResult.PASS;
         ItemStack is = player.getItemInHand(hand);
         if (is.isEmpty()) return InteractionResult.PASS;
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
             this.owner_uuid = player.getUUID();
-            if (getLevel().isClientSide()) {
-                player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind", GetName(player)));
-            }
+            setWirelessEnergyContainerCache(null);
+            player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind", GetName(player)));
             updateEnergySubscription();
             return InteractionResult.SUCCESS;
         } else if (is.is(Items.STICK)) {
@@ -162,13 +163,13 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     @Override
     public boolean onLeftClick(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction) {
+        if (isRemote()) return false;
         ItemStack is = player.getItemInHand(hand);
         if (is.isEmpty()) return false;
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
             this.owner_uuid = null;
-            if (getLevel().isClientSide()) {
-                player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.unbind"));
-            }
+            setWirelessEnergyContainerCache(null);
+            player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.unbind"));
             updateEnergySubscription();
             return true;
         }
