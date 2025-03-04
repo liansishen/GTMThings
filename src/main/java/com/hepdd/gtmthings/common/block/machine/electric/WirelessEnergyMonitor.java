@@ -126,12 +126,13 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
             Component voltageName = Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
             BigDecimal voltageAmperage = avgEnergy.abs().divide(BigDecimal.valueOf(GTValues.VEX[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]), 1, RoundingMode.FLOOR);
 
-            if (avgEnergy.compareTo(BigDecimal.valueOf(0)) >= 0) {
+            int compare = avgEnergy.compareTo(BigDecimal.valueOf(0));
+            if (compare > 0) {
                 textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.input",
                         FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
                 textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_fill",
                         container.getCapacity() == null ? Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.time_to_fill") : getTimeToFillDrainText((container.getCapacity().subtract(energyTotal)).divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
-            } else {
+            } else if (compare < 0) {
                 textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.output",
                         FormattingUtil.formatNumbers(avgEnergy.abs()), voltageAmperage, voltageName).withStyle(ChatFormatting.GRAY));
                 textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
