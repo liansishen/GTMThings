@@ -5,10 +5,13 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.PhantomFluidWidget;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -22,6 +25,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -66,7 +70,7 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
     }
 
     protected NotifiableFluidTank createTank() {
-        return new NotifiableFluidTank(this, SLOT_COUNT, Integer.MAX_VALUE, IO.IN);
+        return new InfinityFluidTank(this, SLOT_COUNT, Integer.MAX_VALUE, IO.IN);
     }
 
     @Override
@@ -197,5 +201,17 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
     @Override
     public void setDistinct(boolean isDistinct) {
         this.tank.setDistinct(isDistinct);
+    }
+
+    private static class InfinityFluidTank extends NotifiableFluidTank {
+
+        public InfinityFluidTank(MetaMachine machine, int slots, int capacity, IO io) {
+            super(machine, slots, capacity, io);
+        }
+
+        @Override
+        public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left, @Nullable String slotName, boolean simulate) {
+            return super.handleRecipeInner(io, recipe, left, slotName, true);
+        }
     }
 }
