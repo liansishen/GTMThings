@@ -4,10 +4,12 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -25,6 +27,7 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
@@ -76,7 +79,7 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     protected NotifiableEnergyContainer createEnergyContainer() {
         NotifiableEnergyContainer container;
         this.maxEnergy = GTValues.VEX[tier] * 16L * amps;
-        container = NotifiableEnergyContainer.receiverContainer(this, this.maxEnergy, GTValues.VEX[tier], amps);
+        container = new InfinityEnergyContainer(this, this.maxEnergy, GTValues.VEX[tier], amps, 0L, 0L);
         return container;
     }
 
@@ -166,5 +169,38 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
                     String.format("%d/%d EU", energyContainer.getEnergyStored(), energyContainer.getEnergyCapacity())));
         }
         return new ArrayList<>();
+    }
+
+    private static class InfinityEnergyContainer extends NotifiableEnergyContainer {
+
+        public InfinityEnergyContainer(MetaMachine machine, long maxCapacity, long maxInputVoltage, long maxInputAmperage, long maxOutputVoltage, long maxOutputAmperage) {
+            super(machine, maxCapacity, maxInputVoltage, maxInputAmperage, maxOutputVoltage, maxOutputAmperage);
+        }
+
+        @Override
+        public List<Long> handleRecipeInner(IO io, GTRecipe recipe, List<Long> left, @Nullable String slotName, boolean simulate) {
+            return super.handleRecipeInner(io, recipe, left, slotName, true);
+        }
+
+        @Override
+        public void checkOutputSubscription() {}
+
+        @Override
+        public void serverTick() {}
+
+        @Override
+        public long acceptEnergyFromNetwork(Direction side, long voltage, long amperage) {
+            return 0;
+        }
+
+        @Override
+        public boolean outputsEnergy(Direction side) {
+            return false;
+        }
+
+        @Override
+        public boolean inputsEnergy(Direction side) {
+            return false;
+        }
     }
 }

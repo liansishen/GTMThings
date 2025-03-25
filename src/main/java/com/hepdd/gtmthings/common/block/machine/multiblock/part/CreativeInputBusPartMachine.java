@@ -5,12 +5,15 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.ItemHandlerProxyRecipeTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
 
 import com.lowdragmc.lowdraglib.gui.widget.PhantomSlotWidget;
@@ -28,6 +31,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import com.hepdd.gtmthings.api.misc.UnlimitedItemStackTransfer;
 import lombok.Getter;
@@ -35,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -91,17 +96,7 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     }
 
     protected NotifiableItemStackHandler createInventory() {
-        return new NotifiableItemStackHandler(this, getInventorySize(), io, io, UnlimitedItemStackTransfer::new) {
-
-            @Override
-            public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-                var extracted = super.extractItem(slot, amount, simulate).copy();
-                if (!extracted.isEmpty()) {
-                    extracted.setCount(Integer.MAX_VALUE);
-                }
-                return extracted;
-            }
-        };
+        return new InfinityItemStackHandler(this, getInventorySize(), io, io, UnlimitedItemStackTransfer::new);
     }
 
     protected NotifiableItemStackHandler createCircuitItemHandler() {
@@ -292,5 +287,17 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
         group.addWidget(container);
 
         return group;
+    }
+
+    private static class InfinityItemStackHandler extends NotifiableItemStackHandler {
+
+        public InfinityItemStackHandler(MetaMachine machine, int slots, @NotNull IO handlerIO, @NotNull IO capabilityIO, Function<Integer, CustomItemStackHandler> storageFactory) {
+            super(machine, slots, handlerIO, capabilityIO, storageFactory);
+        }
+
+        @Override
+        public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left, @Nullable String slotName, boolean simulate) {
+            return super.handleRecipeInner(io, recipe, left, slotName, true);
+        }
     }
 }
