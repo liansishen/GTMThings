@@ -14,7 +14,6 @@ import net.minecraftforge.fluids.FluidStack;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class CatalystFluidStackHandler extends NotifiableFluidTank {
     }
 
     @Override
-    public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left, @Nullable String slotName, boolean simulate) {
+    public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left, boolean simulate) {
         Object2IntMap<FluidStack> map = new Object2IntOpenCustomHashMap<>(FluidStackHashStrategy.comparingAllButAmount());
         CustomFluidTank[] storages = getStorages();
         for (CustomFluidTank storage : storages) {
@@ -42,6 +41,6 @@ public class CatalystFluidStackHandler extends NotifiableFluidTank {
             }
         }
 
-        return super.handleRecipeInner(io, recipe, left, slotName, simulate);
+        return super.handleRecipeInner(io, recipe, left, simulate);
     }
 }

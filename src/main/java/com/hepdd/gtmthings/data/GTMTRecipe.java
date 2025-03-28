@@ -2,7 +2,7 @@ package com.hepdd.gtmthings.data;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.data.chemical.material.stack.UnificationEntry;
+import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
@@ -651,11 +651,11 @@ public class GTMTRecipe {
 
         VanillaRecipeHelper.addShapedRecipe(provider, true, GTMThings.id("advanced_terminal"), ADVANCED_TERMINAL.asStack(),
                 "SGS", "PBP", "PWP",
-                'S', new UnificationEntry(screw, Steel),
+                'S', new MaterialEntry(screw, Steel),
                 'G', Tags.Items.GLASS_PANES,
                 'B', new ItemStack(Items.BOOK),
-                'P', new UnificationEntry(plate, Steel),
-                'W', new UnificationEntry(wireGtSingle, Tin));
+                'P', new MaterialEntry(plate, Steel),
+                'W', new MaterialEntry(wireGtSingle, Tin));
 
         VanillaRecipeHelper.addShapedRecipe(provider, true, GTMThings.id("wireless_energy_binding_tool"), WIRELESS_ENERGY_BINDING_TOOL.asStack(),
                 "A", 'A', Items.PAPER);

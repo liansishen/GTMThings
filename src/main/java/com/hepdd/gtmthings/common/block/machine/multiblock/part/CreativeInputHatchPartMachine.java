@@ -210,8 +210,8 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
         }
 
         @Override
-        public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left, @Nullable String slotName, boolean simulate) {
-            return super.handleRecipeInner(io, recipe, left, slotName, true);
+        public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left, boolean simulate) {
+            return super.handleRecipeInner(io, recipe, left, true);
         }
     }
 }
