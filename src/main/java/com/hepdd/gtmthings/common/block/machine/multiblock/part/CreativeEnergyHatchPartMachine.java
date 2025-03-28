@@ -178,8 +178,8 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
         }
 
         @Override
-        public List<Long> handleRecipeInner(IO io, GTRecipe recipe, List<Long> left, @Nullable String slotName, boolean simulate) {
-            return super.handleRecipeInner(io, recipe, left, slotName, true);
+        public List<Long> handleRecipeInner(IO io, GTRecipe recipe, List<Long> left, boolean simulate) {
+            return super.handleRecipeInner(io, recipe, left, true);
         }
 
         @Override
