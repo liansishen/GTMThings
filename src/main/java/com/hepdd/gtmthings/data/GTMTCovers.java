@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.data;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
@@ -9,6 +10,7 @@ import com.gregtechceu.gtceu.client.renderer.cover.SimpleCoverRenderer;
 
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.cover.AdvancedWirelessTransferCover;
+import com.hepdd.gtmthings.common.cover.ProgrammableCover;
 import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
 import com.hepdd.gtmthings.common.cover.WirelessTransferCover;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
@@ -18,13 +20,16 @@ import java.util.Locale;
 
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 
-public class WirelessCovers {
+public class GTMTCovers {
 
     static {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.WIRELESS_TAB);
     }
     public static final int[] ALL_TIERS = GTValues.tiersBetween(GTValues.LV,
             GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV);
+
+    public final static CoverDefinition PROGRAMMABLE_COVER = register("programmable_cover",
+            ProgrammableCover::new, new SimpleCoverRenderer(GTCEu.id("item/programmed_circuit/1")));
 
     public final static CoverDefinition[] WIRELESS_ENERGY_RECEIVE = registerTieredWirelessCover(
             "wireless_energy_receive", 1, ALL_TIERS);

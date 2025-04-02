@@ -40,10 +40,14 @@ public class CustomItems {
 
     public static final ItemEntry<VirtualItemProviderCellItem> VIRTUAL_ITEM_PROVIDER_CELL = GTMTHINGS_REGISTRATE.item("virtual_item_provider_cell", VirtualItemProviderCellItem::new).register();
 
+    public static final ItemEntry<ComponentItem> PROGRAMMABLE_COVER = GTMTHINGS_REGISTRATE.item("programmable_cover", ComponentItem::create)
+            .onRegister(attach(new CoverPlaceBehavior(GTMTCovers.PROGRAMMABLE_COVER)))
+            .register();
+
     public static ItemEntry<ComponentItem> WIRELESS_ITEM_TRANSFER_COVER = GTMTHINGS_REGISTRATE
             .item("wireless_item_transfer_cover", ComponentItem::create)
-            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(WirelessCovers.WIRELESS_ITEM_TRANSFER),
-                    new CoverPlaceBehavior(WirelessCovers.WIRELESS_ITEM_TRANSFER),
+            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(GTMTCovers.WIRELESS_ITEM_TRANSFER),
+                    new CoverPlaceBehavior(GTMTCovers.WIRELESS_ITEM_TRANSFER),
                     new WirelessTransferCoverTooltipBehavior(lines -> {
                         lines.add(Component.translatable("item.gtmthings.wireless_transfer.item.tooltip.1"));
                         lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
@@ -52,8 +56,8 @@ public class CustomItems {
 
     public static ItemEntry<ComponentItem> WIRELESS_FLUID_TRANSFER_COVER = GTMTHINGS_REGISTRATE
             .item("wireless_fluid_transfer_cover", ComponentItem::create)
-            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(WirelessCovers.WIRELESS_FLUID_TRANSFER),
-                    new CoverPlaceBehavior(WirelessCovers.WIRELESS_FLUID_TRANSFER),
+            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(GTMTCovers.WIRELESS_FLUID_TRANSFER),
+                    new CoverPlaceBehavior(GTMTCovers.WIRELESS_FLUID_TRANSFER),
                     new WirelessTransferCoverTooltipBehavior(lines -> {
                         lines.add(Component.translatable("item.gtmthings.wireless_transfer.fluid.tooltip.1"));
                         lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
@@ -62,8 +66,8 @@ public class CustomItems {
 
     public static ItemEntry<ComponentItem> ADVANCED_WIRELESS_ITEM_TRANSFER_COVER = GTMTHINGS_REGISTRATE
             .item("advanced_wireless_item_transfer_cover", ComponentItem::create)
-            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(WirelessCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
-                    new CoverPlaceBehavior(WirelessCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
+            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
+                    new CoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
                     new WirelessTransferCoverTooltipBehavior(lines -> {
                         lines.add(Component.translatable("item.gtmthings.wireless_transfer.item.tooltip.1"));
                         lines.add(Component.translatable("item.gtmthings.advanced_wireless_transfer.tooltip.1"));
@@ -73,8 +77,8 @@ public class CustomItems {
 
     public static ItemEntry<ComponentItem> ADVANCED_WIRELESS_FLUID_TRANSFER_COVER = GTMTHINGS_REGISTRATE
             .item("advanced_wireless_fluid_transfer_cover", ComponentItem::create)
-            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(WirelessCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
-                    new CoverPlaceBehavior(WirelessCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
+            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
+                    new CoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
                     new WirelessTransferCoverTooltipBehavior(lines -> {
                         lines.add(Component.translatable("item.gtmthings.wireless_transfer.fluid.tooltip.1"));
                         lines.add(Component.translatable("item.gtmthings.advanced_wireless_transfer.tooltip.1"));
@@ -128,7 +132,7 @@ public class CustomItems {
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.1"));
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.2"));
                     lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3", GTValues.VEX[tier] * amperage));
-                }), new CoverPlaceBehavior(amperage == 1 ? WirelessCovers.WIRELESS_ENERGY_RECEIVE[tier - 1] : WirelessCovers.WIRELESS_ENERGY_RECEIVE_4A[tier - 1]))).register();
+                }), new CoverPlaceBehavior(amperage == 1 ? GTMTCovers.WIRELESS_ENERGY_RECEIVE[tier - 1] : GTMTCovers.WIRELESS_ENERGY_RECEIVE_4A[tier - 1]))).register();
     }
 
     public static ItemEntry<ComponentItem> ADVANCED_TERMINAL = GTMTHINGS_REGISTRATE

@@ -649,6 +649,16 @@ public class GTMTRecipe {
                 .EUt(GTValues.VA[GTValues.LV])
                 .save(provider);
 
+        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("programmable_cover"))
+                .inputItems(GTItems.ROBOT_ARM_LV.asStack(2))
+                .inputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
+                .inputItems(CustomTags.MV_CIRCUITS, 2)
+                .outputItems(CustomItems.PROGRAMMABLE_COVER)
+                .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                .duration(200)
+                .EUt(GTValues.VA[GTValues.LV])
+                .save(provider);
+
         VanillaRecipeHelper.addShapedRecipe(provider, true, GTMThings.id("advanced_terminal"), ADVANCED_TERMINAL.asStack(),
                 "SGS", "PBP", "PWP",
                 'S', new MaterialEntry(screw, Steel),
