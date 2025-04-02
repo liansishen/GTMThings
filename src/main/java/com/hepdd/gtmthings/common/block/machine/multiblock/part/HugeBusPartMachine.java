@@ -10,7 +10,6 @@ import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigura
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
-import com.gregtechceu.gtceu.api.machine.trait.ItemHandlerProxyRecipeTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.IntCircuitBehaviour;
 
@@ -48,7 +47,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -75,8 +73,6 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
     @Getter
     @Persisted
     protected final CatalystItemStackHandler shareInventory;
-    @Getter
-    protected final ItemHandlerProxyRecipeTrait combinedInventory;
 
     public HugeBusPartMachine(IMachineBlockEntity holder, int tier, IO io, Object... args) {
         this(holder, tier, io, 4, args);
@@ -87,7 +83,6 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         this.inventory = createInventory(args);
         this.circuitInventory = createCircuitItemHandler(io);
         this.shareInventory = new CatalystItemStackHandler(this, shareSize, IO.IN, IO.NONE);
-        this.combinedInventory = createCombinedItemHandler(io);
     }
 
     //////////////////////////////////////
@@ -122,14 +117,6 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         }
     }
 
-    protected ItemHandlerProxyRecipeTrait createCombinedItemHandler(Object... args) {
-        if (args.length > 0 && args[0] instanceof IO io && io == IO.IN) {
-            return new ItemHandlerProxyRecipeTrait(this, Set.of(getInventory(), circuitInventory, shareInventory), IO.IN, IO.NONE);
-        } else {
-            return new ItemHandlerProxyRecipeTrait(this, Set.of(getInventory(), circuitInventory), IO.NONE, IO.NONE);
-        }
-    }
-
     @Override
     public void onLoad() {
         super.onLoad();
@@ -137,8 +124,6 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
             serverLevel.getServer().tell(new TickTask(0, this::updateInventorySubscription));
         }
         inventorySubs = getInventory().addChangedListener(this::updateInventorySubscription);
-
-        combinedInventory.recomputeEnabledState();
     }
 
     @Override
@@ -170,7 +155,6 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         getInventory().setDistinct(isDistinct);
         circuitInventory.setDistinct(isDistinct);
         shareInventory.setDistinct(isDistinct);
-        combinedInventory.setDistinct(isDistinct);
     }
 
     protected void refundAll(ClickData clickData) {
@@ -291,6 +275,6 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
             textList.add(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.3"));
         }
         textList.add(0, Component.translatable("gtmthings.machine.huge_item_bus.tooltip.2", itemCount, getInventorySize())
-                .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));;
+                .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
     }
 }

@@ -15,7 +15,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class CatalystItemStackHandler extends NotifiableItemStackHandler {
     }
 
     @Override
-    public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left, @Nullable String slotName,
+    public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left,
                                               boolean simulate) {
         Object2IntMap<ItemStack> map = new Object2IntOpenCustomHashMap<>(ItemStackHashStrategy.comparingAllButCount());
         for (int i = 0; i < storage.getSlots(); i++) {

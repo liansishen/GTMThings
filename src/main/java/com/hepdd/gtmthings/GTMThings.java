@@ -47,7 +47,7 @@ public class GTMThings {
 
     private void registerCovers(GTCEuAPI.RegisterEvent<ResourceLocation, CoverDefinition> event) {
         CreativeModeTabs.init();
-        WirelessCovers.init();
+        GTMTCovers.init();
         CustomItems.init();
     }
 }
