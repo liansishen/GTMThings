@@ -93,6 +93,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
     public void onRemoved() {
         super.onRemoved();
         machine = null;
+        WirelessEnergyContainerCache = null;
         if (subscription != null) {
             subscription.unsubscribe();
             subscription = null;
@@ -100,12 +101,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
     }
 
     private void updateCoverSub() {
-        if (this.getUUID() != null) {
-            subscription = coverHolder.subscribeServerTick(subscription, this::updateEnergy);
-        } else if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
+        subscription = coverHolder.subscribeServerTick(subscription, this::updateEnergy);
     }
 
     private void updateEnergy() {

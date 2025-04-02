@@ -100,6 +100,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
 
     @Override
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
+        if (isRemote()) return true;
         WirelessEnergyContainer container = getWirelessEnergyContainer();
         if (container != null) this.beforeEnergy = container.getStorage();
         return true;
