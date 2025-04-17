@@ -2,9 +2,9 @@ package com.hepdd.gtmthings.api.misc;
 
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 
-import com.hepdd.gtmthings.config.ConfigHolder;
 import net.minecraft.core.GlobalPos;
 
+import com.hepdd.gtmthings.config.ConfigHolder;
 import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
 import com.hepdd.gtmthings.utils.BigIntegerUtils;
 import com.hepdd.gtmthings.utils.TeamUtil;

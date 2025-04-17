@@ -9,7 +9,6 @@ import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.PowerSubstationMachine;
 
-import com.hepdd.gtmthings.config.ConfigHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
@@ -19,6 +18,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
+import com.hepdd.gtmthings.config.ConfigHolder;
 
 import java.math.BigInteger;
 

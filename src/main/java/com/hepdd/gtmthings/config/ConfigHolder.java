@@ -1,7 +1,6 @@
 package com.hepdd.gtmthings.config;
 
 import com.hepdd.gtmthings.GTMThings;
-
 import dev.toma.configuration.Configuration;
 import dev.toma.configuration.config.Config;
 import dev.toma.configuration.config.Configurable;
@@ -9,6 +8,7 @@ import dev.toma.configuration.config.format.ConfigFormats;
 
 @Config(id = GTMThings.MOD_ID)
 public class ConfigHolder {
+
     public static com.hepdd.gtmthings.config.ConfigHolder INSTANCE;
     private static final Object LOCK = new Object();
 

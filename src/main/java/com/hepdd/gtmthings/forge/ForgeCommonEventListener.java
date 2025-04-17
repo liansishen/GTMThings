@@ -1,6 +1,5 @@
 package com.hepdd.gtmthings.forge;
 
-import com.hepdd.gtmthings.config.ConfigHolder;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -12,6 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior;
+import com.hepdd.gtmthings.config.ConfigHolder;
 import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
 
 @Mod.EventBusSubscriber(modid = GTMThings.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)

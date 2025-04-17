@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import com.hepdd.gtmthings.config.ConfigHolder;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -25,6 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
 import com.hepdd.gtmthings.api.misc.ITransferData;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
+import com.hepdd.gtmthings.config.ConfigHolder;
 import com.hepdd.gtmthings.utils.BigIntegerUtils;
 import com.hepdd.gtmthings.utils.TeamUtil;
 import lombok.Getter;
