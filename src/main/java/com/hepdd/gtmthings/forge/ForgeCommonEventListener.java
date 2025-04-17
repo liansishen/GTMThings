@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.forge;
 
+import com.hepdd.gtmthings.config.ConfigHolder;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -19,15 +20,17 @@ public class ForgeCommonEventListener {
     @SubscribeEvent
     public static void onServerTickEvent(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            if (event.getServer().getTickCount() % 200 == 0) {
-                WirelessEnergySavaedData.INSTANCE.containerMap.values().forEach(container -> {
-                    long rate = 0;
-                    GlobalPos pos = container.getBindPos();
-                    if (pos != null) {
-                        rate = WirelessEnergyBindingToolBehavior.getRate(event.getServer().getLevel(pos.dimension()), pos.pos());
-                    }
-                    container.setRate(rate);
-                });
+            if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
+                if (event.getServer().getTickCount() % 200 == 0) {
+                    WirelessEnergySavaedData.INSTANCE.containerMap.values().forEach(container -> {
+                        long rate = 0;
+                        GlobalPos pos = container.getBindPos();
+                        if (pos != null) {
+                            rate = WirelessEnergyBindingToolBehavior.getRate(event.getServer().getLevel(pos.dimension()), pos.pos());
+                        }
+                        container.setRate(rate);
+                    });
+                }
             }
         } else {
             WirelessEnergyContainer.observed = false;

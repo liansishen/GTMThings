@@ -153,5 +153,6 @@
   "block.gtmthings.uiv_huge_dual_hatch":"§2UIV§rHuge Input Dual Hatch",
   "block.gtmthings.ulv_huge_dual_hatch":"§8ULV§rHuge Input Dual Hatch",
   "block.gtmthings.uv_huge_dual_hatch":"§3UV§rHuge Input Dual Hatch",
-  "block.gtmthings.uxv_huge_dual_hatch":"§eUXV§rHuge Input Dual Hatch"
+  "block.gtmthings.uxv_huge_dual_hatch":"§eUXV§rHuge Input Dual Hatch",
+  "config.gtmthings.option.isWirelessRateEnable": "Is enable wireless rate limit."
 }

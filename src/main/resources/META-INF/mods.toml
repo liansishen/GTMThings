@@ -8,7 +8,7 @@ issueTrackerURL="https://github.com/liansishen/GTMThings/issues"
 # A list of mods - how many allowed here is determined by the individual mod loader
 
 [[mods]]
-    modId = "${mod_id}"
+    modId = "gtmthings"
     version = "${version}"
     displayName = "${mod_name}"
     displayURL = "${mod_url}"
@@ -17,27 +17,27 @@ issueTrackerURL="https://github.com/liansishen/GTMThings/issues"
 Add some machines to GregTech-Modern
 '''
 
-    [[dependencies.${mod_id}]]
+    [[dependencies.gtmthings]]
         modId = "forge"
         mandatory = true
         versionRange = "[${forge_version},)"
         ordering = "NONE"
         side = "BOTH"
-    [[dependencies.${mod_id}]]
+    [[dependencies.gtmthings]]
         modId = "minecraft"
         mandatory = true
         versionRange = "[${minecraft_version},)"
         ordering = "NONE"
         side = "BOTH"
-    [[dependencies.${mod_id}]]
+    [[dependencies.gtmthings]]
         modId = "gtceu"
         mandatory = true
         versionRange = "[${gtceu_version},)"
         ordering = "AFTER"
         side = "BOTH"
-    [[dependencies.${mod_id}]]
+    [[dependencies.gtmthings]]
         modId = "ae2"
-        mandadtory = true
+        mandatory = true
         versionRange = "[${ae2_version},)"
         ordering = "AFTER"
         side = "BOTH"

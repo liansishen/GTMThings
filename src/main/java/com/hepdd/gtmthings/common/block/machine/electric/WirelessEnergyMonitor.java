@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+import com.hepdd.gtmthings.config.ConfigHolder;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -119,8 +120,11 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
             BigInteger energyTotal = container.getStorage();
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), this.UUID)).withStyle(ChatFormatting.AQUA));
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1", FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
-            long rate = container.getRate();
-            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2", FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
+            if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
+                long rate = container.getRate();
+                textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2", FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
+            }
+
             // average useage
             BigDecimal avgEnergy = getAvgUsage(energyTotal);
             Component voltageName = Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
@@ -138,7 +142,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
                 textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
                         getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
             }
-            if (container.getBindPos() != null) {
+            if (ConfigHolder.INSTANCE.isWirelessRateEnable && container.getBindPos() != null) {
                 String pos = container.getBindPos().pos().toShortString();
                 textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.2", Component.translatable("recipe.condition.dimension.tooltip", container.getBindPos().dimension().location().toString()).append(" [").append(pos).append("] ")).withStyle(ChatFormatting.GRAY));
             }

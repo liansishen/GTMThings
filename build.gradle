@@ -109,6 +109,10 @@ repositories {
             includeGroup "dev.ftb.mods"
         }
     }
+    maven {
+        name 'Configuration'
+        url 'https://api.repsy.io/mvn/toma/public/'
+    }
 
 }
 
@@ -157,6 +161,7 @@ dependencies {
     //modRuntimeOnly('dev:Glodium-1.20-1.5-forge')
     //modRuntimeOnly('dev:ExtendedAE-1.20-1.1.12-forge')
 
+    modImplementation('dev.toma.configuration:configuration-forge-1.20.1:2.2.0')
 }
 
 processResources {
