@@ -146,7 +146,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     modImplementation 'maven.modrinth:Jade-1.20.1-forge-11.9.2'
-    modImplementation('appeng:appliedenergistics2-forge-15.2.13'){ transitive false }
+    modImplementation("appeng:appliedenergistics2-forge-$project.ae2_version"){ transitive false }
     //modRuntimeOnly 'dev:emi:1.1.12'
     //modRuntimeOnly 'dev:jecharacters:4.5.9'
 
@@ -171,6 +171,7 @@ processResources {
             "forge_version": forge_version.split("\\.")[0], // only specify major version of forge
             "minecraft_version": minecraft_version,
             "gtceu_version": gtceu_version,
+            "ae2_version": ae2_version
     ]
     inputs.properties(properties)
 
