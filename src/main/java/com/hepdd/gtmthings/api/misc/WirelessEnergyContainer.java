@@ -51,7 +51,7 @@ public class WirelessEnergyContainer {
         storage = storage.add(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
         if (observed && machine != null) {
-            TRANSFER_DATA.put(machine, new BasicTransferData(uuid, change));
+            TRANSFER_DATA.put(machine, new BasicTransferData(uuid, change, machine));
         }
         return change;
     }
@@ -62,7 +62,7 @@ public class WirelessEnergyContainer {
         storage = storage.subtract(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
         if (observed && machine != null) {
-            TRANSFER_DATA.put(machine, new BasicTransferData(uuid, -change));
+            TRANSFER_DATA.put(machine, new BasicTransferData(uuid, -change, machine));
         }
         return change;
     }
@@ -80,5 +80,9 @@ public class WirelessEnergyContainer {
     public void setBindPos(GlobalPos bindPos) {
         this.bindPos = bindPos;
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
+    }
+
+    public BigInteger getCapacity() {
+        return null;
     }
 }

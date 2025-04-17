@@ -34,9 +34,7 @@ import com.hepdd.gtmthings.api.gui.widget.TerminalInputWidget;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.hepdd.gtmthings.api.pattern.AdvancedBlockPattern.getAdvancedBlockPattern;
 
@@ -144,13 +142,13 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
         this.itemStack.setTag(tag);
     }
 
+    @Setter
+    @Getter
     public static class AutoBuildSetting {
 
-        final String[] HATCH_NAMES = { "input_hatch", "output_hatch", "input_bus", "output_bus", "laser_target", "laser_source",
-                "transmitter_hatch", "receiver_hatch", "maintenance_hatch", "parallel_hatch", "import_bus", "export_bus" };
+        public static final Set<String> HATCH_NAMES = new HashSet<>(Set.of("input_hatch", "output_hatch", "input_bus", "output_bus", "laser_target", "laser_source",
+                "transmitter_hatch", "receiver_hatch", "maintenance_hatch", "parallel_hatch", "import_bus", "export_bus"));
 
-        @Getter
-        @Setter
         private int coilTier, repeatCount, noHatchMode;
 
         public AutoBuildSetting() {
@@ -186,8 +184,10 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
             if (blockInfos != null && blockInfos.length > 0) {
                 var blockInfo = blockInfos[0];
                 if (blockInfo.getBlockState().getBlock() instanceof MetaMachineBlock machineBlock) {
-                    var id = machineBlock.getDefinition().getDescriptionId();
-                    return Arrays.stream(HATCH_NAMES).noneMatch(id::contains);
+                    var id = machineBlock.getDefinition().getName();
+                    for (String hatchName : HATCH_NAMES) {
+                        if (id.contains(hatchName)) return false;
+                    }
                 }
                 return true;
             }

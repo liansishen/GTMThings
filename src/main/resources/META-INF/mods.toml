@@ -4,7 +4,7 @@ license = "${mod_license}"
 
 # This is a URL to e.g. your GitHub or CurseForge issues page.
 # It will appear in any crash reports this mod is directly involved in.
-# issueTrackerURL="https://github.com/invalid/pleasechangeme/issues" #optional
+issueTrackerURL="https://github.com/liansishen/GTMThings/issues"
 # A list of mods - how many allowed here is determined by the individual mod loader
 
 [[mods]]
@@ -33,5 +33,11 @@ Add some machines to GregTech-Modern
         modId = "gtceu"
         mandatory = true
         versionRange = "[${gtceu_version},)"
+        ordering = "AFTER"
+        side = "BOTH"
+    [[dependencies.${mod_id}]]
+        modId = "ae2"
+        mandadtory = true
+        versionRange = "[${ae2_version},)"
         ordering = "AFTER"
         side = "BOTH"
