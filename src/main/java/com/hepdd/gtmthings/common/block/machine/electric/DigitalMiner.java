@@ -98,7 +98,6 @@ public class DigitalMiner extends WorkableTieredMachine implements IDigitalMiner
         this.minHeight = 0;
         this.maxHeight = 64;
         this.minerRadius = 32;
-        resetRecipe();
     }
 
     //////////////////////////////////////

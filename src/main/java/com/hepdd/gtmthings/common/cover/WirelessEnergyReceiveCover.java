@@ -11,9 +11,6 @@ import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
 import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
 import com.gregtechceu.gtceu.common.machine.electric.HullMachine;
 
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,7 +21,6 @@ import com.hepdd.gtmthings.api.machine.WirelessEnergyReceiveCoverHolder;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -37,30 +33,18 @@ import static com.gregtechceu.gtceu.api.capability.GTCapabilityHelper.getEnergyC
 @MethodsReturnNonnullByDefault
 public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirelessEnergyContainerHolder {
 
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyReceiveCover.class,
-            CoverBehavior.MANAGED_FIELD_HOLDER);
-
     private TickableSubscription subscription;
 
     @Getter
     @Setter
     private WirelessEnergyContainer WirelessEnergyContainerCache;
 
-    @Persisted
-    private UUID uuid;
-    @Persisted
-    private final long energyPerTick;
-    @Persisted
-    private final int tier;
-    @Persisted
-    private final int amperage;
-    @Persisted
-    private long machineMaxEnergy;
+    private MetaMachine machine;
 
-    @Override
-    public @NotNull ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
+    private final long energyPerTick;
+    private final int tier;
+    private final int amperage;
+    private long machineMaxEnergy;
 
     public WirelessEnergyReceiveCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int tier, int amperage) {
         super(definition, coverHolder, attachedSide);
@@ -92,10 +76,9 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
     @Override
     public void onAttached(ItemStack itemStack, ServerPlayer player) {
         super.onAttached(itemStack, player);
-        this.uuid = player.getUUID();
-        var machine = getMachine();
-        if (machine instanceof TieredEnergyMachine tieredEnergyMachine) {
-            this.machineMaxEnergy = GTValues.VEX[tieredEnergyMachine.getTier()] << 6;
+        MetaMachine machine = getMachine();
+        if (machine != null && getUUID() == null) {
+            machine.setOwnerUUID(player.getUUID());
         }
         updateCoverSub();
     }
@@ -109,22 +92,20 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
     @Override
     public void onRemoved() {
         super.onRemoved();
+        machine = null;
+        WirelessEnergyContainerCache = null;
         if (subscription != null) {
-            subscription.unsubscribe();
-        }
-    }
-
-    private void updateCoverSub() {
-        if (this.uuid != null) {
-            subscription = coverHolder.subscribeServerTick(subscription, this::updateEnergy);
-        } else if (subscription != null) {
             subscription.unsubscribe();
             subscription = null;
         }
     }
 
+    private void updateCoverSub() {
+        subscription = coverHolder.subscribeServerTick(subscription, this::updateEnergy);
+    }
+
     private void updateEnergy() {
-        if (uuid == null) return;
+        if (getUUID() == null) return;
         var energyContainer = getEnergyContainer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
         if (energyContainer != null) {
             var machine = getMachine();
@@ -150,7 +131,9 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
     @Override
     @Nullable
     public UUID getUUID() {
-        return uuid;
+        MetaMachine machine = getMachine();
+        if (machine != null) return machine.getOwnerUUID();
+        return null;
     }
 
     @Override
@@ -160,6 +143,10 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
 
     @Nullable
     private MetaMachine getMachine() {
-        return MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        if (machine == null) machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        if (machine instanceof TieredEnergyMachine tieredEnergyMachine) {
+            this.machineMaxEnergy = GTValues.VEX[tieredEnergyMachine.getTier()] << 6;
+        }
+        return machine;
     }
 }

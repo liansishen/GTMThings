@@ -30,6 +30,7 @@ import com.hepdd.gtmthings.utils.TeamUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -59,9 +60,6 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
     public ManagedFieldHolder getFieldHolder() {
         return MANAGED_FIELD_HOLDER;
     }
-
-    @Getter
-    private UUID UUID;
 
     @Getter
     @Setter
@@ -103,9 +101,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
 
     @Override
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
-        if (this.UUID == null) {
-            this.UUID = player.getUUID();
-        }
+        if (isRemote()) return true;
         WirelessEnergyContainer container = getWirelessEnergyContainer();
         if (container != null) this.beforeEnergy = container.getStorage();
         return true;
@@ -118,7 +114,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
             WirelessEnergyContainer container = getWirelessEnergyContainer();
             if (container == null) return;
             BigInteger energyTotal = container.getStorage();
-            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), this.UUID)).withStyle(ChatFormatting.AQUA));
+            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), this.getUUID())).withStyle(ChatFormatting.AQUA));
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1", FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
             if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
                 long rate = container.getRate();
@@ -155,7 +151,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
             WirelessEnergyContainer.TRANSFER_DATA.clear();
             for (Map.Entry<MetaMachine, ITransferData> m : sortedEntries) {
                 UUID uuid = m.getValue().UUID();
-                if (all || uuid.equals(TeamUtil.getTeamUUID(this.UUID))) {
+                if (all || uuid.equals(TeamUtil.getTeamUUID(this.getUUID()))) {
                     textListCache.add(m.getValue().getInfo());
                 }
             }
@@ -198,6 +194,11 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
         BigInteger changed = now.subtract(this.beforeEnergy);
         this.beforeEnergy = now;
         return new BigDecimal(changed).divide(BigDecimal.valueOf(10), RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public @Nullable UUID getUUID() {
+        return this.getOwnerUUID();
     }
 
     @Override
