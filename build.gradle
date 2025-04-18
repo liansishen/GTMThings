@@ -102,18 +102,16 @@ repositories {
         url "https://maven.architectury.dev/"
     }
     maven {
-        // FTB
         url "https://maven.saps.dev/minecraft"
-        content {
-            includeGroup "dev.latvian.mods"
-            includeGroup "dev.ftb.mods"
-        }
     }
     maven {
         name 'Configuration'
         url 'https://api.repsy.io/mvn/toma/public/'
     }
-
+    exclusiveContent { // FTB mods
+        forRepository { maven { url = "https://maven.ftb.dev/releases" } }
+        filter { includeGroup("dev.ftb.mods") }
+    }
 }
 
 dependencies {
