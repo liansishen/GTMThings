@@ -102,14 +102,16 @@ repositories {
         url "https://maven.architectury.dev/"
     }
     maven {
-        // FTB
         url "https://maven.saps.dev/minecraft"
-        content {
-            includeGroup "dev.latvian.mods"
-            includeGroup "dev.ftb.mods"
-        }
     }
-
+    maven {
+        name 'Configuration'
+        url 'https://api.repsy.io/mvn/toma/public/'
+    }
+    exclusiveContent { // FTB mods
+        forRepository { maven { url = "https://maven.ftb.dev/releases" } }
+        filter { includeGroup("dev.ftb.mods") }
+    }
 }
 
 dependencies {
@@ -146,7 +148,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     modImplementation 'maven.modrinth:Jade-1.20.1-forge-11.9.2'
-    modImplementation('appeng:appliedenergistics2-forge-15.2.13'){ transitive false }
+    modImplementation("appeng:appliedenergistics2-forge-$project.ae2_version"){ transitive false }
     //modRuntimeOnly 'dev:emi:1.1.12'
     //modRuntimeOnly 'dev:jecharacters:4.5.9'
 
@@ -157,6 +159,7 @@ dependencies {
     //modRuntimeOnly('dev:Glodium-1.20-1.5-forge')
     //modRuntimeOnly('dev:ExtendedAE-1.20-1.1.12-forge')
 
+    modImplementation('dev.toma.configuration:configuration-forge-1.20.1:2.2.0')
 }
 
 processResources {
@@ -171,6 +174,7 @@ processResources {
             "forge_version": forge_version.split("\\.")[0], // only specify major version of forge
             "minecraft_version": minecraft_version,
             "gtceu_version": gtceu_version,
+            "ae2_version": ae2_version
     ]
     inputs.properties(properties)
 

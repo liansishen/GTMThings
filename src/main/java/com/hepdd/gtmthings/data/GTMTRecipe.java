@@ -398,15 +398,17 @@ public class GTMTRecipe {
                     .save(provider);
         }
 
-        ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("programmablec_hatch_" + GTValues.VN[GTValues.MAX].toLowerCase() + "_4a"))
-                .inputItems(GTMachines.DUAL_IMPORT_HATCH[GTValues.MAX].asStack())
-                .inputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
-                .inputItems(CustomTags.CIRCUITS_ARRAY[GTValues.MAX], 4)
-                .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
-                .outputItems(CustomMachines.PROGRAMMABLEC_HATCH[GTValues.MAX].asStack())
-                .duration(400)
-                .EUt(GTValues.VA[GTValues.MAX])
-                .save(provider);
+        if (GTCEuAPI.isHighTier()) {
+            ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("programmablec_hatch_" + GTValues.VN[GTValues.MAX].toLowerCase() + "_4a"))
+                    .inputItems(GTMachines.DUAL_IMPORT_HATCH[GTValues.MAX].asStack())
+                    .inputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
+                    .inputItems(CustomTags.CIRCUITS_ARRAY[GTValues.MAX], 4)
+                    .inputFluids(GTMaterials.SolderingAlloy.getFluid(144))
+                    .outputItems(CustomMachines.PROGRAMMABLEC_HATCH[GTValues.MAX].asStack())
+                    .duration(400)
+                    .EUt(GTValues.VA[GTValues.MAX])
+                    .save(provider);
+        }
 
         for (int tier : GTValues.tiersBetween(GTValues.EV, GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV)) {
             if (tier > GTValues.IV) {

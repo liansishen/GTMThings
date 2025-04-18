@@ -24,6 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
 import com.hepdd.gtmthings.api.misc.ITransferData;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
+import com.hepdd.gtmthings.config.ConfigHolder;
 import com.hepdd.gtmthings.utils.BigIntegerUtils;
 import com.hepdd.gtmthings.utils.TeamUtil;
 import lombok.Getter;
@@ -115,8 +116,11 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
             BigInteger energyTotal = container.getStorage();
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.0", GetName(getLevel(), this.getUUID())).withStyle(ChatFormatting.AQUA));
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.1", FormattingUtil.formatNumbers(energyTotal)).withStyle(ChatFormatting.GRAY));
-            long rate = container.getRate();
-            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2", FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
+            if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
+                long rate = container.getRate();
+                textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2", FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
+            }
+
             // average useage
             BigDecimal avgEnergy = getAvgUsage(energyTotal);
             Component voltageName = Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(avgEnergy.abs().longValue())]);
@@ -134,7 +138,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
                 textListCache.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
                         getTimeToFillDrainText(energyTotal.divide(avgEnergy.abs().toBigInteger().multiply(BigInteger.valueOf(20))))).withStyle(ChatFormatting.GRAY));
             }
-            if (container.getBindPos() != null) {
+            if (ConfigHolder.INSTANCE.isWirelessRateEnable && container.getBindPos() != null) {
                 String pos = container.getBindPos().pos().toShortString();
                 textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.2", Component.translatable("recipe.condition.dimension.tooltip", container.getBindPos().dimension().location().toString()).append(" [").append(pos).append("] ")).withStyle(ChatFormatting.GRAY));
             }
