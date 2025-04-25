@@ -364,6 +364,7 @@
   "item.gtmthings.wireless_energy_binding_tool": "无线能源绑定工具",
   "item.gtmthings.virtual_item_provider": "虚拟物品提供器",
   "item.gtmthings.virtual_item_provider_cell": "虚拟物品提供器元件",
+  "item.gtmthings.creative_energy_cover": "创造能源覆盖板",
   "config.jade.plugin_gtmthings.wireless_energy_hatch_provider":"[gtmthings] 无线能源监视器",
   "itemGroup.gtmthings.creative": "创造物品",
   "itemGroup.gtmthings.wireless": "格雷无线科技",
