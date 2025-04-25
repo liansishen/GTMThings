@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.client.renderer.cover.SimpleCoverRenderer;
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.cover.AdvancedWirelessTransferCover;
 import com.hepdd.gtmthings.common.cover.ProgrammableCover;
+import com.hepdd.gtmthings.common.cover.CreativeEnergyCover;
 import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
 import com.hepdd.gtmthings.common.cover.WirelessTransferCover;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
@@ -48,6 +49,9 @@ public class GTMTCovers {
 
     public final static CoverDefinition ADVANCED_WIRELESS_FLUID_TRANSFER = register("advanced_wireless_fluid_transfer",
             (holder, coverable, side) -> new AdvancedWirelessTransferCover(holder, coverable, side, WirelessTransferCover.TRANSFER_FLUID), new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_wireless_fluid_transfer")));
+
+    public final static CoverDefinition CREATIVE_ENERGY = register("creative_energy",
+            CreativeEnergyCover::new, new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_creative_energy")));
 
     public static CoverDefinition register(String id, CoverDefinition.CoverBehaviourProvider behaviorCreator,
                                            ICoverRenderer coverRenderer) {
