@@ -1,8 +1,11 @@
 package com.hepdd.gtmthings.data;
 
 import com.gregtechceu.gtceu.api.data.RotationState;
+import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
+import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
+import com.gregtechceu.gtceu.common.item.TooltipBehavior;
 
 import net.minecraft.network.chat.Component;
 
@@ -10,8 +13,10 @@ import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeEnergyHa
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputBusPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeInputHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.CreativeLaserHatchPartMachine;
+import com.tterrag.registrate.util.entry.ItemEntry;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
+import static com.gregtechceu.gtceu.common.data.GTItems.attach;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 
 public class CreativeMachines {
@@ -56,6 +61,12 @@ public class CreativeMachines {
             .overlayTieredHullRenderer("laser_hatch.target")
             .abilities(PartAbility.INPUT_LASER)
             .tier(MAX)
+            .register();
+
+    public static ItemEntry<ComponentItem> CREATIVE_ENERGY_COVER = GTMTHINGS_REGISTRATE
+            .item("creative_energy_cover", ComponentItem::create)
+            .onRegister(attach(new CoverPlaceBehavior(WirelessCovers.CREATIVE_ENERGY),
+                    new TooltipBehavior(lines -> lines.add(Component.translatable("gtmthings.creative_tooltip")))))
             .register();
 
     public static void init() {}

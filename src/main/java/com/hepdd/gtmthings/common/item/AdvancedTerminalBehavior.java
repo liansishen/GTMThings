@@ -40,7 +40,7 @@ import static com.hepdd.gtmthings.api.pattern.AdvancedBlockPattern.getAdvancedBl
 
 public class AdvancedTerminalBehavior implements IItemUIFactory {
 
-    private AutoBuildSetting autoBuildSetting;
+    private AutoBuildSetting autoBuildSetting = null;
     private ItemStack itemStack;
 
     public AdvancedTerminalBehavior() {
@@ -73,6 +73,12 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
     private Widget createWidget() {
         var group = new WidgetGroup(0, 0, 182 + 8, 117 + 8);
         int rowIndex = 1;
+        List<Component> lines = new ArrayList<>(List.of());
+        lines.add(Component.translatable("item.gtmthings.advanced_terminal.setting.1.tooltip"));
+        GTCEuAPI.HEATING_COILS.entrySet().stream()
+                .sorted(Comparator.comparingInt(value -> value.getKey().getTier()))
+                .forEach(coil -> lines.add(Component.literal(String.valueOf(coil.getKey().getTier() + 1)).append(":").append(coil.getValue().get().getName())));
+
         group.addWidget(
                 new DraggableScrollableWidgetGroup(4, 4, 182, 117)
                         .setBackground(GuiTextures.DISPLAY)
@@ -80,17 +86,17 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
                         .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
                         .addWidget(new LabelWidget(40, 5, Component.translatable("item.gtmthings.advanced_terminal.setting.title").getString()))
                         .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.1").getString())
-                                .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.1.tooltip")))
+                                .setHoverTooltips(lines))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, autoBuildSetting::getCoilTier,
                                 this::setCoilTier)
-                                .setMin(0).setMax(GTCEuAPI.HEATING_COILS.size() - 1))
+                                .setMin(0).setMax(GTCEuAPI.HEATING_COILS.size()))
                         .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.2").getString())
                                 .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.2.tooltip")))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, autoBuildSetting::getRepeatCount,
                                 this::setRepeatCount)
                                 .setMin(0).setMax(99))
                         .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.3").getString())
-                                .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.3.tooltip")))
+                                .setHoverTooltips("item.gtmthings.advanced_terminal.setting.3.tooltip"))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, autoBuildSetting::getNoHatchMode,
                                 this::setIsBuildHatches).setMin(0).setMax(1)));
         group.setBackground(GuiTextures.BACKGROUND_INVERSE);
@@ -109,11 +115,11 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
             tag = new CompoundTag();
             tag.putInt("CoilTier", 0);
             tag.putInt("RepeatCount", 0);
-            tag.putInt("NoHatchMode", 0);
+            tag.putInt("NoHatchMode", 1);
             this.itemStack.setTag(tag);
             this.autoBuildSetting.setCoilTier(0);
             this.autoBuildSetting.setRepeatCount(0);
-            this.autoBuildSetting.setNoHatchMode(0);
+            this.autoBuildSetting.setNoHatchMode(1);
         }
         return IItemUIFactory.super.use(item, level, player, usedHand);
     }
@@ -154,7 +160,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
         public AutoBuildSetting() {
             this.coilTier = 0;
             this.repeatCount = 0;
-            this.noHatchMode = 0;
+            this.noHatchMode = 1;
         }
 
         public List<ItemStack> apply(BlockInfo[] blockInfos) {
@@ -162,8 +168,8 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
             if (blockInfos != null) {
                 if (Arrays.stream(blockInfos).anyMatch(
                         info -> info.getBlockState().getBlock() instanceof CoilBlock)) {
-                    var tier = Math.min(coilTier, blockInfos.length - 1);
-                    if (tier == 0) {
+                    var tier = Math.min(coilTier - 1, blockInfos.length - 1);
+                    if (tier == -1) {
                         for (int i = 0; i < blockInfos.length - 1; i++) {
                             candidates.add(blockInfos[i].getItemStackForm());
                         }
