@@ -9,10 +9,7 @@ import com.gregtechceu.gtceu.client.renderer.cover.ICoverRenderer;
 import com.gregtechceu.gtceu.client.renderer.cover.SimpleCoverRenderer;
 
 import com.hepdd.gtmthings.GTMThings;
-import com.hepdd.gtmthings.common.cover.AdvancedWirelessTransferCover;
-import com.hepdd.gtmthings.common.cover.ProgrammableCover;
-import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
-import com.hepdd.gtmthings.common.cover.WirelessTransferCover;
+import com.hepdd.gtmthings.common.cover.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 
 import java.util.Arrays;
@@ -27,6 +24,9 @@ public class GTMTCovers {
     }
     public static final int[] ALL_TIERS = GTValues.tiersBetween(GTValues.LV,
             GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV);
+
+    public final static CoverDefinition CREATIVE_ENERGY = register("creative_energy",
+            CreativeEnergyCover::new, new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_creative_energy")));
 
     public final static CoverDefinition PROGRAMMABLE_COVER = register("programmable_cover",
             ProgrammableCover::new, new SimpleCoverRenderer(GTCEu.id("item/programmed_circuit/1")));
