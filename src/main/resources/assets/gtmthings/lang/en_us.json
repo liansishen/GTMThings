@@ -139,6 +139,7 @@
   "item.gtmthings.wireless_transfer.fluid.tooltip.1": "§bTransfer Fluid§7 to §ebinded container§7 from the machine as §fCover§7.",
   "itemGroup.gtmthings.creative": "Creative Things",
   "itemGroup.gtmthings.wireless": "Gregtech Wireless",
+  "itemGroup.gtmthings.more_machines": "More Machines",
   "block.gtmthings.zpm_huge_dual_hatch":"§cZPM§rHuge Input Dual Hatch",
   "block.gtmthings.ev_huge_dual_hatch":"§5EV§rHuge Input Dual Hatch",
   "block.gtmthings.hv_huge_dual_hatch":"§6HV§rHuge Input Dual Hatch",
