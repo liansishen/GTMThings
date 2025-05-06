@@ -19,6 +19,11 @@ public class ForgeCommonEventListener {
 
     @SubscribeEvent
     public static void onServerTickEvent(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.START && event.getServer().getTickCount() % 20 == 0) {
+            for (WirelessEnergyContainer container : WirelessEnergySavaedData.INSTANCE.containerMap.values()) {
+                container.energyStat.tick();
+            }
+        }
         if (event.phase == TickEvent.Phase.END) {
             if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
                 if (event.getServer().getTickCount() % 200 == 0) {
@@ -43,6 +48,7 @@ public class ForgeCommonEventListener {
             ServerLevel serverLevel = level.getServer().getLevel(Level.OVERWORLD);
             if (serverLevel == null) return;
             WirelessEnergySavaedData.INSTANCE = WirelessEnergySavaedData.getOrCreate(serverLevel);
+            WirelessEnergyContainer.server = event.getLevel().getServer();
         }
     }
 }

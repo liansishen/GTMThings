@@ -3,6 +3,7 @@ package com.hepdd.gtmthings.api.misc;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 
 import net.minecraft.core.GlobalPos;
+import net.minecraft.server.MinecraftServer;
 
 import com.hepdd.gtmthings.config.ConfigHolder;
 import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
@@ -21,6 +22,9 @@ public class WirelessEnergyContainer {
     public static boolean observed;
 
     public static final WeakHashMap<MetaMachine, ITransferData> TRANSFER_DATA = new WeakHashMap<>();
+    public static MinecraftServer server;
+
+    public EnergyStat energyStat;
 
     public static WirelessEnergyContainer getOrCreateContainer(UUID uuid) {
         return WirelessEnergySavaedData.INSTANCE.containerMap.computeIfAbsent(TeamUtil.getTeamUUID(uuid), WirelessEnergyContainer::new);
@@ -39,11 +43,15 @@ public class WirelessEnergyContainer {
         this.rate = rate;
         this.bindPos = bindPos;
         this.uuid = uuid;
+        int currentTick = server.getTickCount();
+        this.energyStat = new EnergyStat(currentTick);
     }
 
     private WirelessEnergyContainer(UUID uuid) {
         this.uuid = uuid;
         this.storage = BigInteger.ZERO;
+        int currentTick = server.getTickCount();
+        this.energyStat = new EnergyStat(currentTick);
     }
 
     public long addEnergy(long energy, @Nullable MetaMachine machine) {
@@ -52,6 +60,9 @@ public class WirelessEnergyContainer {
         if (change <= 0) return 0;
         storage = storage.add(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
+        if (machine != null) {
+            energyStat.update(BigInteger.valueOf(change), server.getTickCount());
+        }
         if (observed && machine != null) {
             TRANSFER_DATA.put(machine, new BasicTransferData(uuid, change, machine));
         }
@@ -64,6 +75,9 @@ public class WirelessEnergyContainer {
         if (change <= 0) return 0;
         storage = storage.subtract(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
+        if (machine != null) {
+            energyStat.update(BigInteger.valueOf(change), server.getTickCount());
+        }
         if (observed && machine != null) {
             TRANSFER_DATA.put(machine, new BasicTransferData(uuid, -change, machine));
         }
