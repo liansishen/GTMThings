@@ -44,14 +44,14 @@ public interface IWirelessMonitorBehavior extends IWirelessEnergyContainerHolder
         textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.net_power"));
 
         BigDecimal avgMinute = stat.getMinuteAvg();
-        textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_minute", DISPLAY_TEXT_WIDTH, Component.literal((avgMinute.signum() < 0 ? "-" : "") + formatBigDecimalNumberOrSic(avgMinute)).withStyle(ChatFormatting.DARK_AQUA), Component.literal(voltageAmperage(avgMinute).toEngineeringString()), voltageName(avgMinute)));
+        textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_minute", DISPLAY_TEXT_WIDTH, Component.literal(formatBigDecimalNumberOrSic(avgMinute)).withStyle(ChatFormatting.DARK_AQUA), Component.literal(voltageAmperage(avgMinute).toEngineeringString()), voltageName(avgMinute)));
         BigDecimal avgHour = stat.getHourAvg();
-        textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_hour", DISPLAY_TEXT_WIDTH, Component.literal((avgHour.signum() < 0 ? "-" : "") + formatBigDecimalNumberOrSic(avgHour)).withStyle(ChatFormatting.YELLOW), Component.literal(voltageAmperage(avgHour).toEngineeringString()), voltageName(avgHour)));
+        textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_hour", DISPLAY_TEXT_WIDTH, Component.literal(formatBigDecimalNumberOrSic(avgHour)).withStyle(ChatFormatting.YELLOW), Component.literal(voltageAmperage(avgHour).toEngineeringString()), voltageName(avgHour)));
         BigDecimal avgDay = stat.getDayAvg();
-        textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_day", DISPLAY_TEXT_WIDTH, Component.literal((avgDay.signum() < 0 ? "-" : "") + formatBigDecimalNumberOrSic(avgDay)).withStyle(ChatFormatting.DARK_GREEN), Component.literal(voltageAmperage(avgDay).toEngineeringString()), voltageName(avgDay)));
+        textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_day", DISPLAY_TEXT_WIDTH, Component.literal(formatBigDecimalNumberOrSic(avgDay)).withStyle(ChatFormatting.DARK_GREEN), Component.literal(voltageAmperage(avgDay).toEngineeringString()), voltageName(avgDay)));
         // average useage
         BigDecimal avgEnergy = stat.getAvgEnergy();
-        textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.now", DISPLAY_TEXT_WIDTH, Component.literal((energyTotal.signum() < 0 ? "-" : "") + formatBigDecimalNumberOrSic(avgEnergy)).withStyle(ChatFormatting.DARK_PURPLE), Component.literal(voltageAmperage(avgEnergy).toEngineeringString()), voltageName(avgEnergy)));
+        textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.now", DISPLAY_TEXT_WIDTH, Component.literal(formatBigDecimalNumberOrSic(avgEnergy)).withStyle(ChatFormatting.DARK_PURPLE), Component.literal(voltageAmperage(avgEnergy).toEngineeringString()), voltageName(avgEnergy)));
 
         int compare = avgEnergy.compareTo(BigDecimal.valueOf(0));
         if (compare > 0) {

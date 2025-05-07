@@ -76,7 +76,7 @@ public class WirelessEnergyContainer {
         storage = storage.subtract(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
         if (machine != null) {
-            energyStat.update(BigInteger.valueOf(change), server.getTickCount());
+            energyStat.update(BigInteger.valueOf(change).negate(), server.getTickCount());
         }
         if (observed && machine != null) {
             TRANSFER_DATA.put(machine, new BasicTransferData(uuid, -change, machine));
