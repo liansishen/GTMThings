@@ -11,12 +11,9 @@ import com.gregtechceu.gtceu.common.item.TooltipBehavior;
 import net.minecraft.network.chat.Component;
 
 import com.hepdd.gtmthings.client.VirtualItemProviderRenderer;
-import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
+import com.hepdd.gtmthings.common.item.*;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverPlaceBehavior;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverTooltipBehavior;
-import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
-import com.hepdd.gtmthings.common.item.VirtualItemProviderCellItem;
-import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 
@@ -139,6 +136,12 @@ public class CustomItems {
             .item("advanced_terminal", ComponentItem::create)
             .properties(p -> p.stacksTo(1))
             .onRegister(attach(new AdvancedTerminalBehavior())).register();
+
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_TERMINAL = GTMTHINGS_REGISTRATE
+            .item("wireless_energy_terminal", ComponentItem::create)
+            .properties(p -> p.stacksTo(1))
+            .onRegister(attach(new WirelessEnergyTerminalBehavior()))
+            .onRegister(attach(new WirelessEnergyBindingToolBehavior())).register();
 
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_BINDING_TOOL = GTMTHINGS_REGISTRATE
             .item("wireless_energy_binding_tool", ComponentItem::create)

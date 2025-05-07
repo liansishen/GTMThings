@@ -13,6 +13,7 @@ import com.lowdragmc.lowdraglib.utils.BlockInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +29,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
+import appeng.api.config.Actionable;
+import appeng.api.networking.IGrid;
+import appeng.api.stacks.AEItemKey;
+import appeng.api.storage.MEStorage;
+import appeng.items.tools.powered.WirelessTerminalItem;
 import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
 import com.mojang.datafixers.util.Pair;
 import org.apache.commons.lang3.ArrayUtils;
@@ -225,7 +232,7 @@ public class AdvancedBlockPattern extends BlockPattern {
                             IItemHandler handler = null;
                             if (!player.isCreative()) {
                                 var foundHandler = getMatchStackWithHandler(candidates,
-                                        player.getCapability(ForgeCapabilities.ITEM_HANDLER));
+                                        player.getCapability(ForgeCapabilities.ITEM_HANDLER), player);
                                 if (foundHandler != null) {
                                     foundSlot = foundHandler.getFirst();
                                     handler = foundHandler.getSecond();
@@ -389,7 +396,7 @@ public class AdvancedBlockPattern extends BlockPattern {
     @Nullable
     private static Pair<Integer, IItemHandler> getMatchStackWithHandler(
                                                                         List<ItemStack> candidates,
-                                                                        LazyOptional<IItemHandler> cap) {
+                                                                        LazyOptional<IItemHandler> cap, Player player) {
         IItemHandler handler = cap.orElse(null);
         if (handler == null) {
             return null;
@@ -402,10 +409,23 @@ public class AdvancedBlockPattern extends BlockPattern {
             @NotNull
             LazyOptional<IItemHandler> stackCap = stack.getCapability(ForgeCapabilities.ITEM_HANDLER);
             if (stackCap.isPresent()) {
-                var rt = getMatchStackWithHandler(candidates, stackCap);
+                var rt = getMatchStackWithHandler(candidates, stackCap, player);
                 if (rt != null) {
                     return rt;
                 }
+            } else if (stack.getItem() instanceof WirelessTerminalItem terminalItem && stack.hasTag() && stack.getTag().contains("accessPoint", 10)) {
+                IGrid grid = terminalItem.getLinkedGrid(stack, player.level(), player);
+                if (grid != null) {
+                    MEStorage storage = grid.getStorageService().getInventory();
+                    for (ItemStack candidate : candidates) {
+                        if (storage.extract(AEItemKey.of(candidate), 1, Actionable.MODULATE, null) > 0) {
+                            NonNullList<ItemStack> stacks = NonNullList.withSize(1, candidate);
+                            IItemHandler handler1 = new ItemStackHandler(stacks);
+                            return Pair.of(0, handler1);
+                        }
+                    }
+                }
+
             } else if (candidates.stream().anyMatch(candidate -> ItemStack.isSameItemSameTags(candidate, stack)) &&
                     !stack.isEmpty() && stack.getItem() instanceof BlockItem) {
                         return Pair.of(i, handler);

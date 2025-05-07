@@ -65,7 +65,7 @@ public class CreativeMachines {
 
     public static ItemEntry<ComponentItem> CREATIVE_ENERGY_COVER = GTMTHINGS_REGISTRATE
             .item("creative_energy_cover", ComponentItem::create)
-            .onRegister(attach(new CoverPlaceBehavior(WirelessCovers.CREATIVE_ENERGY),
+            .onRegister(attach(new CoverPlaceBehavior(GTMTCovers.CREATIVE_ENERGY),
                     new TooltipBehavior(lines -> lines.add(Component.translatable("gtmthings.creative_tooltip")))))
             .register();
 
