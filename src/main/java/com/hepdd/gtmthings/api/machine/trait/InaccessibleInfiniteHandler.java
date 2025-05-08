@@ -13,7 +13,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import appeng.api.stacks.AEItemKey;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +45,7 @@ public class InaccessibleInfiniteHandler extends NotifiableItemStackHandler {
     }
 
     @Override
-    public List<Ingredient> handleRecipe(IO io, GTRecipe recipe, List<?> left, @Nullable String slotName, boolean simulate) {
+    public List<Ingredient> handleRecipe(IO io, GTRecipe recipe, List<?> left, boolean simulate) {
         if (!simulate && io == IO.OUT) {
             for (Object ingredient : left) {
                 if (((Ingredient) ingredient).isEmpty()) continue;
