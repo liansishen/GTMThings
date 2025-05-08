@@ -1,5 +1,7 @@
 package com.hepdd.gtmthings.api.misc;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -58,7 +60,7 @@ public class TimeWheel {
         if (firstUpdateTick == -1) firstUpdateTick = lastUpdateTick;
     }
 
-    public BigDecimal getAvgByTick() {
+    public @NotNull BigDecimal getAvgByTick() {
         if (lastUpdateTick - firstUpdateTick < slotResolution * slotNum) return new BigDecimal(sum).divide(BigDecimal.valueOf(lastUpdateTick - firstUpdateTick + 1), RoundingMode.HALF_UP);
         return slots.isEmpty() ? BigDecimal.ZERO : new BigDecimal(sum).divide(BigDecimal.valueOf((long) slots.size() * slotResolution + lastUpdateTick % slotResolution - slotResolution), RoundingMode.HALF_UP);
     }

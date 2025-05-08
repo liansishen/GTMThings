@@ -1,6 +1,7 @@
 package com.hepdd.gtmthings.api.misc;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -14,7 +15,7 @@ public class EnergyStat {
     private BigInteger lastChangedCache = BigInteger.ZERO;
 
     @Getter
-    private BigDecimal avgEnergy;
+    private @NotNull BigDecimal avgEnergy = BigDecimal.ZERO;
 
     public EnergyStat(int windowStart) {
         minute = new TimeWheel(TimeWheel.TIMESCALE.SECOND, 60, windowStart);
@@ -41,15 +42,15 @@ public class EnergyStat {
         lastChangedCache = lastChangedCache.add(value);
     }
 
-    public BigDecimal getMinuteAvg() {
+    public @NotNull BigDecimal getMinuteAvg() {
         return minute.getAvgByTick();
     }
 
-    public BigDecimal getHourAvg() {
+    public @NotNull BigDecimal getHourAvg() {
         return hour.getAvgByTick();
     }
 
-    public BigDecimal getDayAvg() {
+    public @NotNull BigDecimal getDayAvg() {
         return day.getAvgByTick();
     }
 }
