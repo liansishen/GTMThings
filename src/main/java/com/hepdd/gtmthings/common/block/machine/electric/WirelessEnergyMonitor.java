@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
-import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
@@ -15,24 +14,20 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
-import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
-import com.hepdd.gtmthings.common.item.IWirelessMonitorBehavior;
-import com.hepdd.gtmthings.utils.BigIntegerUtils;
+import com.hepdd.gtmthings.common.item.IWirelessMonitor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigInteger;
-import java.time.Duration;
 import java.util.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachine, IWirelessEnergyContainerHolder, IWirelessMonitorBehavior {
+public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachine, IWirelessMonitor {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyMonitor.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
@@ -91,40 +86,9 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
     public void addDisplayText(@NotNull List<Component> textList) {
         if (isRemote()) return;
         if (textListCache == null || getOffsetTimer() % 10 == 0) {
-            textListCache = getDisplayText(DISPLAY_TEXT_WIDTH);
+            textListCache = getDisplayText(all, DISPLAY_TEXT_WIDTH);
         }
         textList.addAll(textListCache);
-    }
-
-    public static Component getTimeToFillDrainText(BigInteger timeToFillSeconds) {
-        if (timeToFillSeconds.compareTo(BigIntegerUtils.BIG_INTEGER_MAX_LONG) > 0) {
-            // too large to represent in a java Duration
-            timeToFillSeconds = BigIntegerUtils.BIG_INTEGER_MAX_LONG;
-        }
-
-        Duration duration = Duration.ofSeconds(timeToFillSeconds.longValue());
-        String key;
-        long fillTime;
-        if (duration.getSeconds() <= 180) {
-            fillTime = duration.getSeconds();
-            key = "gtceu.multiblock.power_substation.time_seconds";
-        } else if (duration.toMinutes() <= 180) {
-            fillTime = duration.toMinutes();
-            key = "gtceu.multiblock.power_substation.time_minutes";
-        } else if (duration.toHours() <= 72) {
-            fillTime = duration.toHours();
-            key = "gtceu.multiblock.power_substation.time_hours";
-        } else if (duration.toDays() <= 730) { // 2 years
-            fillTime = duration.toDays();
-            key = "gtceu.multiblock.power_substation.time_days";
-        } else if (duration.toDays() / 365 < 1_000_000) {
-            fillTime = duration.toDays() / 365;
-            key = "gtceu.multiblock.power_substation.time_years";
-        } else {
-            return Component.translatable("gtceu.multiblock.power_substation.time_forever");
-        }
-
-        return Component.translatable(key, FormattingUtil.formatNumbers(fillTime));
     }
 
     @Override

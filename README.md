@@ -52,9 +52,8 @@ When used as a cover, it draws Item from the bind container to the machine.
 ## Wireless Fluid Transfer Cover
 When used as a cover, it draws Fluid from the bind container to the machine.
 
-
-# Machines Planned to be Added
-* Programmable Circuit Series
+## Programmable Circuit Series
+Modify the items in the machine circuit slots through a virtual item provider.
 
 ---
 
@@ -97,7 +96,8 @@ Make GregTech-Modern great again!
 作覆盖板时机器中提取物品到绑定的容器中。
 ## 无线流体传输覆盖板
 作覆盖板时机器中提取流体到绑定的容器中。
+## 可编程电路系列
+通过虚拟物品提供器修改机器电路槽的物品。
 
 # 计划添加的机器
 * 进阶无线传输覆盖板
-* 可编程电路系列

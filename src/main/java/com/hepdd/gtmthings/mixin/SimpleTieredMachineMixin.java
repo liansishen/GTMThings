@@ -30,6 +30,6 @@ public class SimpleTieredMachineMixin extends WorkableTieredMachine {
 
     @Override
     protected @NotNull NotifiableItemStackHandler createImportItemHandler(Object @NotNull... args) {
-        return new NotifiableItemStackHandler(this, getRecipeType().getMaxInputs(ItemRecipeCapability.CAP), IO.IN).setFilter(i -> !i.is(CustomItems.VIRTUAL_ITEM_PROVIDER.get()));
+        return new NotifiableItemStackHandler(this, getRecipeType().getMaxInputs(ItemRecipeCapability.CAP), IO.IN).setFilter(i -> !i.is(CustomItems.VIRTUAL_ITEM_PROVIDER.get()) || !i.hasTag());
     }
 }

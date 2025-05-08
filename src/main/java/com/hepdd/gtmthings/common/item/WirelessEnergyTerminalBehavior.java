@@ -10,11 +10,7 @@ import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
@@ -26,21 +22,14 @@ import java.util.*;
 
 import static com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor.DISPLAY_TEXT_WIDTH;
 
-public class WirelessEnergyTerminalBehavior implements IItemUIFactory, IWirelessMonitorBehavior {
-
-    private UUID uuid;
-    private Level level;
-
-    public WirelessEnergyTerminalBehavior() {}
-
-    private List<Component> displayTextCache;
+public class WirelessEnergyTerminalBehavior implements IItemUIFactory {
 
     @Override
     public ModularUI createUI(HeldItemUIFactory.HeldItemHolder holder, Player entityPlayer) {
-        return new ModularUI(DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8 + 8 + 8 + 17, holder, entityPlayer).widget(createWidget(holder.getHeld().getDescriptionId()));
+        return new ModularUI(DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8 + 8 + 8 + 17, holder, entityPlayer).widget(createWidget(holder.getHeld().getDescriptionId(), new WirelessMonitor(entityPlayer.getUUID(), entityPlayer.level())));
     }
 
-    private Widget createWidget(String descriptionId) {
+    private static Widget createWidget(String descriptionId, WirelessMonitor monitor) {
         var group = new WidgetGroup(0, 0, DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8 + 8 + 8 + 17);
         Widget label = new LabelWidget(4, 5, descriptionId);
         label.setSelfPositionX(group.getSizeWidth() / 2 - label.getSizeWidth() / 2);
@@ -50,56 +39,62 @@ public class WirelessEnergyTerminalBehavior implements IItemUIFactory, IWireless
                         .setYScrollBarWidth(2)
                         .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1)))
                 .addWidget(label)
-                .addWidget(new ComponentPanelWidget(8, 17, this::addDisplayText).setMaxWidthLimit(DISPLAY_TEXT_WIDTH));
+                .addWidget(new ComponentPanelWidget(8, 17, text -> addDisplayText(text, monitor)).setMaxWidthLimit(DISPLAY_TEXT_WIDTH));
 
         group.setBackground(GuiTextures.BACKGROUND_INVERSE);
         return group;
     }
 
-    private void addDisplayText(List<Component> textList) {
-        if (isRemote()) return;
-        if (displayTextCache == null || level.getServer().getTickCount() % 10 == 0) {
-            displayTextCache = getDisplayText(DISPLAY_TEXT_WIDTH);
+    private static void addDisplayText(List<Component> textList, WirelessMonitor monitor) {
+        if (monitor.isRemote()) return;
+        if (monitor.displayTextCache == null || monitor.level.getServer().getTickCount() % 10 == 0) {
+            monitor.displayTextCache = monitor.getDisplayText(false, DISPLAY_TEXT_WIDTH);
         }
-        textList.addAll(displayTextCache);
+        textList.addAll(monitor.displayTextCache);
     }
 
-    @Override
-    public InteractionResultHolder<ItemStack> use(Item item, Level level, Player player, InteractionHand usedHand) {
-        this.uuid = player.getUUID();
-        this.level = level;
-        return IItemUIFactory.super.use(item, level, player, usedHand);
-    }
+    private static class WirelessMonitor implements IWirelessMonitor {
 
-    public boolean isRemote() {
-        return getLevel() == null ? GTCEu.isClientThread() : getLevel().isClientSide;
-    }
+        private WirelessMonitor(UUID uuid, Level level) {
+            this.uuid = uuid;
+            this.level = level;
+        }
 
-    @Getter
-    @Setter
-    private WirelessEnergyContainer WirelessEnergyContainerCache;
+        private boolean isRemote() {
+            return level == null ? GTCEu.isClientThread() : level.isClientSide;
+        }
 
-    /**
-     * @return cached uuid of player/team
-     */
-    @Override
-    public @Nullable UUID getUUID() {
-        return uuid;
-    }
+        private final UUID uuid;
+        private final Level level;
 
-    /**
-     * @return false
-     */
-    @Override
-    public boolean display() {
-        return false;
-    }
+        private List<Component> displayTextCache;
 
-    /**
-     * @return level
-     */
-    @Override
-    public Level getLevel() {
-        return level;
+        @Getter
+        @Setter
+        private WirelessEnergyContainer WirelessEnergyContainerCache;
+
+        /**
+         * @return cached uuid of player/team
+         */
+        @Override
+        public @Nullable UUID getUUID() {
+            return uuid;
+        }
+
+        /**
+         * @return false
+         */
+        @Override
+        public boolean display() {
+            return false;
+        }
+
+        /**
+         * @return level
+         */
+        @Override
+        public Level getLevel() {
+            return level;
+        }
     }
 }

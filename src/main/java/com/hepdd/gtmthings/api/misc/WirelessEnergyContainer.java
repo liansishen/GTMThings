@@ -24,8 +24,6 @@ public class WirelessEnergyContainer {
     public static final WeakHashMap<MetaMachine, ITransferData> TRANSFER_DATA = new WeakHashMap<>();
     public static MinecraftServer server;
 
-    public EnergyStat energyStat;
-
     public static WirelessEnergyContainer getOrCreateContainer(UUID uuid) {
         return WirelessEnergySavaedData.INSTANCE.containerMap.computeIfAbsent(TeamUtil.getTeamUUID(uuid), WirelessEnergyContainer::new);
     }
@@ -37,6 +35,8 @@ public class WirelessEnergyContainer {
     private GlobalPos bindPos;
 
     private final UUID uuid;
+
+    private final EnergyStat energyStat;
 
     public WirelessEnergyContainer(UUID uuid, BigInteger storage, long rate, GlobalPos bindPos) {
         this.storage = storage;
