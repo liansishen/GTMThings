@@ -1,11 +1,14 @@
 package com.hepdd.gtmthings.utils;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -64,6 +67,10 @@ public class FormatUtil {
     }
 
     private static int getComponentLength(Component component) {
-        return Minecraft.getInstance().font.width(component.getString());
+        if (GTCEu.isClientSide()) {
+            return Minecraft.getInstance().font.width(component.getString());
+        } else {
+            return component.getString().length();
+        }
     }
 }
