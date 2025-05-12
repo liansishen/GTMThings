@@ -7,8 +7,6 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

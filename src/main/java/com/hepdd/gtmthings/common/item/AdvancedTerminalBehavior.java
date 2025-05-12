@@ -31,6 +31,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 import com.hepdd.gtmthings.api.gui.widget.TerminalInputWidget;
+import com.hepdd.gtmthings.api.misc.Hatch;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -152,9 +153,6 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
     @Getter
     public static class AutoBuildSetting {
 
-        public static final Set<String> HATCH_NAMES = new HashSet<>(Set.of("input_hatch", "output_hatch", "input_bus", "output_bus", "laser_target", "laser_source",
-                "transmitter_hatch", "receiver_hatch", "maintenance_hatch", "parallel_hatch", "import_bus", "export_bus"));
-
         private int coilTier, repeatCount, noHatchMode;
 
         public AutoBuildSetting() {
@@ -189,13 +187,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
             if (this.noHatchMode == 0) return true;
             if (blockInfos != null && blockInfos.length > 0) {
                 var blockInfo = blockInfos[0];
-                if (blockInfo.getBlockState().getBlock() instanceof MetaMachineBlock machineBlock) {
-                    var id = machineBlock.getDefinition().getName();
-                    for (String hatchName : HATCH_NAMES) {
-                        if (id.contains(hatchName)) return false;
-                    }
-                }
-                return true;
+                return !(blockInfo.getBlockState().getBlock() instanceof MetaMachineBlock machineBlock) || !Hatch.Set.contains(machineBlock);
             }
             return true;
         }
