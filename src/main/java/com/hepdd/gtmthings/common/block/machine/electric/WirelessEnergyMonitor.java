@@ -103,6 +103,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
 
     @Override
     public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
+        if (getLevel() == null || getLevel().isClientSide()) return false;
         if (this.UUID == null) {
             this.UUID = player.getUUID();
         }
