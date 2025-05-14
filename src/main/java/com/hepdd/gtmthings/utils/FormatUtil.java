@@ -48,7 +48,8 @@ public class FormatUtil {
         var baseLength = getComponentLength(tmp);
         var spaceLength = width - baseLength;
         if (spaceLength <= 0) return tmp;
-        var spacerCount = (spaceLength / 2) - 4;
+//        var spacerCount = (spaceLength / 2) - 4;
+        var spacerCount = 0; // 暂时移除对齐功能
         var spacer = spacerCount > 0 ? (".".repeat((spaceLength / 2) - 4) + " ") : "";
         var spacerComponent = Component.literal(spacer);
         // return tmp;
@@ -68,7 +69,7 @@ public class FormatUtil {
         if (GTCEu.isClientSide()) {
             return Minecraft.getInstance().font.width(component.getString());
         } else {
-            return component.getString().length();
+            return component.getString().length() / 2;
         }
     }
 }
