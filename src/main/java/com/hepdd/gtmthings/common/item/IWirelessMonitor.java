@@ -30,7 +30,7 @@ public interface IWirelessMonitor extends IWirelessEnergyContainerHolder {
 
     default List<Component> getDisplayText(boolean all, int displayTextWidth) {
         List<Component> textListCache = new ArrayList<>();
-
+        displayTextWidth -= 16;
         WirelessEnergyContainer container = getWirelessEnergyContainer();
         if (container == null) return List.of();
         BigInteger energyTotal = container.getStorage();
@@ -38,7 +38,10 @@ public interface IWirelessMonitor extends IWirelessEnergyContainerHolder {
         textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.1", displayTextWidth, Component.literal(formatBigIntegerNumberOrSic(energyTotal))).withStyle(ChatFormatting.GOLD));
         if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
             long rate = container.getRate();
-            textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2", FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)], Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
+            // textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2",
+            // FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)],
+            // Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
+            textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.2", displayTextWidth, Component.literal(formatBigIntegerNumberOrSic(BigInteger.valueOf(rate))), Component.literal(String.valueOf(rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)])), Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
         }
 
         var stat = container.getEnergyStat();
