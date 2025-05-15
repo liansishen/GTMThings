@@ -78,8 +78,9 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     protected NotifiableEnergyContainer createEnergyContainer() {
         NotifiableEnergyContainer container;
-        this.maxEnergy = GTValues.VEX[tier] * 16L * amps;
-        container = new InfinityEnergyContainer(this, this.maxEnergy, GTValues.VEX[tier], amps, 0L, 0L);
+        this.voltage = GTValues.VEX[setTier];
+        this.maxEnergy = this.voltage * 16L * this.amps;
+        container = new InfinityEnergyContainer(this, this.maxEnergy, this.voltage, this.amps, 0L, 0L);
         return container;
     }
 
@@ -104,11 +105,6 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     }
 
     protected void addEnergy() {
-        if (energyContainer.getInputVoltage() != voltage || energyContainer.getInputAmperage() != amps) {
-            maxEnergy = voltage * 16L * amps;
-            energyContainer.resetBasicInfo(maxEnergy, voltage, amps, 0, 0);
-            energyContainer.setEnergyStored(0);
-        }
         if (energyContainer.getEnergyStored() < this.maxEnergy) {
             energyContainer.setEnergyStored(this.maxEnergy);
         }
@@ -121,32 +117,50 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
                 .widget(new LabelWidget(7, 32, "gtceu.creative.energy.voltage"))
                 .widget(new TextFieldWidget(9, 47, 152, 16, () -> String.valueOf(voltage),
                         value -> {
-                            voltage = Long.parseLong(value);
-                            setTier = GTUtil.getTierByVoltage(voltage);
+                            setVoltage(Long.parseLong(value));
+                            setTier = GTUtil.getTierByVoltage(this.voltage);
                         }).setNumbersOnly(8L, Long.MAX_VALUE))
                 .widget(new LabelWidget(7, 74, "gtceu.creative.energy.amperage"))
                 .widget(new ButtonWidget(7, 87, 20, 20,
                         new GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, new TextTexture("-")),
-                        cd -> amps = --amps == -1 ? 0 : amps))
+                        cd -> setAmps(--amps == -1 ? 0 : amps)))
                 .widget(new TextFieldWidget(31, 89, 114, 16, () -> String.valueOf(amps),
-                        value -> amps = Integer.parseInt(value)).setNumbersOnly(1, 67108864))
+                        value -> setAmps(Integer.parseInt(value))).setNumbersOnly(1, 67108864))
                 .widget(new ButtonWidget(149, 87, 20, 20,
                         new GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, new TextTexture("+")),
                         cd -> {
                             if (amps < Integer.MAX_VALUE) {
-                                amps++;
+                                setAmps(++amps);
                             }
                         }))
 
-                .widget(new SelectorWidget(7, 7, 30, 20, Arrays.stream(GTValues.VNF).toList(), -1)
+                .widget(new SelectorWidget(7, 7, 50, 20, Arrays.stream(GTValues.VNF).toList(), -1)
                         .setOnChanged(tier -> {
                             setTier = ArrayUtils.indexOf(GTValues.VNF, tier);
-                            voltage = GTValues.VEX[setTier];
+                            setVoltage(GTValues.VEX[setTier]);
                         })
                         .setSupplier(() -> GTValues.VNF[setTier])
                         .setButtonBackground(ResourceBorderTexture.BUTTON_COMMON)
                         .setBackground(ColorPattern.BLACK.rectTexture())
                         .setValue(GTValues.VNF[setTier]));
+    }
+
+    private void setVoltage(long voltage) {
+        this.voltage = voltage;
+        this.maxEnergy = this.voltage * 16L * this.amps;
+        updateEnergyContainer();
+    }
+
+    private void setAmps(int amps) {
+        this.amps = amps;
+        this.maxEnergy = this.voltage * 16L * this.amps;
+        updateEnergyContainer();
+    }
+
+    private void updateEnergyContainer() {
+        this.energyContainer.resetBasicInfo(this.maxEnergy, this.voltage, this.amps, 0, 0);
+        this.energyContainer.setEnergyStored(this.maxEnergy);
+        if (!getControllers().isEmpty()) getControllers().first().onPartUnload();
     }
 
     //////////////////////////////////////
