@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.item.component.IItemUIFactory;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
+import com.gregtechceu.gtceu.api.machine.multiblock.WorkableMultiblockMachine;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
 
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
@@ -60,6 +61,12 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
                         getAdvancedBlockPattern(controller.getPattern()).autoBuild(context.getPlayer(), controller.getMultiblockState(), autoBuildSetting);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
+                } else if (MetaMachine.getMachine(level, blockPos) instanceof WorkableMultiblockMachine workableMultiblockMachine && autoBuildSetting.isReplaceCoilMode()) {
+                    if (!level.isClientSide) {
+                        getAdvancedBlockPattern(controller.getPattern()).autoBuild(context.getPlayer(), controller.getMultiblockState(), autoBuildSetting);
+                        workableMultiblockMachine.onPartUnload();
+                    }
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
         }
@@ -99,7 +106,12 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
                         .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.3").getString())
                                 .setHoverTooltips("item.gtmthings.advanced_terminal.setting.3.tooltip"))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, autoBuildSetting::getNoHatchMode,
-                                this::setIsBuildHatches).setMin(0).setMax(1)));
+                                this::setIsBuildHatches).setMin(0).setMax(1))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.4").getString())
+                                .setHoverTooltips("item.gtmthings.advanced_terminal.setting.4.tooltip"))
+                        .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, autoBuildSetting::getReplaceCoilMode,
+                                this::setReplaceCoilMode).setMin(0).setMax(1)));
+
         group.setBackground(GuiTextures.BACKGROUND_INVERSE);
         return group;
     }
@@ -149,16 +161,25 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
         this.itemStack.setTag(tag);
     }
 
+    private void setReplaceCoilMode(int isReplaceCoil) {
+        autoBuildSetting.setReplaceCoilMode(isReplaceCoil);
+        var tag = this.itemStack.getTag();
+        if (tag == null) tag = new CompoundTag();
+        tag.putInt("ReplaceCoilMode", isReplaceCoil);
+        this.itemStack.setTag(tag);
+    }
+
     @Setter
     @Getter
     public static class AutoBuildSetting {
 
-        private int coilTier, repeatCount, noHatchMode;
+        private int coilTier, repeatCount, noHatchMode, replaceCoilMode;
 
         public AutoBuildSetting() {
             this.coilTier = 0;
             this.repeatCount = 0;
             this.noHatchMode = 1;
+            this.replaceCoilMode = 0;
         }
 
         public List<ItemStack> apply(BlockInfo[] blockInfos) {
@@ -190,6 +211,10 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
                 return !(blockInfo.getBlockState().getBlock() instanceof MetaMachineBlock machineBlock) || !Hatch.Set.contains(machineBlock);
             }
             return true;
+        }
+
+        public boolean isReplaceCoilMode() {
+            return replaceCoilMode == 1;
         }
     }
 }
