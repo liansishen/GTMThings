@@ -259,9 +259,9 @@ public class AdvancedBlockPattern extends BlockPattern {
                             }
                         }
 
-                        if (holderHandler != null && autoBuildSetting.isReplaceCoilMode() && coilItemStack != null) {
+                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null) {
                             world.removeBlock(pos, true);
-                            holderHandler.insertItem(holderSlot, coilItemStack, false);
+                            if (holderHandler != null) holderHandler.insertItem(holderSlot, coilItemStack, false);
                         }
 
                         BlockItem itemBlock = (BlockItem) found.getItem();
