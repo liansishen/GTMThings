@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.pattern.MultiblockState;
 import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.pattern.predicates.SimplePredicate;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
+import com.gregtechceu.gtceu.common.block.CoilBlock;
 
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 
@@ -41,6 +42,7 @@ import com.mojang.datafixers.util.Pair;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import oshi.util.tuples.Triplet;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -146,25 +148,51 @@ public class AdvancedBlockPattern extends BlockPattern {
                         BlockPos pos = setActualRelativeOffset(x, y, z, facing, upwardsFacing, isFlipped)
                                 .offset(centerPos.getX(), centerPos.getY(), centerPos.getZ());
                         updateWorldState(worldState, pos, predicate);
+                        ItemStack coilItemStack = null;
                         if (!world.isEmptyBlock(pos)) {
-                            blocks.put(pos, world.getBlockState(pos));
-                            for (SimplePredicate limit : predicate.limited) {
-                                limit.testLimited(worldState);
+                            if (world.getBlockState(pos).getBlock() instanceof CoilBlock coilBlock && autoBuildSetting.isReplaceCoilMode()) {
+                                coilItemStack = coilBlock.asItem().getDefaultInstance();
+                            } else {
+                                blocks.put(pos, world.getBlockState(pos));
+                                for (SimplePredicate limit : predicate.limited) {
+                                    limit.testLimited(worldState);
+                                }
+                                continue;
                             }
-                        } else {
-                            boolean find = false;
-                            BlockInfo[] infos = new BlockInfo[0];
+
+                        }
+
+                        boolean find = false;
+                        BlockInfo[] infos = new BlockInfo[0];
+                        for (SimplePredicate limit : predicate.limited) {
+                            if (limit.minLayerCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
+                                if (!cacheLayer.containsKey(limit)) {
+                                    cacheLayer.put(limit, 1);
+                                } else
+                                    if (cacheLayer.get(limit) < limit.minLayerCount && (limit.maxLayerCount == -1 ||
+                                            cacheLayer.get(limit) < limit.maxLayerCount)) {
+                                                cacheLayer.put(limit, cacheLayer.get(limit) + 1);
+                                            } else {
+                                                continue;
+                                            }
+                            } else {
+                                continue;
+                            }
+                            infos = limit.candidates == null ? null : limit.candidates.get();
+                            find = true;
+                            break;
+                        }
+                        if (!find) {
                             for (SimplePredicate limit : predicate.limited) {
-                                if (limit.minLayerCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
-                                    if (!cacheLayer.containsKey(limit)) {
-                                        cacheLayer.put(limit, 1);
-                                    } else
-                                        if (cacheLayer.get(limit) < limit.minLayerCount && (limit.maxLayerCount == -1 ||
-                                                cacheLayer.get(limit) < limit.maxLayerCount)) {
-                                                    cacheLayer.put(limit, cacheLayer.get(limit) + 1);
-                                                } else {
-                                                    continue;
-                                                }
+                                if (limit.minCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
+                                    if (!cacheGlobal.containsKey(limit)) {
+                                        cacheGlobal.put(limit, 1);
+                                    } else if (cacheGlobal.get(limit) < limit.minCount &&
+                                            (limit.maxCount == -1 || cacheGlobal.get(limit) < limit.maxCount)) {
+                                                cacheGlobal.put(limit, cacheGlobal.get(limit) + 1);
+                                            } else {
+                                                continue;
+                                            }
                                 } else {
                                     continue;
                                 }
@@ -172,98 +200,86 @@ public class AdvancedBlockPattern extends BlockPattern {
                                 find = true;
                                 break;
                             }
-                            if (!find) {
-                                for (SimplePredicate limit : predicate.limited) {
-                                    if (limit.minCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
-                                        if (!cacheGlobal.containsKey(limit)) {
-                                            cacheGlobal.put(limit, 1);
-                                        } else if (cacheGlobal.get(limit) < limit.minCount &&
-                                                (limit.maxCount == -1 || cacheGlobal.get(limit) < limit.maxCount)) {
-                                                    cacheGlobal.put(limit, cacheGlobal.get(limit) + 1);
-                                                } else {
-                                                    continue;
-                                                }
-                                    } else {
-                                        continue;
-                                    }
-                                    infos = limit.candidates == null ? null : limit.candidates.get();
-                                    find = true;
-                                    break;
+                        }
+                        if (!find) { // no limited
+                            for (SimplePredicate limit : predicate.limited) {
+                                if (!autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
+                                    continue;
                                 }
+                                if (limit.maxLayerCount != -1 &&
+                                        cacheLayer.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxLayerCount)
+                                    continue;
+                                if (limit.maxCount != -1 &&
+                                        cacheGlobal.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxCount)
+                                    continue;
+                                if (cacheLayer.containsKey(limit)) {
+                                    cacheLayer.put(limit, cacheLayer.get(limit) + 1);
+                                } else {
+                                    cacheLayer.put(limit, 1);
+                                }
+                                if (cacheGlobal.containsKey(limit)) {
+                                    cacheGlobal.put(limit, cacheGlobal.get(limit) + 1);
+                                } else {
+                                    cacheGlobal.put(limit, 1);
+                                }
+                                infos = ArrayUtils.addAll(infos,
+                                        limit.candidates == null ? null : limit.candidates.get());
                             }
-                            if (!find) { // no limited
-                                for (SimplePredicate limit : predicate.limited) {
-                                    if (!autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
-                                        continue;
-                                    }
-                                    if (limit.maxLayerCount != -1 &&
-                                            cacheLayer.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxLayerCount)
-                                        continue;
-                                    if (limit.maxCount != -1 &&
-                                            cacheGlobal.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxCount)
-                                        continue;
-                                    if (cacheLayer.containsKey(limit)) {
-                                        cacheLayer.put(limit, cacheLayer.get(limit) + 1);
-                                    } else {
-                                        cacheLayer.put(limit, 1);
-                                    }
-                                    if (cacheGlobal.containsKey(limit)) {
-                                        cacheGlobal.put(limit, cacheGlobal.get(limit) + 1);
-                                    } else {
-                                        cacheGlobal.put(limit, 1);
-                                    }
-                                    infos = ArrayUtils.addAll(infos,
-                                            limit.candidates == null ? null : limit.candidates.get());
+                            for (SimplePredicate common : predicate.common) {
+                                if (common.candidates != null && predicate.common.size() > 1 && !autoBuildSetting.isPlaceHatch(common.candidates.get())) {
+                                    continue;
                                 }
-                                for (SimplePredicate common : predicate.common) {
-                                    if (common.candidates != null && predicate.common.size() > 1 && !autoBuildSetting.isPlaceHatch(common.candidates.get())) {
-                                        continue;
-                                    }
-                                    infos = ArrayUtils.addAll(infos,
-                                            common.candidates == null ? null : common.candidates.get());
-                                }
-                            }
-
-                            List<ItemStack> candidates = autoBuildSetting.apply(infos);
-
-                            // check inventory
-                            ItemStack found = null;
-                            int foundSlot = -1;
-                            IItemHandler handler = null;
-                            if (!player.isCreative()) {
-                                var foundHandler = getMatchStackWithHandler(candidates,
-                                        player.getCapability(ForgeCapabilities.ITEM_HANDLER), player);
-                                if (foundHandler != null) {
-                                    foundSlot = foundHandler.getFirst();
-                                    handler = foundHandler.getSecond();
-                                    found = handler.getStackInSlot(foundSlot).copy();
-                                }
-                            } else {
-                                for (ItemStack candidate : candidates) {
-                                    found = candidate.copy();
-                                    if (!found.isEmpty() && found.getItem() instanceof BlockItem) {
-                                        break;
-                                    }
-                                    found = null;
-                                }
-                            }
-                            if (found == null) continue;
-                            BlockItem itemBlock = (BlockItem) found.getItem();
-                            BlockPlaceContext context = new BlockPlaceContext(world, player, InteractionHand.MAIN_HAND,
-                                    found, BlockHitResult.miss(player.getEyePosition(0), Direction.UP, pos));
-                            InteractionResult interactionResult = itemBlock.place(context);
-                            if (interactionResult != InteractionResult.FAIL) {
-                                placeBlockPos.add(pos);
-                                if (handler != null) {
-                                    handler.extractItem(foundSlot, 1, false);
-                                }
-                            }
-                            if (world.getBlockEntity(pos) instanceof IMachineBlockEntity machineBlockEntity) {
-                                blocks.put(pos, machineBlockEntity.getMetaMachine());
-                            } else {
-                                blocks.put(pos, world.getBlockState(pos));
+                                infos = ArrayUtils.addAll(infos,
+                                        common.candidates == null ? null : common.candidates.get());
                             }
                         }
+
+                        List<ItemStack> candidates = autoBuildSetting.apply(infos);
+
+                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null && ItemStack.isSameItem(candidates.get(0), coilItemStack)) continue;
+
+                        // check inventory
+                        Triplet<ItemStack, IItemHandler, Integer> result = foundItem(player, candidates);
+                        ItemStack found = result.getA();
+                        IItemHandler handler = result.getB();
+                        int foundSlot = result.getC();
+
+                        if (found == null) continue;
+
+                        // check can get old coilBlock
+                        IItemHandler holderHandler = null;
+                        int holderSlot = -1;
+                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null) {
+                            Pair<IItemHandler, Integer> holderResult = foundHolderSlot(player, coilItemStack);
+                            holderHandler = holderResult.getFirst();
+                            holderSlot = holderResult.getSecond();
+
+                            if (holderHandler != null && holderSlot < 0) {
+                                continue;
+                            }
+                        }
+
+                        if (holderHandler != null && autoBuildSetting.isReplaceCoilMode() && coilItemStack != null) {
+                            world.removeBlock(pos, true);
+                            holderHandler.insertItem(holderSlot, coilItemStack, false);
+                        }
+
+                        BlockItem itemBlock = (BlockItem) found.getItem();
+                        BlockPlaceContext context = new BlockPlaceContext(world, player, InteractionHand.MAIN_HAND,
+                                found, BlockHitResult.miss(player.getEyePosition(0), Direction.UP, pos));
+                        InteractionResult interactionResult = itemBlock.place(context);
+                        if (interactionResult != InteractionResult.FAIL) {
+                            placeBlockPos.add(pos);
+                            if (handler != null) {
+                                handler.extractItem(foundSlot, 1, false);
+                            }
+                        }
+                        if (world.getBlockEntity(pos) instanceof IMachineBlockEntity machineBlockEntity) {
+                            blocks.put(pos, machineBlockEntity.getMetaMachine());
+                        } else {
+                            blocks.put(pos, world.getBlockState(pos));
+                        }
+
                     }
                 }
                 z++;
@@ -289,6 +305,51 @@ public class AdvancedBlockPattern extends BlockPattern {
                 }
             }
         });
+    }
+
+    private Triplet<ItemStack, IItemHandler, Integer> foundItem(Player player, List<ItemStack> candidates) {
+        ItemStack found = null;
+        IItemHandler handler = null;
+        int foundSlot = -1;
+        if (!player.isCreative()) {
+            var foundHandler = getMatchStackWithHandler(candidates,
+                    player.getCapability(ForgeCapabilities.ITEM_HANDLER), player);
+            if (foundHandler != null) {
+                foundSlot = foundHandler.getFirst();
+                handler = foundHandler.getSecond();
+                found = handler.getStackInSlot(foundSlot).copy();
+            }
+        } else {
+            for (ItemStack candidate : candidates) {
+                found = candidate.copy();
+                if (!found.isEmpty() && found.getItem() instanceof BlockItem) {
+                    break;
+                }
+                found = null;
+            }
+        }
+        return new Triplet<>(found, handler, foundSlot);
+    }
+
+    private Pair<IItemHandler, Integer> foundHolderSlot(Player player, ItemStack coilItemStack) {
+        IItemHandler handler = null;
+        int foundSlot = -1;
+        if (!player.isCreative()) {
+            handler = player.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+            for (int i = 0; i < handler.getSlots(); i++) {
+                @NotNull
+                ItemStack stack = handler.getStackInSlot(i);
+                if (stack.isEmpty()) {
+                    if (foundSlot < 0) {
+                        foundSlot = i;
+                    }
+                } else if (ItemStack.isSameItemSameTags(coilItemStack, stack) && (stack.getCount() + 1) <= stack.getMaxStackSize()) {
+                    foundSlot = i;
+                }
+            }
+        }
+
+        return new Pair<>(handler, foundSlot);
     }
 
     private void clearWorldState(MultiblockState worldState) {
