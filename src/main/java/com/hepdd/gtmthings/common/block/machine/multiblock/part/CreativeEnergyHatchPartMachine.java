@@ -5,10 +5,10 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
+import com.gregtechceu.gtceu.api.pattern.MultiblockWorldSavedData;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -22,19 +22,19 @@ import com.lowdragmc.lowdraglib.gui.widget.ButtonWidget;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SelectorWidget;
 import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
-import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,9 +51,6 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     @Persisted
     public final NotifiableEnergyContainer energyContainer;
-    protected TickableSubscription explosionSubs;
-    @Nullable
-    protected ISubscription energyListener;
     private Long maxEnergy;
     @Persisted
     private long voltage = 0;
@@ -85,29 +82,9 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     }
 
     @Override
-    public void onLoad() {
-        super.onLoad();
-        energyListener = energyContainer.addChangedListener(this::InfinityEnergySubscription);
-        InfinityEnergySubscription();
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-        if (energyListener != null) {
-            energyListener.unsubscribe();
-            energyListener = null;
-        }
-    }
-
-    protected void InfinityEnergySubscription() {
-        explosionSubs = subscribeServerTick(explosionSubs, this::addEnergy);
-    }
-
-    protected void addEnergy() {
-        if (energyContainer.getEnergyStored() < this.maxEnergy) {
-            energyContainer.setEnergyStored(this.maxEnergy);
-        }
+    public void loadCustomPersistedData(@NotNull CompoundTag tag) {
+        super.loadCustomPersistedData(tag);
+        updateEnergyContainer();
     }
 
     @Override
@@ -160,7 +137,23 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     private void updateEnergyContainer() {
         this.energyContainer.resetBasicInfo(this.maxEnergy, this.voltage, this.amps, 0, 0);
         this.energyContainer.setEnergyStored(this.maxEnergy);
-        if (!getControllers().isEmpty()) getControllers().first().onPartUnload();
+        if (getLevel() instanceof ServerLevel serverLevel) {
+            serverLevel.getServer().execute(() -> {
+                for (var c : getControllers()) {
+                    if (c.isFormed()) {
+                        c.getPatternLock().lock();
+                        try {
+                            c.onStructureInvalid();
+                            var mwsd = MultiblockWorldSavedData.getOrCreate(serverLevel);
+                            mwsd.removeMapping(c.getMultiblockState());
+                            mwsd.addAsyncLogic(c);
+                        } finally {
+                            c.getPatternLock().unlock();
+                        }
+                    }
+                }
+            });
+        }
     }
 
     //////////////////////////////////////
