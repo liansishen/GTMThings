@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
@@ -22,6 +23,7 @@ import com.lowdragmc.lowdraglib.gui.widget.ButtonWidget;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SelectorWidget;
 import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
+import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
@@ -35,6 +37,7 @@ import net.minecraft.world.entity.player.Player;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +54,9 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     @Persisted
     public final NotifiableEnergyContainer energyContainer;
+    protected TickableSubscription energySubs;
+    @Nullable
+    protected ISubscription energyListener;
     private Long maxEnergy;
     @Persisted
     private long voltage = 0;
@@ -79,6 +85,32 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
         this.maxEnergy = this.voltage * 16L * this.amps;
         container = new InfinityEnergyContainer(this, this.maxEnergy, this.voltage, this.amps, 0L, 0L);
         return container;
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        energyListener = energyContainer.addChangedListener(this::InfinityEnergySubscription);
+        InfinityEnergySubscription();
+    }
+
+    @Override
+    public void onUnload() {
+        super.onUnload();
+        if (energyListener != null) {
+            energyListener.unsubscribe();
+            energyListener = null;
+        }
+    }
+
+    protected void InfinityEnergySubscription() {
+        energySubs = subscribeServerTick(energySubs, this::addEnergy);
+    }
+
+    protected void addEnergy() {
+        if (energyContainer.getEnergyStored() < this.maxEnergy) {
+            energyContainer.setEnergyStored(this.maxEnergy);
+        }
     }
 
     @Override
