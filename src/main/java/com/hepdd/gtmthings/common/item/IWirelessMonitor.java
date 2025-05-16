@@ -72,14 +72,16 @@ public interface IWirelessMonitor extends IWirelessEnergyContainerHolder {
             textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.2", Component.translatable("recipe.condition.dimension.tooltip", container.getBindPos().dimension().location().toString()).append(" [").append(pos).append("] ")).withStyle(ChatFormatting.GRAY));
         }
         textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.statistics").append(ComponentPanelWidget.withButton(all ? Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.all") : Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.team"), "all")));
-        WirelessEnergyContainer.observed = true;
-        WirelessEnergyContainer.TRANSFER_DATA.clear();
+
         for (Map.Entry<MetaMachine, ITransferData> m : WirelessEnergyContainer.TRANSFER_DATA.entrySet().stream().sorted(Comparator.comparingLong(entry -> entry.getValue().Throughput())).toList()) {
             UUID uuid = m.getValue().UUID();
             if (all || uuid.equals(TeamUtil.getTeamUUID(this.getUUID()))) {
                 textListCache.add(m.getValue().getInfo());
             }
         }
+
+        WirelessEnergyContainer.observed = true;
+        WirelessEnergyContainer.TRANSFER_DATA.clear();
 
         return textListCache;
     }
