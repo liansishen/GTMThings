@@ -58,9 +58,6 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
     private WirelessEnergyContainer WirelessEnergyContainerCache;
 
     @Persisted
-    public UUID owner_uuid;
-
-    @Persisted
     public final NotifiableEnergyContainer energyContainer;
 
     public WirelessEnergyInterface(IMachineBlockEntity holder) {
@@ -95,7 +92,7 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
     }
 
     private void updateEnergySubscription() {
-        if (this.owner_uuid != null) {
+        if (this.getUUID() != null) {
             updEnergySubs = subscribeServerTick(updEnergySubs, this::updateEnergy);
         } else if (updEnergySubs != null) {
             updEnergySubs.unsubscribe();
@@ -123,7 +120,7 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
         ItemStack is = player.getItemInHand(hand);
         if (is.isEmpty()) return InteractionResult.PASS;
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
-            this.owner_uuid = player.getUUID();
+            setOwnerUUID(player.getUUID());
             setWirelessEnergyContainerCache(null);
             player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind", GetName(player)));
             updateEnergySubscription();
@@ -138,7 +135,7 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
         ItemStack is = player.getItemInHand(hand);
         if (is.isEmpty()) return false;
         if (is.is(GTItems.TOOL_DATA_STICK.asItem())) {
-            this.owner_uuid = null;
+            setOwnerUUID(null);
             setWirelessEnergyContainerCache(null);
             player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.unbind"));
             updateEnergySubscription();
@@ -150,14 +147,14 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
     @Override
     public void onMachinePlaced(@Nullable LivingEntity player, ItemStack stack) {
         if (player != null) {
-            this.owner_uuid = player.getUUID();
+            setOwnerUUID(player.getUUID());
             updateEnergySubscription();
         }
     }
 
     @Override
-    public UUID getUUID() {
-        return this.owner_uuid;
+    public @Nullable UUID getUUID() {
+        return this.getOwnerUUID();
     }
 
     //////////////////////////////////////

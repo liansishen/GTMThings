@@ -162,7 +162,7 @@ public class WirelessNotifiableComputationContainer extends NotifiableComputatio
     }
 
     @Override
-    public List<Integer> handleRecipeInner(IO io, GTRecipe recipe, List<Integer> left, @Nullable String slotName,
+    public List<Integer> handleRecipeInner(IO io, GTRecipe recipe, List<Integer> left,
                                            boolean simulate) {
         IOpticalComputationProvider provider = getOpticalNetProvider();
         if (provider == null) return left;

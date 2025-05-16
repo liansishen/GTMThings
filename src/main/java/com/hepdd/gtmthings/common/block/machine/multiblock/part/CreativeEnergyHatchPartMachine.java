@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
+import com.gregtechceu.gtceu.api.pattern.MultiblockWorldSavedData;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -28,7 +29,9 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 
 import lombok.Getter;
@@ -51,7 +54,7 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     @Persisted
     public final NotifiableEnergyContainer energyContainer;
-    protected TickableSubscription explosionSubs;
+    protected TickableSubscription energySubs;
     @Nullable
     protected ISubscription energyListener;
     private Long maxEnergy;
@@ -78,8 +81,9 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     protected NotifiableEnergyContainer createEnergyContainer() {
         NotifiableEnergyContainer container;
-        this.maxEnergy = GTValues.VEX[tier] * 16L * amps;
-        container = new InfinityEnergyContainer(this, this.maxEnergy, GTValues.VEX[tier], amps, 0L, 0L);
+        this.voltage = GTValues.VEX[setTier];
+        this.maxEnergy = this.voltage * 16L * this.amps;
+        container = new InfinityEnergyContainer(this, this.maxEnergy, this.voltage, this.amps, 0L, 0L);
         return container;
     }
 
@@ -100,18 +104,19 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     }
 
     protected void InfinityEnergySubscription() {
-        explosionSubs = subscribeServerTick(explosionSubs, this::addEnergy);
+        energySubs = subscribeServerTick(energySubs, this::addEnergy);
     }
 
     protected void addEnergy() {
-        if (energyContainer.getInputVoltage() != voltage || energyContainer.getInputAmperage() != amps) {
-            maxEnergy = voltage * 16L * amps;
-            energyContainer.resetBasicInfo(maxEnergy, voltage, amps, 0, 0);
-            energyContainer.setEnergyStored(0);
-        }
         if (energyContainer.getEnergyStored() < this.maxEnergy) {
             energyContainer.setEnergyStored(this.maxEnergy);
         }
+    }
+
+    @Override
+    public void loadCustomPersistedData(@NotNull CompoundTag tag) {
+        super.loadCustomPersistedData(tag);
+        updateEnergyContainer();
     }
 
     @Override
@@ -121,32 +126,66 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
                 .widget(new LabelWidget(7, 32, "gtceu.creative.energy.voltage"))
                 .widget(new TextFieldWidget(9, 47, 152, 16, () -> String.valueOf(voltage),
                         value -> {
-                            voltage = Long.parseLong(value);
-                            setTier = GTUtil.getTierByVoltage(voltage);
+                            setVoltage(Long.parseLong(value));
+                            setTier = GTUtil.getTierByVoltage(this.voltage);
                         }).setNumbersOnly(8L, Long.MAX_VALUE))
                 .widget(new LabelWidget(7, 74, "gtceu.creative.energy.amperage"))
                 .widget(new ButtonWidget(7, 87, 20, 20,
                         new GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, new TextTexture("-")),
-                        cd -> amps = --amps == -1 ? 0 : amps))
+                        cd -> setAmps(--amps == -1 ? 0 : amps)))
                 .widget(new TextFieldWidget(31, 89, 114, 16, () -> String.valueOf(amps),
-                        value -> amps = Integer.parseInt(value)).setNumbersOnly(1, 67108864))
+                        value -> setAmps(Integer.parseInt(value))).setNumbersOnly(1, 67108864))
                 .widget(new ButtonWidget(149, 87, 20, 20,
                         new GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, new TextTexture("+")),
                         cd -> {
                             if (amps < Integer.MAX_VALUE) {
-                                amps++;
+                                setAmps(++amps);
                             }
                         }))
 
-                .widget(new SelectorWidget(7, 7, 30, 20, Arrays.stream(GTValues.VNF).toList(), -1)
+                .widget(new SelectorWidget(7, 7, 50, 20, Arrays.stream(GTValues.VNF).toList(), -1)
                         .setOnChanged(tier -> {
                             setTier = ArrayUtils.indexOf(GTValues.VNF, tier);
-                            voltage = GTValues.VEX[setTier];
+                            setVoltage(GTValues.VEX[setTier]);
                         })
                         .setSupplier(() -> GTValues.VNF[setTier])
                         .setButtonBackground(ResourceBorderTexture.BUTTON_COMMON)
                         .setBackground(ColorPattern.BLACK.rectTexture())
                         .setValue(GTValues.VNF[setTier]));
+    }
+
+    private void setVoltage(long voltage) {
+        this.voltage = voltage;
+        this.maxEnergy = this.voltage * 16L * this.amps;
+        updateEnergyContainer();
+    }
+
+    private void setAmps(int amps) {
+        this.amps = amps;
+        this.maxEnergy = this.voltage * 16L * this.amps;
+        updateEnergyContainer();
+    }
+
+    private void updateEnergyContainer() {
+        this.energyContainer.resetBasicInfo(this.maxEnergy, this.voltage, this.amps, 0, 0);
+        this.energyContainer.setEnergyStored(this.maxEnergy);
+        if (getLevel() instanceof ServerLevel serverLevel) {
+            serverLevel.getServer().execute(() -> {
+                for (var c : getControllers()) {
+                    if (c.isFormed()) {
+                        c.getPatternLock().lock();
+                        try {
+                            c.onStructureInvalid();
+                            var mwsd = MultiblockWorldSavedData.getOrCreate(serverLevel);
+                            mwsd.removeMapping(c.getMultiblockState());
+                            mwsd.addAsyncLogic(c);
+                        } finally {
+                            c.getPatternLock().unlock();
+                        }
+                    }
+                }
+            });
+        }
     }
 
     //////////////////////////////////////
@@ -178,8 +217,8 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
         }
 
         @Override
-        public List<Long> handleRecipeInner(IO io, GTRecipe recipe, List<Long> left, @Nullable String slotName, boolean simulate) {
-            return super.handleRecipeInner(io, recipe, left, slotName, true);
+        public List<Long> handleRecipeInner(IO io, GTRecipe recipe, List<Long> left, boolean simulate) {
+            return super.handleRecipeInner(io, recipe, left, true);
         }
 
         @Override
