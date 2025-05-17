@@ -129,7 +129,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
             tag.putInt("CoilTier", 0);
             tag.putInt("RepeatCount", 0);
             tag.putInt("NoHatchMode", 1);
-            tag.putInt("ReplaceCoilMode",0);
+            tag.putInt("ReplaceCoilMode", 0);
             this.itemStack.setTag(tag);
             this.autoBuildSetting.setCoilTier(0);
             this.autoBuildSetting.setRepeatCount(0);

@@ -19,7 +19,7 @@ import java.util.Locale;
 
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 
-public class WirelessCovers {
+public class GTMTCovers {
 
     static {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.WIRELESS_TAB);
