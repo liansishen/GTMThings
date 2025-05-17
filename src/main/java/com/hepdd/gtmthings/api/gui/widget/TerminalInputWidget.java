@@ -77,7 +77,20 @@ public class TerminalInputWidget extends WidgetGroup {
     private void buildUI() {
         this.textField = new TextFieldWidget(0, 0, getSizeWidth(), 12,
                 () -> toText(valueSupplier.get()),
-                stringValue -> this.setValue(clamp(fromText(stringValue), min, max)));
+                stringValue -> this.setValue(clamp(fromText(stringValue), min, max))) {
+
+            @Override
+            public boolean mouseWheelMove(double mouseX, double mouseY, double wheelDelta) {
+                if (wheelDur > 0 && numberInstance != null && isMouseOverElement(mouseX, mouseY) && isFocus()) {
+                    try {
+                        onTextChanged(String.valueOf(Integer.parseInt(getCurrentString()) + (int) ((wheelDelta > 0 ? 1 : -1) * wheelDur)));
+                    } catch (Exception ignored) {}
+                    setFocus(true);
+                    return true;
+                }
+                return false;
+            }
+        };
 
         this.addWidget(this.textField);
     }
