@@ -37,9 +37,9 @@ public class WirelessEnergyTerminalBehavior implements IItemUIFactory {
                 new DraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117 + 8 + 8 + 17)
                         .setBackground(GuiTextures.DISPLAY)
                         .setYScrollBarWidth(2)
-                        .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1)))
+                        .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
                 .addWidget(label)
-                .addWidget(new ComponentPanelWidget(8, 17, text -> addDisplayText(text, monitor)).setMaxWidthLimit(DISPLAY_TEXT_WIDTH));
+                .addWidget(new ComponentPanelWidget(8, 17, text -> addDisplayText(text, monitor)).setMaxWidthLimit(DISPLAY_TEXT_WIDTH)));
 
         group.setBackground(GuiTextures.BACKGROUND_INVERSE);
         return group;
