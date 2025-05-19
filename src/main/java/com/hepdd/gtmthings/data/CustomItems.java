@@ -11,12 +11,9 @@ import com.gregtechceu.gtceu.common.item.TooltipBehavior;
 import net.minecraft.network.chat.Component;
 
 import com.hepdd.gtmthings.client.VirtualItemProviderRenderer;
-import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
+import com.hepdd.gtmthings.common.item.*;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverPlaceBehavior;
 import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverTooltipBehavior;
-import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
-import com.hepdd.gtmthings.common.item.VirtualItemProviderCellItem;
-import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 
@@ -39,6 +36,10 @@ public class CustomItems {
             .register();
 
     public static final ItemEntry<VirtualItemProviderCellItem> VIRTUAL_ITEM_PROVIDER_CELL = GTMTHINGS_REGISTRATE.item("virtual_item_provider_cell", VirtualItemProviderCellItem::new).register();
+
+    public static final ItemEntry<ComponentItem> PROGRAMMABLE_COVER = GTMTHINGS_REGISTRATE.item("programmable_cover", ComponentItem::create)
+            .onRegister(attach(new CoverPlaceBehavior(GTMTCovers.PROGRAMMABLE_COVER)))
+            .register();
 
     public static ItemEntry<ComponentItem> WIRELESS_ITEM_TRANSFER_COVER = GTMTHINGS_REGISTRATE
             .item("wireless_item_transfer_cover", ComponentItem::create)
@@ -135,6 +136,12 @@ public class CustomItems {
             .item("advanced_terminal", ComponentItem::create)
             .properties(p -> p.stacksTo(1))
             .onRegister(attach(new AdvancedTerminalBehavior())).register();
+
+    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_TERMINAL = GTMTHINGS_REGISTRATE
+            .item("wireless_energy_terminal", ComponentItem::create)
+            .properties(p -> p.stacksTo(1))
+            .onRegister(attach(new WirelessEnergyTerminalBehavior()))
+            .onRegister(attach(new WirelessEnergyBindingToolBehavior())).register();
 
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_BINDING_TOOL = GTMTHINGS_REGISTRATE
             .item("wireless_energy_binding_tool", ComponentItem::create)

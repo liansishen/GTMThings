@@ -285,8 +285,11 @@
   "gtmthings.machine.wireless_energy_monitor.tooltip.0": "所有者：%s",
   "gtmthings.machine.wireless_energy_monitor.tooltip.1": "能源总量：%s EU",
   "gtmthings.machine.wireless_energy_monitor.tooltip.2": "单次传输上限：%s EU/t (%sA %s§r)",
-  "gtmthings.machine.wireless_energy_monitor.tooltip.input": "平均输入：§a%s EU/t (%sA %s§r)",
-  "gtmthings.machine.wireless_energy_monitor.tooltip.output": "平均输出：§a%s EU/t (%sA %s§r)",
+  "gtmthings.machine.wireless_energy_monitor.tooltip.net_power": "平均净功率：",
+  "gtmthings.machine.wireless_energy_monitor.tooltip.last_minute": "近一分钟：§a%s EU/t (%sA %s§r)",
+  "gtmthings.machine.wireless_energy_monitor.tooltip.last_hour": "近一小时：§a%s EU/t (%sA %s§r)",
+  "gtmthings.machine.wireless_energy_monitor.tooltip.last_day": "近一天：§a%s EU/t (%sA %s§r)",
+  "gtmthings.machine.wireless_energy_monitor.tooltip.now": "当前：§a%s EU/t (%sA %s§r)",
   "gtmthings.machine.wireless_energy_monitor.tooltip.time_to_fill": "你一辈子都充不满",
   "gtmthings.machine.wireless_energy_monitor.tooltip.statistics": "用电统计：",
   "gtmthings.machine.wireless_energy_monitor.tooltip.all": "全局",
@@ -400,5 +403,5 @@
   "block.gtmthings.ulv_huge_dual_hatch":"§8ULV§r巨型输入总成",
   "block.gtmthings.uv_huge_dual_hatch":"§3UV§r巨型输入总成",
   "block.gtmthings.uxv_huge_dual_hatch":"§eUXV§r巨型输入总成",
-  "config.gtmthings.option.isWirelessRateEnable": "是否启用无线能源传输限制。"
+  "config.gtmthings.option.isWirelessRateEnable": "是否启用无线能源传输限制。",
 }

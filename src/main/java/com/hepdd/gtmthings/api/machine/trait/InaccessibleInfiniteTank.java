@@ -40,7 +40,7 @@ public class InaccessibleInfiniteTank extends NotifiableFluidTank {
     }
 
     @Override
-    public List<FluidIngredient> handleRecipe(IO io, GTRecipe recipe, List<?> left, @Nullable String slotName, boolean simulate) {
+    public List<FluidIngredient> handleRecipe(IO io, GTRecipe recipe, List<?> left, boolean simulate) {
         if (!simulate && io == IO.OUT) {
             for (Object ingredient : left) {
                 if (((FluidIngredient) ingredient).isEmpty()) continue;
@@ -95,8 +95,7 @@ public class InaccessibleInfiniteTank extends NotifiableFluidTank {
 
     @Override
     @Nullable
-    public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left,
-                                                   @Nullable String slotName, boolean simulate) {
+    public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left, boolean simulate) {
         if (io != IO.OUT) return left;
         FluidAction action = simulate ? FluidAction.SIMULATE : FluidAction.EXECUTE;
         for (var it = left.iterator(); it.hasNext();) {
@@ -165,11 +164,6 @@ public class InaccessibleInfiniteTank extends NotifiableFluidTank {
         @Override
         public boolean supportsDrain(int tank) {
             return false;
-        }
-
-        @Override
-        public CustomFluidTank copy() {
-            return new FluidStorageDelegate(internalBuffer);
         }
     }
 }

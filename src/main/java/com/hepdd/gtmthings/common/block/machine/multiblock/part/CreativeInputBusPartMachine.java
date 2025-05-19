@@ -10,7 +10,6 @@ import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
-import com.gregtechceu.gtceu.api.machine.trait.ItemHandlerProxyRecipeTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
@@ -40,8 +39,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -67,8 +66,6 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     @Getter
     @Persisted
     protected final NotifiableItemStackHandler circuitInventory;
-    @Getter
-    protected final ItemHandlerProxyRecipeTrait combinedInventory;
     @Persisted
     private ItemStackTransfer creativeStorage;
     protected ArrayList<Item> lstItem;
@@ -77,7 +74,6 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
         super(holder, GTValues.MAX, IO.IN);
         this.inventory = createInventory();
         this.circuitInventory = createCircuitItemHandler();
-        this.combinedInventory = createCombinedItemHandler();
         this.creativeStorage = transferFactory.apply(this.getInventorySize());
         this.lstItem = new ArrayList<>();
     }
@@ -102,10 +98,6 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     protected NotifiableItemStackHandler createCircuitItemHandler() {
         return new NotifiableItemStackHandler(this, 1, IO.IN, IO.NONE)
                 .setFilter(IntCircuitBehaviour::isIntegratedCircuit);
-    }
-
-    protected ItemHandlerProxyRecipeTrait createCombinedItemHandler() {
-        return new ItemHandlerProxyRecipeTrait(this, Set.of(getInventory(), circuitInventory), IO.IN, IO.NONE);
     }
 
     @Override
@@ -138,7 +130,6 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     public void setDistinct(boolean isDistinct) {
         getInventory().setDistinct(isDistinct);
         circuitInventory.setDistinct(isDistinct);
-        combinedInventory.setDistinct(isDistinct);
     }
 
     protected void autoKeep() {
@@ -291,13 +282,13 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
 
     private static class InfinityItemStackHandler extends NotifiableItemStackHandler {
 
-        public InfinityItemStackHandler(MetaMachine machine, int slots, @NotNull IO handlerIO, @NotNull IO capabilityIO, Function<Integer, CustomItemStackHandler> storageFactory) {
+        public InfinityItemStackHandler(MetaMachine machine, int slots, @NotNull IO handlerIO, @NotNull IO capabilityIO, IntFunction<CustomItemStackHandler> storageFactory) {
             super(machine, slots, handlerIO, capabilityIO, storageFactory);
         }
 
         @Override
-        public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left, @Nullable String slotName, boolean simulate) {
-            return super.handleRecipeInner(io, recipe, left, slotName, true);
+        public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left, boolean simulate) {
+            return super.handleRecipeInner(io, recipe, left, true);
         }
     }
 }

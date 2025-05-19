@@ -24,7 +24,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -55,7 +54,7 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
         CompoundTag tag = item.getOrCreateTag();
         String mod = tag.getString("m");
         if (mod.isEmpty()) {
-            return Items.AIR.getDefaultInstance();
+            return ItemStack.EMPTY;
         }
         ItemStack stack = BuiltInRegistries.ITEM.get(new ResourceLocation(mod, tag.getString("n"))).getDefaultInstance();
         if (tag.contains("t")) stack.setTag((CompoundTag) tag.get("t"));

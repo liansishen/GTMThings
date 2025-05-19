@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.data;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
@@ -8,10 +9,7 @@ import com.gregtechceu.gtceu.client.renderer.cover.ICoverRenderer;
 import com.gregtechceu.gtceu.client.renderer.cover.SimpleCoverRenderer;
 
 import com.hepdd.gtmthings.GTMThings;
-import com.hepdd.gtmthings.common.cover.AdvancedWirelessTransferCover;
-import com.hepdd.gtmthings.common.cover.CreativeEnergyCover;
-import com.hepdd.gtmthings.common.cover.WirelessEnergyReceiveCover;
-import com.hepdd.gtmthings.common.cover.WirelessTransferCover;
+import com.hepdd.gtmthings.common.cover.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 
 import java.util.Arrays;
@@ -26,6 +24,12 @@ public class GTMTCovers {
     }
     public static final int[] ALL_TIERS = GTValues.tiersBetween(GTValues.LV,
             GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV);
+
+    public final static CoverDefinition CREATIVE_ENERGY = register("creative_energy",
+            CreativeEnergyCover::new, new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_creative_energy")));
+
+    public final static CoverDefinition PROGRAMMABLE_COVER = register("programmable_cover",
+            ProgrammableCover::new, new SimpleCoverRenderer(GTCEu.id("item/programmed_circuit/1")));
 
     public final static CoverDefinition[] WIRELESS_ENERGY_RECEIVE = registerTieredWirelessCover(
             "wireless_energy_receive", 1, ALL_TIERS);
@@ -44,9 +48,6 @@ public class GTMTCovers {
 
     public final static CoverDefinition ADVANCED_WIRELESS_FLUID_TRANSFER = register("advanced_wireless_fluid_transfer",
             (holder, coverable, side) -> new AdvancedWirelessTransferCover(holder, coverable, side, WirelessTransferCover.TRANSFER_FLUID), new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_wireless_fluid_transfer")));
-
-    public final static CoverDefinition CREATIVE_ENERGY = register("creative_energy",
-            CreativeEnergyCover::new, new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_creative_energy")));
 
     public static CoverDefinition register(String id, CoverDefinition.CoverBehaviourProvider behaviorCreator,
                                            ICoverRenderer coverRenderer) {
