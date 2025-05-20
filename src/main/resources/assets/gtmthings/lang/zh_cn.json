@@ -403,5 +403,5 @@
   "block.gtmthings.ulv_huge_dual_hatch":"§8ULV§r巨型输入总成",
   "block.gtmthings.uv_huge_dual_hatch":"§3UV§r巨型输入总成",
   "block.gtmthings.uxv_huge_dual_hatch":"§eUXV§r巨型输入总成",
-  "config.gtmthings.option.isWirelessRateEnable": "是否启用无线能源传输限制。",
+  "config.gtmthings.option.isWirelessRateEnable": "是否启用无线能源传输限制。"
 }

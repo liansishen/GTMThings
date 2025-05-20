@@ -38,8 +38,8 @@ public class WirelessEnergyTerminalBehavior implements IItemUIFactory {
                         .setBackground(GuiTextures.DISPLAY)
                         .setYScrollBarWidth(2)
                         .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
-                .addWidget(label)
-                .addWidget(new ComponentPanelWidget(8, 17, text -> addDisplayText(text, monitor)).setMaxWidthLimit(DISPLAY_TEXT_WIDTH)));
+                        .addWidget(label)
+                        .addWidget(new ComponentPanelWidget(8, 17, text -> addDisplayText(text, monitor)).setMaxWidthLimit(DISPLAY_TEXT_WIDTH)));
 
         group.setBackground(GuiTextures.BACKGROUND_INVERSE);
         return group;

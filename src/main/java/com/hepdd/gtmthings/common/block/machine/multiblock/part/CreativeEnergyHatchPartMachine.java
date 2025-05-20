@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
@@ -23,7 +22,6 @@ import com.lowdragmc.lowdraglib.gui.widget.ButtonWidget;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SelectorWidget;
 import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
-import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
@@ -37,7 +35,6 @@ import net.minecraft.world.entity.player.Player;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,10 +51,8 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     @Persisted
     public final NotifiableEnergyContainer energyContainer;
-    protected TickableSubscription energySubs;
-    @Nullable
-    protected ISubscription energyListener;
-    private Long maxEnergy;
+    @Persisted
+    private long maxEnergy;
     @Persisted
     private long voltage = 0;
     @Persisted
@@ -82,35 +77,9 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     protected NotifiableEnergyContainer createEnergyContainer() {
         NotifiableEnergyContainer container;
         this.voltage = GTValues.VEX[setTier];
-        this.maxEnergy = this.voltage * 16L * this.amps;
+        this.maxEnergy = this.voltage * this.amps;
         container = new InfinityEnergyContainer(this, this.maxEnergy, this.voltage, this.amps, 0L, 0L);
         return container;
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        energyListener = energyContainer.addChangedListener(this::InfinityEnergySubscription);
-        InfinityEnergySubscription();
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-        if (energyListener != null) {
-            energyListener.unsubscribe();
-            energyListener = null;
-        }
-    }
-
-    protected void InfinityEnergySubscription() {
-        energySubs = subscribeServerTick(energySubs, this::addEnergy);
-    }
-
-    protected void addEnergy() {
-        if (energyContainer.getEnergyStored() < this.maxEnergy) {
-            energyContainer.setEnergyStored(this.maxEnergy);
-        }
     }
 
     @Override
@@ -156,19 +125,23 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
 
     private void setVoltage(long voltage) {
         this.voltage = voltage;
-        this.maxEnergy = this.voltage * 16L * this.amps;
-        updateEnergyContainer();
+        this.maxEnergy = this.voltage * this.amps;
+        updateMachine();
     }
 
     private void setAmps(int amps) {
         this.amps = amps;
-        this.maxEnergy = this.voltage * 16L * this.amps;
-        updateEnergyContainer();
+        this.maxEnergy = this.voltage * this.amps;
+        updateMachine();
     }
 
     private void updateEnergyContainer() {
         this.energyContainer.resetBasicInfo(this.maxEnergy, this.voltage, this.amps, 0, 0);
         this.energyContainer.setEnergyStored(this.maxEnergy);
+    }
+
+    private void updateMachine() {
+        updateEnergyContainer();
         if (getLevel() instanceof ServerLevel serverLevel) {
             serverLevel.getServer().execute(() -> {
                 for (var c : getControllers()) {
@@ -219,6 +192,14 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
         @Override
         public List<Long> handleRecipeInner(IO io, GTRecipe recipe, List<Long> left, boolean simulate) {
             return super.handleRecipeInner(io, recipe, left, true);
+        }
+
+        @Override
+        public long changeEnergy(long energyToAdd) {
+            long oldEnergyStored = getEnergyStored();
+            long newEnergyStored = (getEnergyCapacity() - oldEnergyStored < energyToAdd) ? getEnergyCapacity() : (oldEnergyStored + energyToAdd);
+            if (newEnergyStored < 0) newEnergyStored = 0;
+            return newEnergyStored - oldEnergyStored;
         }
 
         @Override
