@@ -13,6 +13,7 @@ import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup;
+import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
@@ -27,7 +28,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-import com.hepdd.gtmthings.api.gui.widget.LabelWidgetEx;
 import com.hepdd.gtmthings.api.gui.widget.TerminalInputWidget;
 import com.hepdd.gtmthings.api.misc.Hatch;
 import lombok.Getter;
@@ -100,22 +100,22 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
                         .setBackground(GuiTextures.DISPLAY)
                         .setYScrollBarWidth(2)
                         .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
-                        .addWidget(new LabelWidgetEx(40, 5, Component.translatable("item.gtmthings.advanced_terminal.setting.title")))
-                        .addWidget(new LabelWidgetEx(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.1"))
+                        .addWidget(new LabelWidget(40, 5, "item.gtmthings.advanced_terminal.setting.title"))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.1")
                                 .setHoverTooltips(lines))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getCoilTier(handItem),
                                 (v) -> setCoilTier(v, handItem))
                                 .setMin(0).setMax(GTCEuAPI.HEATING_COILS.size()))
-                        .addWidget(new LabelWidgetEx(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.2"))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.2")
                                 .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.2.tooltip")))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getRepeatCount(handItem),
                                 (v) -> setRepeatCount(v, handItem))
                                 .setMin(0).setMax(99))
-                        .addWidget(new LabelWidgetEx(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.3"))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.3")
                                 .setHoverTooltips("item.gtmthings.advanced_terminal.setting.3.tooltip"))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getIsBuildHatches(handItem),
                                 (v) -> setIsBuildHatches(v, handItem)).setMin(0).setMax(1))
-                        .addWidget(new LabelWidgetEx(4, 5 + 16 * rowIndex, Component.translatable("item.gtmthings.advanced_terminal.setting.4"))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.4")
                                 .setHoverTooltips("item.gtmthings.advanced_terminal.setting.4.tooltip"))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getReplaceCoilMode(handItem),
                                 (v) -> setReplaceCoilMode(v, handItem)).setMin(0).setMax(1)));
