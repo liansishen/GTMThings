@@ -39,6 +39,8 @@ import appeng.api.storage.MEStorage;
 import appeng.items.tools.powered.WirelessTerminalItem;
 import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
 import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.ints.IntObjectPair;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +49,7 @@ import oshi.util.tuples.Triplet;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 public class AdvancedBlockPattern extends BlockPattern {
@@ -122,8 +124,8 @@ public class AdvancedBlockPattern extends BlockPattern {
         Direction facing = controller.self().getFrontFacing();
         Direction upwardsFacing = controller.self().getUpwardsFacing();
         boolean isFlipped = controller.self().isFlipped();
-        Map<SimplePredicate, Integer> cacheGlobal = worldState.getGlobalCount();
-        Map<SimplePredicate, Integer> cacheLayer = worldState.getLayerCount();
+        Object2IntOpenHashMap<SimplePredicate> cacheGlobal = worldState.getGlobalCount();
+        Object2IntOpenHashMap<SimplePredicate> cacheLayer = worldState.getLayerCount();
         Map<BlockPos, Object> blocks = new HashMap<>();
         Set<BlockPos> placeBlockPos = new HashSet<>();
         blocks.put(centerPos, controller);
@@ -166,15 +168,13 @@ public class AdvancedBlockPattern extends BlockPattern {
                         BlockInfo[] infos = new BlockInfo[0];
                         for (SimplePredicate limit : predicate.limited) {
                             if (limit.minLayerCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
-                                if (!cacheLayer.containsKey(limit)) {
-                                    cacheLayer.put(limit, 1);
-                                } else
-                                    if (cacheLayer.get(limit) < limit.minLayerCount && (limit.maxLayerCount == -1 ||
-                                            cacheLayer.get(limit) < limit.maxLayerCount)) {
-                                                cacheLayer.put(limit, cacheLayer.get(limit) + 1);
-                                            } else {
-                                                continue;
-                                            }
+                                int curr = cacheLayer.getInt(limit);
+                                if (curr < limit.minLayerCount &&
+                                        (limit.maxLayerCount == -1 || curr < limit.maxLayerCount)) {
+                                    cacheLayer.addTo(limit, 1);
+                                } else {
+                                    continue;
+                                }
                             } else {
                                 continue;
                             }
@@ -185,14 +185,12 @@ public class AdvancedBlockPattern extends BlockPattern {
                         if (!find) {
                             for (SimplePredicate limit : predicate.limited) {
                                 if (limit.minCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
-                                    if (!cacheGlobal.containsKey(limit)) {
-                                        cacheGlobal.put(limit, 1);
-                                    } else if (cacheGlobal.get(limit) < limit.minCount &&
-                                            (limit.maxCount == -1 || cacheGlobal.get(limit) < limit.maxCount)) {
-                                                cacheGlobal.put(limit, cacheGlobal.get(limit) + 1);
-                                            } else {
-                                                continue;
-                                            }
+                                    int curr = cacheGlobal.getInt(limit);
+                                    if (curr < limit.minCount && (limit.maxCount == -1 || curr < limit.maxCount)) {
+                                        cacheGlobal.addTo(limit, 1);
+                                    } else {
+                                        continue;
+                                    }
                                 } else {
                                     continue;
                                 }
@@ -207,21 +205,15 @@ public class AdvancedBlockPattern extends BlockPattern {
                                     continue;
                                 }
                                 if (limit.maxLayerCount != -1 &&
-                                        cacheLayer.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxLayerCount)
+                                        cacheLayer.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxLayerCount) {
                                     continue;
+                                }
                                 if (limit.maxCount != -1 &&
-                                        cacheGlobal.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxCount)
+                                        cacheGlobal.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxCount) {
                                     continue;
-                                if (cacheLayer.containsKey(limit)) {
-                                    cacheLayer.put(limit, cacheLayer.get(limit) + 1);
-                                } else {
-                                    cacheLayer.put(limit, 1);
                                 }
-                                if (cacheGlobal.containsKey(limit)) {
-                                    cacheGlobal.put(limit, cacheGlobal.get(limit) + 1);
-                                } else {
-                                    cacheGlobal.put(limit, 1);
-                                }
+                                cacheLayer.addTo(limit, 1);
+                                cacheGlobal.addTo(limit, 1);
                                 infos = ArrayUtils.addAll(infos,
                                         limit.candidates == null ? null : limit.candidates.get());
                             }
@@ -315,8 +307,8 @@ public class AdvancedBlockPattern extends BlockPattern {
             var foundHandler = getMatchStackWithHandler(candidates,
                     player.getCapability(ForgeCapabilities.ITEM_HANDLER), player);
             if (foundHandler != null) {
-                foundSlot = foundHandler.getFirst();
-                handler = foundHandler.getSecond();
+                foundSlot = foundHandler.firstInt();
+                handler = foundHandler.second();
                 found = handler.getStackInSlot(foundSlot).copy();
             }
         } else {
@@ -455,10 +447,10 @@ public class AdvancedBlockPattern extends BlockPattern {
     }
 
     @Nullable
-    private static Pair<Integer, IItemHandler> getMatchStackWithHandler(
+    private static IntObjectPair<IItemHandler> getMatchStackWithHandler(
                                                                         List<ItemStack> candidates,
                                                                         LazyOptional<IItemHandler> cap, Player player) {
-        IItemHandler handler = cap.orElse(null);
+        IItemHandler handler = cap.resolve().orElse(null);
         if (handler == null) {
             return null;
         }
@@ -482,21 +474,21 @@ public class AdvancedBlockPattern extends BlockPattern {
                         if (storage.extract(AEItemKey.of(candidate), 1, Actionable.MODULATE, null) > 0) {
                             NonNullList<ItemStack> stacks = NonNullList.withSize(1, candidate);
                             IItemHandler handler1 = new ItemStackHandler(stacks);
-                            return Pair.of(0, handler1);
+                            return IntObjectPair.of(i, handler);
                         }
                     }
                 }
 
             } else if (candidates.stream().anyMatch(candidate -> ItemStack.isSameItemSameTags(candidate, stack)) &&
                     !stack.isEmpty() && stack.getItem() instanceof BlockItem) {
-                        return Pair.of(i, handler);
+                        return IntObjectPair.of(i, handler);
                     }
         }
         return null;
     }
 
     private void resetFacing(BlockPos pos, BlockState blockState, Direction facing,
-                             BiFunction<BlockPos, Direction, Boolean> checker, Consumer<BlockState> consumer) {
+                             BiPredicate<BlockPos, Direction> checker, Consumer<BlockState> consumer) {
         if (blockState.hasProperty(BlockStateProperties.FACING)) {
             tryFacings(blockState, pos, checker, consumer, BlockStateProperties.FACING,
                     facing == null ? FACINGS : ArrayUtils.addAll(new Direction[] { facing }, FACINGS));
@@ -507,11 +499,11 @@ public class AdvancedBlockPattern extends BlockPattern {
         }
     }
 
-    private void tryFacings(BlockState blockState, BlockPos pos, BiFunction<BlockPos, Direction, Boolean> checker,
+    private void tryFacings(BlockState blockState, BlockPos pos, BiPredicate<BlockPos, Direction> checker,
                             Consumer<BlockState> consumer, Property<Direction> property, Direction[] facings) {
         Direction found = null;
         for (Direction facing : facings) {
-            if (checker.apply(pos, facing)) {
+            if (checker.test(pos, facing)) {
                 found = facing;
                 break;
             }
