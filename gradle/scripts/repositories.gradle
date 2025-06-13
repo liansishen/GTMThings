@@ -5,9 +5,10 @@ repositories {
     }
     mavenCentral()
     maven {
-        url "https://maven.gtceu.com"
+        name = 'GTCEu Maven'
+        url = 'https://maven.gtceu.com'
         content {
-            includeGroup "com.gregtechceu.gtceu"
+            includeGroup 'com.gregtechceu.gtceu'
         }
     }
     maven {
