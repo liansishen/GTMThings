@@ -1,5 +1,9 @@
 package com.hepdd.gtmthings.client;
 
+import com.lowdragmc.lowdraglib.client.model.ModelFactory;
+import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -12,8 +16,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
-import com.lowdragmc.lowdraglib.client.model.ModelFactory;
-import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import org.joml.Matrix4f;
@@ -27,7 +29,11 @@ public final class VirtualItemProviderRenderer implements IRenderer {
     public void renderItem(ItemStack stack, ItemDisplayContext transformType, boolean leftHand, PoseStack poseStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model) {
         ItemStack item = VirtualItemProviderBehavior.getVirtualItem(stack);
         poseStack.pushPose();
-        if (!item.isEmpty()) ClientUtil.vanillaRender(stack, transformType, leftHand, poseStack, buffer, combinedLight, combinedOverlay, ClientUtil.getVanillaModel(item, null, null));
+        if (!item.isEmpty()) {
+            Minecraft mc = Minecraft.getInstance();
+            BakedModel bakedModel = mc.getItemRenderer().getModel(item, mc.level, mc.player, 0);
+            mc.getItemRenderer().render(item, transformType, leftHand, poseStack, buffer, combinedLight, combinedOverlay, bakedModel);
+        }
         if (transformType == ItemDisplayContext.GUI) {
             poseStack.translate(-0.5F, -0.5F, -0.5F);
             Tesselator tess = Tesselator.getInstance();
