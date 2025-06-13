@@ -55,3 +55,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             build/libs/!(*-@(dev|sources|javadoc)).jar
+          curseforge-id: 1104310
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          curseforge-changelog: ${{ github.event.head_commit.message }}
+          curseforge-game-versions: "1.20.1"
+          curseforge-release-type: release
