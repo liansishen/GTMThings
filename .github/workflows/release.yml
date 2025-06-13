@@ -60,3 +60,9 @@ jobs:
           curseforge-changelog: ${{ github.event.head_commit.message }}
           curseforge-game-versions: "1.20.1"
           curseforge-release-type: release
+          name: 'GTMThings-${{ github.ref_name }}'
+          version: ${{ github.ref_name }}
+          loaders: |
+            forge
+            neoforge
+          java: 17
