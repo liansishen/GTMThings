@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
+import static net.minecraft.resources.ResourceLocation.tryBuild;
 
 @Mod(GTMThings.MOD_ID)
 public class GTMThings {
@@ -25,7 +26,7 @@ public class GTMThings {
     public static final Logger LOGGER = LogManager.getLogger();
 
     public static ResourceLocation id(String name) {
-        return new ResourceLocation(MOD_ID, name);
+        return tryBuild(MOD_ID, name);
     }
 
     public GTMThings() {

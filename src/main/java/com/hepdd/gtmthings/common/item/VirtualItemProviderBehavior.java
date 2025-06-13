@@ -34,6 +34,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import static net.minecraft.resources.ResourceLocation.tryBuild;
+
 public final class VirtualItemProviderBehavior implements IAddInformation, IItemUIFactory, IFancyUIProvider {
 
     public static final VirtualItemProviderBehavior INSTANCE = new VirtualItemProviderBehavior();
@@ -55,7 +57,7 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
         if (mod.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        ItemStack stack = BuiltInRegistries.ITEM.get(new ResourceLocation(mod, tag.getString("n"))).getDefaultInstance();
+        ItemStack stack = BuiltInRegistries.ITEM.get(tryBuild(mod, tag.getString("n"))).getDefaultInstance();
         if (tag.contains("t")) stack.setTag((CompoundTag) tag.get("t"));
         return stack;
     }

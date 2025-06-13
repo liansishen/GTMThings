@@ -51,7 +51,7 @@ jobs:
         id: release
         uses: Kir-Antipov/mc-publish@v3.3.0
         with:
-          github-tag: ${VERSION}
+          github-tag: ${{VERSION}}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             build/libs/!(*-@(dev|sources|javadoc)).jar

@@ -8,25 +8,41 @@ dependencies {
     modImplementation("com.tterrag.registrate:Registrate:$project.registrate_version")
 
     modImplementation("dev.toma.configuration:configuration-forge-$project.minecraft_version:$project.configuration_version")
+
+    // JEI
     modCompileOnly("mezz.jei:jei-$project.minecraft_version-forge-api:$project.jei_version") { transitive = false }
     modCompileOnly("mezz.jei:jei-$project.minecraft_version-common-api:$project.jei_version") { transitive = false }
     modRuntimeOnly("mezz.jei:jei-$project.minecraft_version-forge:$project.jei_version") { transitive = false }
-    modRuntimeOnly("dev:emi-1.1.12")
-    modRuntimeOnly("dev:jecharacters-4.5.9")
+
+    // EMI
+    modImplementation("dev.emi:emi-forge:${emi_version}")
+    modRuntimeOnly("dev:jecharacters:1.20.1-forge-4.5.11-dev-shadow")
 
     // Mixin Extras
+    compileOnly(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.2-beta.4"))
+    implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-neoforge:0.3.2-beta.4"))
+
     api(annotationProcessor("io.github.llamalad7:mixinextras-common:$project.mixinextras_version"))
+    annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 
     // lombok
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+    // JADE
     modImplementation("curse.maven:jade-324717:6106101")
-    modImplementation("appeng:appliedenergistics2-forge:${project.ae2_version}") { transitive false }
 
+    // AE2
+    modImplementation("appeng:appliedenergistics2-forge:${project.ae2_version}") { transitive false }
+    modImplementation("org.appliedenergistics:guideme:20.1.7")
+
+    // FTB
     modCompileOnly("dev.architectury:architectury-forge:${project.architectury_version}")
     modCompileOnly("dev.ftb.mods:ftb-library-forge:${project.ftb_library_version}") { transitive false }
     modCompileOnly("dev.ftb.mods:ftb-teams-forge:${project.ftb_teams_version}") { transitive false }
 
+    modRuntimeOnly("curse.maven:embeddium-908741:5681725")
+
+    modRuntimeOnly("curse.maven:modern-ui-352491:5977000")
 
 }
