@@ -1,15 +1,14 @@
 name: Auto publish for GTMThings
 on:
   push:
-    branches:
-    - master
+    tags: [ '*' ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GITHUB_ACTION_NUMBER: ${{ vars.GITHUB_RUN_NUMBER }}
-      GITHUB_RUN_NUMBER: ${{ vars.GITHUB_RUN_NUMBER }}
+      VERSION: ${{ github.ref_name }}
+      RELEASE_VERSION: ${{ github.ref_name }}
     permissions:
       contents: write
     steps:
@@ -52,7 +51,7 @@ jobs:
         id: release
         uses: Kir-Antipov/mc-publish@v3.3.0
         with:
-          github-tag: ${{ steps.var.outputs.version }}
+          github-tag: ${VERSION}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             build/libs/!(*-@(dev|sources|javadoc)).jar

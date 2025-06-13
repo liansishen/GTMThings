@@ -2,8 +2,6 @@ package com.hepdd.gtmthings.client;
 
 import com.gregtechceu.gtceu.api.GTValues;
 
-import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
-
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -18,6 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor;
+import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;

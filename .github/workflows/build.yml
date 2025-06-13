@@ -3,11 +3,9 @@ on:
   push:
     branches:
       - master
-    paths:
-      - src/**
-      - build.gradle
-      - gradle.properties
-      - settings.gradle
+    paths-ignore:
+      - 'README.md'
+      - '.github/**'
   pull_request: 
 
 jobs:

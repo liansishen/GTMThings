@@ -1,8 +1,5 @@
 package com.hepdd.gtmthings.client;
 
-import com.lowdragmc.lowdraglib.client.model.ModelFactory;
-import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
-
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -15,6 +12,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
+import com.lowdragmc.lowdraglib.client.model.ModelFactory;
+import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import org.joml.Matrix4f;

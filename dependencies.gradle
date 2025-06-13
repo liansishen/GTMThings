@@ -1,0 +1,31 @@
+dependencies {
+    compileOnly libs.jetbrains.annotations
+
+
+    modImplementation("dev:gtceu-$project.minecraft_version:$project.gtceu_version") { transitive false }
+    modImplementation("com.lowdragmc.ldlib:ldlib-forge-$project.minecraft_version:$project.ldlib_version") { transitive = false }
+    modImplementation("com.tterrag.registrate:Registrate:$project.registrate_version")
+
+    modImplementation("dev.toma.configuration:configuration-forge-$project.minecraft_version:$project.configuration_version")
+    modCompileOnly("mezz.jei:jei-$project.minecraft_version-forge-api:$project.jei_version") { transitive = false }
+    modCompileOnly("mezz.jei:jei-$project.minecraft_version-common-api:$project.jei_version") { transitive = false }
+    modRuntimeOnly("mezz.jei:jei-$project.minecraft_version-forge:$project.jei_version") { transitive = false }
+    modRuntimeOnly("dev:emi-1.1.12")
+    modRuntimeOnly("dev:jecharacters-4.5.9")
+
+    // Mixin Extras
+    api(annotationProcessor("io.github.llamalad7:mixinextras-common:$project.mixinextras_version"))
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    modImplementation("curse.maven:jade-324717:6106101")
+    modImplementation("appeng:appliedenergistics2-forge:${project.ae2_version}") { transitive false }
+
+    modCompileOnly("dev.architectury:architectury-forge:${project.architectury_version}")
+    modCompileOnly("dev.ftb.mods:ftb-library-forge:${project.ftb_library_version}") { transitive false }
+    modCompileOnly("dev.ftb.mods:ftb-teams-forge:${project.ftb_teams_version}") { transitive false }
+
+
+}

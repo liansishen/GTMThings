@@ -5,15 +5,14 @@ import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfigurator;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 
+import net.minecraft.network.chat.Component;
+
+import com.hepdd.gtmthings.GTMThings;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.jei.IngredientIO;
-
-import net.minecraft.network.chat.Component;
-
-import com.hepdd.gtmthings.GTMThings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

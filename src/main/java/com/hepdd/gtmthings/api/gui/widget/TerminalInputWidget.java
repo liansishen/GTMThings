@@ -1,11 +1,10 @@
 package com.hepdd.gtmthings.api.gui.widget;
 
-import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
-import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 
+import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
+import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import lombok.Getter;
 
 import java.util.function.Consumer;
