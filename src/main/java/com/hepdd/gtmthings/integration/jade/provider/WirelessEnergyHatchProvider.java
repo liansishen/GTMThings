@@ -24,11 +24,12 @@ import java.util.UUID;
 
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 import static com.hepdd.gtmthings.utils.TeamUtil.hasOwner;
+import static net.minecraft.resources.ResourceLocation.tryBuild;
 
 public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindable> {
 
     public WirelessEnergyHatchProvider() {
-        super(new ResourceLocation(GTMThings.MOD_ID, FormattingUtil.toLowerCaseUnder("wireless_energy_hatch_provider")));
+        super(tryBuild(GTMThings.MOD_ID, FormattingUtil.toLowerCaseUnder("wireless_energy_hatch_provider")));
     }
 
     @Override

@@ -20,10 +20,12 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
+import static net.minecraft.resources.ResourceLocation.tryBuild;
+
 public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProvider<IGTMTJadeIF> {
 
     public WirelessOpticalComputationHatchProvider() {
-        super(new ResourceLocation(GTMThings.MOD_ID, FormattingUtil.toLowerCaseUnder("wireless_energy_hatch_provider")));
+        super(tryBuild(GTMThings.MOD_ID, FormattingUtil.toLowerCaseUnder("wireless_energy_hatch_provider")));
     }
 
     @Override

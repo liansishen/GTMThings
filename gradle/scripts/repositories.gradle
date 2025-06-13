@@ -49,9 +49,6 @@ repositories {
         url "https://maven.blamejared.com/"
     }
     maven {
-        url "https://maven.terraformersmc.com/releases/"
-    }
-    maven {
         url "https://maven.teamresourceful.com/repository/maven-public/"
     }
     maven {
@@ -83,5 +80,9 @@ repositories {
     exclusiveContent { // FTB mods
         forRepository { maven { url = "https://maven.ftb.dev/releases" } }
         filter { includeGroup("dev.ftb.mods") }
+    }
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
     }
 }

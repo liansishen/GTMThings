@@ -35,6 +35,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -52,6 +53,8 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import static net.minecraft.resources.ResourceLocation.tryParse;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -224,7 +227,7 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
 
     protected void GetLevel() {
         if (this.dimensionId == null) return;
-        ResourceLocation resLoc = new ResourceLocation(this.dimensionId);
+        ResourceLocation resLoc = tryParse(this.dimensionId);
         ResourceKey<Level> resKey = ResourceKey.create(Registries.DIMENSION, resLoc);
         this.targetLever = Objects.requireNonNull(coverHolder.getLevel().getServer()).getLevel(resKey);
     }
@@ -239,7 +242,7 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
 
     protected @Nullable IItemHandler getAdjacentItemTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return GTTransferUtils.getAdjacentItemHandler(targetLever, targetPos, facing).resolve().orElse(null);
+        return GTTransferUtils.getItemHandler(targetLever, targetPos, facing.getOpposite()).resolve().orElse(null);
     }
 
     protected @Nullable IFluidHandler getOwnFluidTransfer() {
@@ -248,7 +251,7 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
 
     protected @Nullable IFluidHandler getAdjacentFluidTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return GTTransferUtils.getAdjacentFluidHandler(targetLever, targetPos, facing).resolve().orElse(null);
+        return FluidUtil.getFluidHandler(targetLever, targetPos, facing.getOpposite()).resolve().orElse(null);
     }
 
     @Override

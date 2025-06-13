@@ -37,6 +37,8 @@ import java.util.Objects;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static net.minecraft.resources.ResourceLocation.tryParse;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WirelessTransferCover extends CoverBehavior {
@@ -146,7 +148,7 @@ public class WirelessTransferCover extends CoverBehavior {
 
     protected void GetLevel() {
         if (this.dimensionId == null) return;
-        ResourceLocation resLoc = new ResourceLocation(this.dimensionId);
+        ResourceLocation resLoc = tryParse(this.dimensionId);
         ResourceKey<Level> resKey = ResourceKey.create(Registries.DIMENSION, resLoc);
         this.targetLever = Objects.requireNonNull(coverHolder.getLevel().getServer()).getLevel(resKey);
     }
