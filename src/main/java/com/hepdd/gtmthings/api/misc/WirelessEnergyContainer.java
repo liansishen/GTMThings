@@ -43,8 +43,7 @@ public class WirelessEnergyContainer {
         this.rate = rate;
         this.bindPos = bindPos;
         this.uuid = uuid;
-        int currentTick = server.getTickCount();
-        this.energyStat = new EnergyStat(currentTick);
+        this.energyStat = new EnergyStat(0);
     }
 
     private WirelessEnergyContainer(UUID uuid) {

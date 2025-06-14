@@ -12,8 +12,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import com.hepdd.gtmthings.config.ConfigHolder;
 import com.hepdd.gtmthings.data.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
 import static net.minecraft.resources.ResourceLocation.tryBuild;
@@ -23,14 +21,13 @@ public class GTMThings {
 
     public static final String MOD_ID = "gtmthings";
     public static final String NAME = "GTM Things";
-    public static final Logger LOGGER = LogManager.getLogger();
 
     public static ResourceLocation id(String name) {
         return tryBuild(MOD_ID, name);
     }
 
-    public GTMThings() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public GTMThings(FMLJavaModLoadingContext context) {
+        IEventBus modEventBus = context.getModEventBus();
         ConfigHolder.init();
         GTMTHINGS_REGISTRATE.registerEventListeners(modEventBus);
         modEventBus.addGenericListener(GTRecipeType.class, this::registerRecipeTypes);
