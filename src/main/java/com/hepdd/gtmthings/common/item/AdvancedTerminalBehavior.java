@@ -70,11 +70,13 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
             autoBuildSetting.setRepeatCount(tag.getInt("RepeatCount"));
             autoBuildSetting.setNoHatchMode(tag.getInt("NoHatchMode"));
             autoBuildSetting.setReplaceCoilMode(tag.getInt("ReplaceCoilMode"));
+            autoBuildSetting.setIsUseAE(tag.getInt("IsUseAE"));
         } else {
             autoBuildSetting.setCoilTier(0);
             autoBuildSetting.setRepeatCount(0);
             autoBuildSetting.setNoHatchMode(1);
             autoBuildSetting.setReplaceCoilMode(0);
+            autoBuildSetting.setIsUseAE(0);
         }
         return autoBuildSetting;
     }
@@ -117,7 +119,11 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
                         .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.4")
                                 .setHoverTooltips("item.gtmthings.advanced_terminal.setting.4.tooltip"))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getReplaceCoilMode(handItem),
-                                (v) -> setReplaceCoilMode(v, handItem)).setMin(0).setMax(1)));
+                                (v) -> setReplaceCoilMode(v, handItem)).setMin(0).setMax(1))
+                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.5")
+                                .setHoverTooltips("item.gtmthings.advanced_terminal.setting.5.tooltip"))
+                        .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getIsUseAE(handItem),
+                                (v) -> setIsUseAE(v, handItem)).setMin(0).setMax(1)));
 
         group.setBackground(GuiTextures.BACKGROUND_INVERSE);
         return group;
@@ -187,17 +193,34 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
         itemStack.setTag(tag);
     }
 
+    private int getIsUseAE(ItemStack itemStack) {
+        var tag = itemStack.getTag();
+        if (tag != null && !tag.isEmpty()) {
+            return tag.getInt("IsUseAE");
+        } else {
+            return 0;
+        }
+    }
+
+    private void setIsUseAE(int isUseAE, ItemStack itemStack) {
+        var tag = itemStack.getTag();
+        if (tag == null) tag = new CompoundTag();
+        tag.putInt("IsUseAE", isUseAE);
+        itemStack.setTag(tag);
+    }
+
     @Setter
     @Getter
     public static class AutoBuildSetting {
 
-        private int coilTier, repeatCount, noHatchMode, replaceCoilMode;
+        private int coilTier, repeatCount, noHatchMode, replaceCoilMode, isUseAE;
 
         public AutoBuildSetting() {
             this.coilTier = 0;
             this.repeatCount = 0;
             this.noHatchMode = 1;
             this.replaceCoilMode = 0;
+            this.isUseAE = 0;
         }
 
         public List<ItemStack> apply(BlockInfo[] blockInfos) {

@@ -366,6 +366,8 @@
   "item.gtmthings.advanced_terminal.setting.3.tooltip": "是否启用无仓室模式(0:不启用,1:启用)\n启用无仓室模式后不会在非唯一时放置各种仓室。",
   "item.gtmthings.advanced_terminal.setting.4": "线圈替换模式",
   "item.gtmthings.advanced_terminal.setting.4.tooltip": "是否启用线圈替换模式(0:不启用,1:启用)\n启用线圈替换模式会将所有线圈替换为线圈等级中指定的线圈。",
+  "item.gtmthings.advanced_terminal.setting.5": "使用AE物品",
+  "item.gtmthings.advanced_terminal.setting.5.tooltip": "是否使用AE物品(0:不使用,1:使用)\n使用AE物品开启后，会通过背包中的AE终端连接到相应的AE网络并使用其中的物品来进行建造。",
   "item.gtmthings.wireless_energy_binding_tool": "无线能源绑定工具",
   "item.gtmthings.virtual_item_provider": "虚拟物品提供器",
   "item.gtmthings.virtual_item_provider_cell": "虚拟物品提供器元件",

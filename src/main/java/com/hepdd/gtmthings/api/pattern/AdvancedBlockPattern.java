@@ -230,7 +230,7 @@ public class AdvancedBlockPattern extends BlockPattern {
                         if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null && ItemStack.isSameItem(candidates.get(0), coilItemStack)) continue;
 
                         // check inventory
-                        Triplet<ItemStack, IItemHandler, Integer> result = foundItem(player, candidates);
+                        Triplet<ItemStack, IItemHandler, Integer> result = foundItem(player, candidates, autoBuildSetting.getIsUseAE());
                         ItemStack found = result.getA();
                         IItemHandler handler = result.getB();
                         int foundSlot = result.getC();
@@ -298,13 +298,13 @@ public class AdvancedBlockPattern extends BlockPattern {
         });
     }
 
-    private Triplet<ItemStack, IItemHandler, Integer> foundItem(Player player, List<ItemStack> candidates) {
+    private Triplet<ItemStack, IItemHandler, Integer> foundItem(Player player, List<ItemStack> candidates, int isUseAE) {
         ItemStack found = null;
         IItemHandler handler = null;
         int foundSlot = -1;
         if (!player.isCreative()) {
             var foundHandler = getMatchStackWithHandler(candidates,
-                    player.getCapability(ForgeCapabilities.ITEM_HANDLER), player);
+                    player.getCapability(ForgeCapabilities.ITEM_HANDLER), player, isUseAE);
             if (foundHandler != null) {
                 foundSlot = foundHandler.firstInt();
                 handler = foundHandler.second();
@@ -448,7 +448,8 @@ public class AdvancedBlockPattern extends BlockPattern {
     @Nullable
     private static IntObjectPair<IItemHandler> getMatchStackWithHandler(
                                                                         List<ItemStack> candidates,
-                                                                        LazyOptional<IItemHandler> cap, Player player) {
+                                                                        LazyOptional<IItemHandler> cap,
+                                                                        Player player, int isUseAE) {
         IItemHandler handler = cap.resolve().orElse(null);
         if (handler == null) {
             return null;
@@ -461,11 +462,11 @@ public class AdvancedBlockPattern extends BlockPattern {
             @NotNull
             LazyOptional<IItemHandler> stackCap = stack.getCapability(ForgeCapabilities.ITEM_HANDLER);
             if (stackCap.isPresent()) {
-                var rt = getMatchStackWithHandler(candidates, stackCap, player);
+                var rt = getMatchStackWithHandler(candidates, stackCap, player, isUseAE);
                 if (rt != null) {
                     return rt;
                 }
-            } else if (stack.getItem() instanceof WirelessTerminalItem terminalItem && stack.hasTag() && stack.getTag().contains("accessPoint", 10)) {
+            } else if (isUseAE == 1 && stack.getItem() instanceof WirelessTerminalItem terminalItem && stack.hasTag() && stack.getTag().contains("accessPoint", 10)) {
                 IGrid grid = terminalItem.getLinkedGrid(stack, player.level(), player);
                 if (grid != null) {
                     MEStorage storage = grid.getStorageService().getInventory();
@@ -473,7 +474,7 @@ public class AdvancedBlockPattern extends BlockPattern {
                         if (storage.extract(AEItemKey.of(candidate), 1, Actionable.MODULATE, null) > 0) {
                             NonNullList<ItemStack> stacks = NonNullList.withSize(1, candidate);
                             IItemHandler handler1 = new ItemStackHandler(stacks);
-                            return IntObjectPair.of(i, handler);
+                            return IntObjectPair.of(0, handler1);
                         }
                     }
                 }
