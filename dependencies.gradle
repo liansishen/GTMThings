@@ -28,13 +28,13 @@ dependencies {
     modImplementation("curse.maven:jade-324717:6106101")
 
     // AE2
-    modImplementation("appeng:appliedenergistics2-forge:${project.ae2_version}") { transitive false }
+    modImplementation("appeng:appliedenergistics2-forge:${project.ae2_version}") { transitive = false }
     modImplementation("org.appliedenergistics:guideme:20.1.7")
 
     // FTB
     modCompileOnly("dev.architectury:architectury-forge:${project.architectury_version}")
-    modCompileOnly("dev.ftb.mods:ftb-library-forge:${project.ftb_library_version}") { transitive false }
-    modCompileOnly("dev.ftb.mods:ftb-teams-forge:${project.ftb_teams_version}") { transitive false }
+    modCompileOnly("dev.ftb.mods:ftb-library-forge:${project.ftb_library_version}") { transitive = false }
+    modCompileOnly("dev.ftb.mods:ftb-teams-forge:${project.ftb_teams_version}") { transitive = false }
 
     // Jech
     modRuntimeOnly("dev:jecharacters:1.20.1-forge-4.5.11-dev-shadow")
