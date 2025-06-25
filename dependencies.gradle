@@ -1,6 +1,8 @@
 dependencies {
     compileOnly libs.jetbrains.annotations
 
+    implementation("thedarkcolour:kotlinforforge:4.11.0")
+
     modImplementation("com.gregtechceu.gtceu:gtceu-${project.minecraft_version}:${project.gtceu_version}")
     modImplementation("com.lowdragmc.ldlib:ldlib-forge-$project.minecraft_version:$project.ldlib_version") { transitive = false }
     modImplementation("com.tterrag.registrate:Registrate:$project.registrate_version")

@@ -5,6 +5,7 @@ plugins {
     alias libs.plugins.modDevGradleLegacy
     alias libs.plugins.lombok
     alias libs.plugins.spotless
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 version = mod_version
@@ -48,4 +49,13 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+kotlin {
+    jvmToolchain(17)
 }

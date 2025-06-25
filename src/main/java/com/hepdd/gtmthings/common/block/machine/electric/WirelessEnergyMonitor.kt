@@ -1,102 +1,117 @@
-package com.hepdd.gtmthings.common.block.machine.electric;
+package com.hepdd.gtmthings.common.block.machine.electric
 
-import com.gregtechceu.gtceu.api.gui.GuiTextures;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
+import com.gregtechceu.gtceu.GTCEu
+import com.gregtechceu.gtceu.api.gui.GuiTextures
+import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
+import com.hepdd.gtmthings.common.item.IWirelessMonitor
+import com.lowdragmc.lowdraglib.gui.util.ClickData
+import com.lowdragmc.lowdraglib.gui.widget.*
+import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
+import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
+import lombok.Getter
+import lombok.Setter
+import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.Component
+import net.minecraft.world.level.Level
+import java.util.*
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+open class WirelessEnergyMonitor(holder: IMachineBlockEntity) : MetaMachine(holder), IFancyUIMachine, IWirelessMonitor {
 
-import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
-import com.hepdd.gtmthings.common.item.IWirelessMonitor;
-import com.lowdragmc.lowdraglib.gui.util.ClickData;
-import com.lowdragmc.lowdraglib.gui.widget.*;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachine, IWirelessMonitor {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyMonitor.class,
-            MetaMachine.MANAGED_FIELD_HOLDER);
-
-    public static int p;
-    public static BlockPos pPos;
-
-    public WirelessEnergyMonitor(IMachineBlockEntity holder) {
-        super(holder);
+    companion object {
+        val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
+            WirelessEnergyMonitor::class.java,
+            MetaMachine.MANAGED_FIELD_HOLDER
+        )
+        @JvmField var p: Int = 0
+        @JvmField var pPos: BlockPos? = null
+        @JvmField var DISPLAY_TEXT_WIDTH: Int = 220
     }
 
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
+
+    override fun getFieldHolder(): ManagedFieldHolder {
+        return MANAGED_FIELD_HOLDER
     }
 
-    @Getter
-    @Setter
-    private WirelessEnergyContainer WirelessEnergyContainerCache;
+    var cache: WirelessEnergyContainer? = null
 
-    private List<Component> textListCache;
+    private var textListCache: List<Component?>? = null
 
     @Persisted
-    private boolean all;
+    private var all = false
 
-    //////////////////////////////////////
-    // *********** GUI ***********//
-    //////////////////////////////////////
-    private void handleDisplayClick(String componentData, ClickData clickData) {
-        if (componentData.equals("all")) {
+
+    /**/////////////////////////////////// */ // *********** GUI ***********//
+    /**/////////////////////////////////// */
+    private fun handleDisplayClick(componentData: String, clickData: ClickData) {
+        if (componentData == "all") {
             if (!clickData.isRemote) {
-                all = !all;
+                all = !all
             }
         } else if (clickData.isRemote) {
-            p = 100;
-            String[] parts = componentData.split(", ");
-            pPos = new BlockPos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+            p = 100
+            val parts = componentData.split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            pPos = BlockPos(parts[0].toInt(), parts[1].toInt(), parts[2].toInt())
         }
     }
 
-    public static int DISPLAY_TEXT_WIDTH = 220;
+    override fun isRemote(): Boolean {
+        return if (holder.level() == null)  GTCEu.isClientThread() else holder.level().isClientSide
+    }
 
-    @Override
-    public Widget createUIWidget() {
-        var group = new WidgetGroup(0, 0, DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8);
+    override fun createUIWidget(): Widget {
+        val group = WidgetGroup(0, 0, DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8)
 
-        group.addWidget(new DraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117).setBackground(GuiTextures.DISPLAY)
-                .addWidget(new LabelWidget(4, 5, self().getBlockState().getBlock().getDescriptionId()))
-                .addWidget(new ComponentPanelWidget(4, 17, this::addDisplayText)
+        group.addWidget(
+            DraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117).setBackground(GuiTextures.DISPLAY)
+                .addWidget(LabelWidget(4, 5, self().blockState.block.descriptionId))
+                .addWidget(
+                    ComponentPanelWidget(
+                        4, 17
+                    ) { textList: MutableList<Component?> ->
+                        this.addDisplayText(
+                            textList
+                        )
+                    }
                         .setMaxWidthLimit(DISPLAY_TEXT_WIDTH)
-                        .clickHandler(this::handleDisplayClick)));
-        group.setBackground(GuiTextures.BACKGROUND_INVERSE);
-        return group;
+                        .clickHandler { componentData: String, clickData: ClickData ->
+                            this.handleDisplayClick(
+                                componentData,
+                                clickData
+                            )
+                        })
+        )
+        group.setBackground(GuiTextures.BACKGROUND_INVERSE)
+        return group
     }
 
-    public void addDisplayText(@NotNull List<Component> textList) {
-        if (isRemote()) return;
-        if (textListCache == null || getOffsetTimer() % 10 == 0) {
-            textListCache = getDisplayText(all, DISPLAY_TEXT_WIDTH);
+    fun addDisplayText(textList: MutableList<Component?>) {
+        if (isRemote) return
+        if (textListCache == null || getOffsetTimer() % 10 == 0L) {
+            textListCache = getDisplayText(all, DISPLAY_TEXT_WIDTH)
         }
-        textList.addAll(textListCache);
+        textList.addAll(textListCache!!)
     }
 
-    @Override
-    public @Nullable UUID getUUID() {
-        return this.getOwnerUUID();
+    override fun getUUID(): UUID? {
+        return this.getOwnerUUID()
     }
 
-    @Override
-    public boolean display() {
-        return false;
+    override fun display(): Boolean {
+        return false
+    }
+
+    override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer?) {
+        this.cache  = container
+    }
+
+    override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? {
+        return this.cache
+    }
+
+    override fun getMonitorLevel(): Level? {
+        return holder.level()
     }
 }
