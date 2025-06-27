@@ -1,75 +1,65 @@
-package com.hepdd.gtmthings.api.misc;
+package com.hepdd.gtmthings.api.misc
 
-import com.gregtechceu.gtceu.api.capability.IThermalFluidHandlerItemStack;
+import com.gregtechceu.gtceu.api.capability.IThermalFluidHandlerItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
+import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack
+import kotlin.math.min
 
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
+class CreativeFluidHandlerItemStack(container: ItemStack, capacity: Int, fluidStack: FluidStack?):FluidHandlerItemStack(container, capacity),IThermalFluidHandlerItemStack {
 
-import org.jetbrains.annotations.NotNull;
-
-public class CreativeFluidHandlerItemStack extends FluidHandlerItemStack implements IThermalFluidHandlerItemStack {
-
-    /**
-     * @param container The container itemStack, data is stored on it directly as NBT.
-     * @param capacity  The maximum capacity of this fluid tank.
-     */
-    public CreativeFluidHandlerItemStack(@NotNull ItemStack container, int capacity, FluidStack fluidStack) {
-        super(container, capacity);
-        this.setFluid(fluidStack);
+    init {
+        this.fluid = fluidStack!!
     }
 
-    @Override
-    public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
-        if (resource.isFluidEqual(this.getFluid())) {
-            if (capacity == Integer.MAX_VALUE) {
-                return resource.copy();
+    override fun drain(resource: FluidStack, action: FluidAction?): FluidStack {
+        if (resource.isFluidEqual(this.fluid)) {
+            if (capacity == Int.Companion.MAX_VALUE) {
+                return resource.copy()
             } else {
-                FluidStack fluidStack = resource.copy();
-                fluidStack.setAmount(Math.min(resource.getAmount(), capacity));
-                return fluidStack;
+                val fluidStack = resource.copy()
+                fluidStack.amount = min(resource.amount, capacity)
+                return fluidStack
             }
         } else {
-            return FluidStack.EMPTY;
+            return FluidStack.EMPTY
         }
     }
 
-    @Override
-    public int fill(FluidStack resource, FluidAction doFill) {
-        return resource.getAmount();
+    override fun fill(resource: FluidStack, doFill: FluidAction?): Int {
+        return resource.amount
     }
 
-    @Override
-    public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-        FluidStack contained = this.getFluid();
-        if (contained.isEmpty()) return FluidStack.EMPTY;
-        FluidStack drained = contained.copy();
-        drained.setAmount(Math.min(maxDrain, capacity));
-        return drained;
+    override fun drain(maxDrain: Int, action: FluidAction?): FluidStack {
+        val contained = this.fluid
+        if (contained.isEmpty) return FluidStack.EMPTY
+        val drained = contained.copy()
+        drained.amount = min(maxDrain, capacity)
+        return drained
     }
 
-    @Override
-    public int getMaxFluidTemperature() {
-        return Integer.MAX_VALUE;
+    override fun canFillFluidType(fluid: FluidStack?): Boolean {
+        return fluid?.let { this.fluid.isFluidEqual(it) }!!
     }
 
-    @Override
-    public boolean isGasProof() {
-        return true;
+    override fun getMaxFluidTemperature(): Int {
+        return Int.Companion.MAX_VALUE
     }
 
-    @Override
-    public boolean isAcidProof() {
-        return true;
+    override fun isGasProof(): Boolean {
+        return true
     }
 
-    @Override
-    public boolean isCryoProof() {
-        return true;
+    override fun isAcidProof(): Boolean {
+        return true
     }
 
-    @Override
-    public boolean isPlasmaProof() {
-        return true;
+    override fun isCryoProof(): Boolean {
+        return true
+    }
+
+    override fun isPlasmaProof(): Boolean {
+        return true
     }
 }

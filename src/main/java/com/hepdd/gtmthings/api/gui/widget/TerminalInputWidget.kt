@@ -1,122 +1,113 @@
-package com.hepdd.gtmthings.api.gui.widget;
+package com.hepdd.gtmthings.api.gui.widget
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.Mth;
+import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget
+import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.util.Mth
+import java.util.function.Consumer
+import java.util.function.Supplier
 
-import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
-import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import lombok.Getter;
+open class TerminalInputWidget(x: Int, y: Int, width: Int, height: Int, valueSupplier: Supplier<Int?>,
+                          onChanged: Consumer<Int?>): WidgetGroup(x, y, width, height) {
+    private var valueSupplier: Supplier<Int?>? = null
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+    private var min: Int = defaultMin()
 
-public class TerminalInputWidget extends WidgetGroup {
+    private var max: Int = defaultMax()
 
-    @Getter
-    private Supplier<Integer> valueSupplier;
-    @Getter
-    private Integer min = defaultMin();
-    @Getter
-    private Integer max = defaultMax();
+    private var onChanged: Consumer<Int?>? = null
 
-    private final Consumer<Integer> onChanged;
+    private var textField: TextFieldWidget? = null
 
-    private TextFieldWidget textField;
-
-    protected String toText(Integer value) {
-        return String.valueOf(value);
+    init {
+        this.valueSupplier = valueSupplier
+        this.onChanged = onChanged
+        buildUI()
     }
 
-    protected Integer fromText(String value) {
-        return Integer.parseInt(value);
+    private fun toText(value: Int?): String? {
+        return value.toString()
     }
 
-    protected Integer clamp(Integer value, Integer min, Integer max) {
-        return Mth.clamp(value, min, max);
+    private fun fromText(value: String): Int {
+        return value.toInt()
     }
 
-    protected Integer defaultMin() {
-        return 0;
+    private fun clamp(value: Int, min: Int, max: Int): Int {
+        return Mth.clamp(value, min, max)
     }
 
-    protected Integer defaultMax() {
-        return Integer.MAX_VALUE;
+    private fun defaultMin(): Int {
+        return 0
     }
 
-    protected void setTextFieldRange(TextFieldWidget textField, Integer min, Integer max) {
-        textField.setNumbersOnly(min, max);
+    private fun defaultMax(): Int {
+        return Int.Companion.MAX_VALUE
     }
 
-    public TerminalInputWidget(int x, int y, int width, int height, Supplier<Integer> valueSupplier,
-                               Consumer<Integer> onChanged) {
-        super(x, y, width, height);
-        this.valueSupplier = valueSupplier;
-        this.onChanged = onChanged;
-        buildUI();
+    private fun setTextFieldRange(textField: TextFieldWidget, min: Int, max: Int) {
+        textField.setNumbersOnly(min, max)
     }
 
-    @Override
-    public void initWidget() {
-        super.initWidget();
-        this.textField.setCurrentString(toText(valueSupplier.get()));
+    override fun initWidget() {
+        super.initWidget()
+        this.textField!!.setCurrentString(toText(valueSupplier!!.get()))
     }
 
-    @Override
-    public void writeInitialData(FriendlyByteBuf buffer) {
-        super.writeInitialData(buffer);
-        buffer.writeUtf(toText(valueSupplier.get()));
+    override fun writeInitialData(buffer: FriendlyByteBuf) {
+        super.writeInitialData(buffer)
+        buffer.writeUtf(toText(valueSupplier!!.get())!!)
     }
 
-    @Override
-    public void readInitialData(FriendlyByteBuf buffer) {
-        super.readInitialData(buffer);
-        this.textField.setCurrentString(buffer.readUtf());
+    override fun readInitialData(buffer: FriendlyByteBuf) {
+        super.readInitialData(buffer)
+        this.textField!!.setCurrentString(buffer.readUtf())
     }
 
-    private void buildUI() {
-        this.textField = new TextFieldWidget(0, 0, getSizeWidth(), 12,
-                () -> toText(valueSupplier.get()),
-                stringValue -> this.setValue(clamp(fromText(stringValue), min, max))) {
-
-            @Override
-            public boolean mouseWheelMove(double mouseX, double mouseY, double wheelDelta) {
-                if (wheelDur > 0 && numberInstance != null && isMouseOverElement(mouseX, mouseY) && isFocus()) {
+    private fun buildUI() {
+        this.textField = object : TextFieldWidget(
+            0, 0, sizeWidth, 12,
+            Supplier { toText(valueSupplier!!.get()) },
+            Consumer { stringValue: String? -> this.setValue(clamp(fromText(stringValue!!), min, max)) }) {
+            override fun mouseWheelMove(mouseX: Double, mouseY: Double, wheelDelta: Double): Boolean {
+                if (wheelDur > 0 && numberInstance != null && isMouseOverElement(mouseX, mouseY) && isFocus) {
                     try {
-                        onTextChanged(String.valueOf(Integer.parseInt(getCurrentString()) + (int) ((wheelDelta > 0 ? 1 : -1) * wheelDur)));
-                    } catch (Exception ignored) {}
-                    setFocus(true);
-                    return true;
+                        onTextChanged((getCurrentString().toInt() + ((if (wheelDelta > 0) 1 else -1) * wheelDur).toInt()).toString())
+                    } catch (_: Exception) {
+                    }
+                    isFocus = true
+                    return true
                 }
-                return false;
+                return false
             }
-        };
+        }
 
-        this.addWidget(this.textField);
+        this.addWidget(this.textField)
     }
 
-    public TerminalInputWidget setValue(Integer value) {
-        onChanged.accept(value);
+    fun setValue(value: Int?): TerminalInputWidget {
+        onChanged!!.accept(value)
 
-        return this;
+        return this
     }
 
-    public TerminalInputWidget setMin(Integer min) {
-        this.min = min;
-        updateTextFieldRange();
+    fun setMin(min: Int): TerminalInputWidget {
+        this.min = min
+        updateTextFieldRange()
 
-        return this;
+        return this
     }
 
-    public TerminalInputWidget setMax(Integer max) {
-        this.max = max;
-        updateTextFieldRange();
+    fun setMax(max: Int): TerminalInputWidget {
+        this.max = max
+        updateTextFieldRange()
 
-        return this;
+        return this
     }
 
-    protected void updateTextFieldRange() {
-        setTextFieldRange(textField, min, max);
+    protected fun updateTextFieldRange() {
+        setTextFieldRange(textField!!, min, max)
 
-        this.setValue(clamp(valueSupplier.get(), min, max));
+        this.setValue(clamp(valueSupplier!!.get()!!, min, max))
     }
 }

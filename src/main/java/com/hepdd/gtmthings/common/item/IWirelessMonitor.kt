@@ -26,7 +26,7 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
         var displayTextWidth = displayTextWidth
         val textListCache: MutableList<Component> = ArrayList()
         displayTextWidth -= 16
-        val container = getWirelessEnergyContainerCache() ?: return listOf()
+        val container = getWirelessEnergyContainer() ?: return listOf()
         val energyTotal = container.storage
 
         textListCache.add(
@@ -46,9 +46,6 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
         )
         if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
             val rate = container.rate
-            // textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.2",
-            // FormattingUtil.formatNumbers(rate), rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate)],
-            // Component.literal(GTValues.VNF[GTUtil.getFloorTierByVoltage(rate)])).withStyle(ChatFormatting.GRAY));
             textListCache.add(
                 FormatUtil.formatWithConstantWidth(
                     "gtmthings.machine.wireless_energy_monitor.tooltip.2",
@@ -67,7 +64,7 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
         val stat = container.energyStat
         textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.net_power"))
 
-        val avgMinute = stat.minuteAvg
+        val avgMinute = stat.getMinuteAvg()
         textListCache.add(
             FormatUtil.formatWithConstantWidth(
                 "gtmthings.machine.wireless_energy_monitor.tooltip.last_minute", displayTextWidth, Component.literal(
@@ -77,7 +74,7 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
                 ), FormatUtil.voltageName(avgMinute)
             )
         )
-        val avgHour = stat.hourAvg
+        val avgHour = stat.getHourAvg()
         textListCache.add(
             FormatUtil.formatWithConstantWidth(
                 "gtmthings.machine.wireless_energy_monitor.tooltip.last_hour", displayTextWidth, Component.literal(
@@ -87,7 +84,7 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
                 ), FormatUtil.voltageName(avgHour)
             )
         )
-        val avgDay = stat.dayAvg
+        val avgDay = stat.getDayAvg()
         textListCache.add(
             FormatUtil.formatWithConstantWidth(
                 "gtmthings.machine.wireless_energy_monitor.tooltip.last_day", displayTextWidth, Component.literal(
@@ -153,11 +150,11 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
         )
 
         for ((_, value) in WirelessEnergyContainer.TRANSFER_DATA.entries.stream()
-            .sorted(Comparator.comparingLong<Map.Entry<MetaMachine?, ITransferData>> { entry: Map.Entry<MetaMachine?, ITransferData> -> entry.value.Throughput() })
+            .sorted(Comparator.comparingLong<Map.Entry<MetaMachine?, ITransferData>> { entry: Map.Entry<MetaMachine?, ITransferData> -> entry.value.throughput() })
             .toList()) {
             val uuid = value.UUID()
             if (all || uuid == TeamUtil.getTeamUUID(this.getUUID())) {
-                textListCache.add(value.info)
+                textListCache.add(value.getInfo())
             }
         }
 
@@ -203,24 +200,6 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
                 return Component.translatable("gtceu.multiblock.power_substation.time_forever")
             }
         }
-//        if (duration.seconds <= 180) {
-//            fillTime = duration.seconds
-//            key = "gtceu.multiblock.power_substation.time_seconds"
-//        } else if (duration.toMinutes() <= 180) {
-//            fillTime = duration.toMinutes()
-//            key = "gtceu.multiblock.power_substation.time_minutes"
-//        } else if (duration.toHours() <= 72) {
-//            fillTime = duration.toHours()
-//            key = "gtceu.multiblock.power_substation.time_hours"
-//        } else if (duration.toDays() <= 730) { // 2 years
-//            fillTime = duration.toDays()
-//            key = "gtceu.multiblock.power_substation.time_days"
-//        } else if (duration.toDays() / 365 < 1000000) {
-//            fillTime = duration.toDays() / 365
-//            key = "gtceu.multiblock.power_substation.time_years"
-//        } else {
-//            return Component.translatable("gtceu.multiblock.power_substation.time_forever")
-//        }
 
         return Component.translatable(key, FormattingUtil.formatNumbers(fillTime))
     }

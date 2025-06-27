@@ -1,169 +1,150 @@
-package com.hepdd.gtmthings.api.machine.trait;
+package com.hepdd.gtmthings.api.machine.trait
 
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
-import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
+import appeng.api.stacks.AEFluidKey
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank
+import com.gregtechceu.gtceu.api.recipe.GTRecipe
+import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient
+import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank
+import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.level.material.Fluid
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
+import kotlin.math.min
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
+class InaccessibleInfiniteTank(holder: MetaMachine, internalBuffer: KeyStorage): NotifiableFluidTank(holder,
+    mutableListOf<CustomFluidTank?>(FluidStorageDelegate(internalBuffer)), IO.OUT, IO.NONE) {
+    private var storage: FluidStorageDelegate? = null
 
-import appeng.api.stacks.AEFluidKey;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
-
-public class InaccessibleInfiniteTank extends NotifiableFluidTank {
-
-    private final FluidStorageDelegate storage;
-
-    public InaccessibleInfiniteTank(MetaMachine holder, KeyStorage internalBuffer) {
-        super(holder, List.of(new FluidStorageDelegate(internalBuffer)), IO.OUT, IO.NONE);
-        internalBuffer.setOnContentsChanged(this::onContentsChanged);
-        storage = (FluidStorageDelegate) getStorages()[0];
-        allowSameFluids = true;
+    init {
+        internalBuffer.setOnContentsChanged { this.onContentsChanged() }
+        storage = getStorages()[0] as FluidStorageDelegate
+        allowSameFluids = true
     }
 
-    public static Fluid getFirst(FluidIngredient fluidIngredient) {
-        for (FluidIngredient.Value value : fluidIngredient.values) {
-            for (Fluid fluid : value.getFluids()) {
-                return fluid;
+    fun getFirst(fluidIngredient: FluidIngredient): Fluid? {
+        for (value in fluidIngredient.values) {
+            for (fluid in value.fluids) {
+                return fluid
             }
         }
-        return null;
+        return null
     }
 
-    @Override
-    public List<FluidIngredient> handleRecipe(IO io, GTRecipe recipe, List<?> left, boolean simulate) {
+    override fun handleRecipe(
+        io: IO?,
+        recipe: GTRecipe?,
+        left: MutableList<*>,
+        simulate: Boolean
+    ): MutableList<FluidIngredient?>? {
         if (!simulate && io == IO.OUT) {
-            for (Object ingredient : left) {
-                if (((FluidIngredient) ingredient).isEmpty()) continue;
-                Fluid fluid = getFirst((FluidIngredient) ingredient);
+            for (ingredient in left) {
+                if ((ingredient as FluidIngredient).isEmpty) continue
+                val fluid: Fluid? = getFirst(ingredient)
                 if (fluid != null) {
-                    storage.fill(fluid, ((FluidIngredient) ingredient).getAmount(), ((FluidIngredient) ingredient).getNbt());
+                    storage!!.fill(fluid, ingredient.amount, ingredient.nbt)
                 }
             }
-            storage.internalBuffer.onChanged();
-            return null;
+            storage?.internalBuffer?.onChanged()
+            return null
         }
-        return null;
+        return null
     }
 
-    @Override
-    public int getTanks() {
-        return 128;
+    override fun getTanks(): Int {
+        return 128
     }
 
-    @Override
-    public List<Object> getContents() {
-        return Collections.emptyList();
+    override fun getContents(): MutableList<Any?> {
+        return mutableListOf()
     }
 
-    @Override
-    public double getTotalContentAmount() {
-        return 0;
+    override fun getTotalContentAmount(): Double {
+        return 0.0
     }
 
-    @Override
-    public boolean isEmpty() {
-        return true;
+    override fun isEmpty(): Boolean {
+        return true
     }
 
-    @Override
-    public @NotNull FluidStack getFluidInTank(int tank) {
-        return FluidStack.EMPTY;
+    override fun getFluidInTank(tank: Int): FluidStack {
+        return FluidStack.EMPTY
     }
 
-    @Override
-    public void setFluidInTank(int tank, @NotNull FluidStack fluidStack) {}
+    override fun setFluidInTank(tank: Int, fluidStack: FluidStack) {}
 
-    @Override
-    public int getTankCapacity(int tank) {
-        return Integer.MAX_VALUE;
+    override fun getTankCapacity(tank: Int): Int {
+        return Int.Companion.MAX_VALUE
     }
 
-    @Override
-    public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-        return true;
+    override fun isFluidValid(tank: Int, stack: FluidStack): Boolean {
+        return true
     }
 
-    @Override
-    @Nullable
-    public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left, boolean simulate) {
-        if (io != IO.OUT) return left;
-        FluidAction action = simulate ? FluidAction.SIMULATE : FluidAction.EXECUTE;
-        for (var it = left.iterator(); it.hasNext();) {
-            var ingredient = it.next();
-            if (ingredient.isEmpty()) {
-                it.remove();
-                continue;
+    override fun handleRecipeInner(
+        io: IO?,
+        recipe: GTRecipe?,
+        left: MutableList<FluidIngredient>,
+        simulate: Boolean
+    ): MutableList<FluidIngredient>? {
+        if (io != IO.OUT) return left
+        val action = if (simulate) FluidAction.SIMULATE else FluidAction.EXECUTE
+        val it: MutableIterator<FluidIngredient?> = left.iterator()
+        while (it.hasNext()) {
+            val ingredient: FluidIngredient = it.next()!!
+            if (ingredient.isEmpty) {
+                it.remove()
+                continue
             }
 
-            var fluids = ingredient.getStacks();
-            if (fluids.length == 0 || fluids[0].isEmpty()) {
-                it.remove();
-                continue;
+            val fluids = ingredient.getStacks()
+            if (fluids.size == 0 || fluids[0]!!.isEmpty) {
+                it.remove()
+                continue
             }
 
-            FluidStack output = fluids[0];
-            ingredient.shrink(storage.fill(output, action));
-            if (ingredient.getAmount() <= 0) it.remove();
+            val output: FluidStack = fluids[0]!!
+            ingredient.shrink(storage!!.fill(output, action))
+            if (ingredient.amount <= 0) it.remove()
         }
-        return left.isEmpty() ? null : left;
+        return if (left.isEmpty()) null else left
     }
 
-    private static class FluidStorageDelegate extends CustomFluidTank {
-
-        private final KeyStorage internalBuffer;
-
-        private FluidStorageDelegate(KeyStorage internalBuffer) {
-            super(0);
-            this.internalBuffer = internalBuffer;
-        }
-
-        private void fill(Fluid fluid, int amount, CompoundTag tag) {
-            var key = AEFluidKey.of(fluid, tag);
-            long oldValue = internalBuffer.storage.getOrDefault(key, 0);
-            long changeValue = Math.min(Long.MAX_VALUE - oldValue, amount);
+    open class FluidStorageDelegate(val internalBuffer: KeyStorage) : CustomFluidTank(0) {
+        fun fill(fluid: Fluid?, amount: Int, tag: CompoundTag?) {
+            val key = AEFluidKey.of(fluid, tag)
+            val oldValue = internalBuffer.storage.getOrDefault(key, 0)
+            val changeValue = min(Long.Companion.MAX_VALUE - oldValue, amount.toLong())
             if (changeValue > 0) {
-                internalBuffer.storage.put(key, oldValue + changeValue);
+                internalBuffer.storage.put(key, oldValue + changeValue)
             }
         }
 
-        @Override
-        public int getCapacity() {
-            return Integer.MAX_VALUE;
+        override fun getCapacity(): Int {
+            return Int.Companion.MAX_VALUE
         }
 
-        @Override
-        public void setFluid(FluidStack fluid) {}
+        override fun setFluid(fluid: FluidStack?) {}
 
-        @Override
-        public int fill(FluidStack resource, FluidAction action) {
-            var key = AEFluidKey.of(resource.getFluid(), resource.getTag());
-            int amount = resource.getAmount();
-            long oldValue = internalBuffer.storage.getOrDefault(key, 0);
-            long changeValue = Math.min(Long.MAX_VALUE - oldValue, amount);
+        override fun fill(resource: FluidStack, action: FluidAction): Int {
+            val key = AEFluidKey.of(resource.fluid, resource.tag)
+            val amount = resource.amount
+            val oldValue = internalBuffer.storage.getOrDefault(key, 0)
+            val changeValue = min(Long.Companion.MAX_VALUE - oldValue, amount.toLong())
             if (changeValue > 0 && action.execute()) {
-                internalBuffer.storage.put(key, oldValue + changeValue);
+                internalBuffer.storage.put(key, oldValue + changeValue)
             }
-            return (int) changeValue;
+            return changeValue.toInt()
         }
 
-        @Override
-        public boolean supportsFill(int tank) {
-            return false;
+        override fun supportsFill(tank: Int): Boolean {
+            return false
         }
 
-        @Override
-        public boolean supportsDrain(int tank) {
-            return false;
+        override fun supportsDrain(tank: Int): Boolean {
+            return false
         }
     }
 }

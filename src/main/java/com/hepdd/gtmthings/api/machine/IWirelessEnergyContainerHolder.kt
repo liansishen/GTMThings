@@ -15,6 +15,6 @@ interface IWirelessEnergyContainerHolder: IBindable {
             val container = getOrCreateContainer(getUUID())
             setWirelessEnergyContainerCache(container)
         }
-        return getWirelessEnergyContainer()
+        return getWirelessEnergyContainerCache()
     }
 }

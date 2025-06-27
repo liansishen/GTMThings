@@ -1,69 +1,69 @@
-package com.hepdd.gtmthings.api.machine.fancyconfigurator;
+package com.hepdd.gtmthings.api.machine.fancyconfigurator
 
-import com.gregtechceu.gtceu.api.gui.GuiTextures;
-import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfigurator;
-import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
-import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-
-import net.minecraft.network.chat.Component;
-
-import com.hepdd.gtmthings.GTMThings;
-import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
-import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
-import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.jei.IngredientIO;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
-import java.util.Collections;
-import java.util.List;
+import com.gregtechceu.gtceu.api.gui.GuiTextures
+import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfigurator
+import com.gregtechceu.gtceu.api.gui.widget.SlotWidget
+import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler
+import com.hepdd.gtmthings.GTMThings
+import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture
+import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture
+import com.lowdragmc.lowdraglib.gui.widget.Widget
+import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
+import com.lowdragmc.lowdraglib.jei.IngredientIO
+import lombok.Getter
+import lombok.Setter
+import lombok.experimental.Accessors
+import net.minecraft.network.chat.Component
+import kotlin.collections.mutableListOf
+import kotlin.math.sqrt
 
 @Accessors(chain = true)
-public class InventoryFancyConfigurator implements IFancyConfigurator {
+open class InventoryFancyConfigurator(inventory: CustomItemStackHandler, title: Component?,val tooltips1:MutableList<Component?>):IFancyConfigurator {
 
-    private final CustomItemStackHandler inventory;
+    private var inventory: CustomItemStackHandler? = null
 
-    @Getter
-    private final Component title;
+    private var title: Component? = null
 
-    @Getter
-    @Setter
-    private List<Component> tooltips = Collections.emptyList();
-
-    public InventoryFancyConfigurator(CustomItemStackHandler inventory, Component title) {
-        this.inventory = inventory;
-        this.title = title;
+    init {
+        this.inventory = inventory
+        this.title = title
     }
 
-    @Override
-    public IGuiTexture getIcon() {
-        return new ResourceTexture("%s:textures/overlay/inventory_configurator.png".formatted(GTMThings.MOD_ID));
+    override fun getIcon(): IGuiTexture {
+        return ResourceTexture("%s:textures/overlay/inventory_configurator.png".format(GTMThings.MOD_ID))
     }
 
-    @Override
-    public Widget createConfigurator() {
-        int rowSize = (int) Math.sqrt(inventory.getSlots());
-        int colSize = rowSize;
-        if (inventory.getSlots() == 8) {
-            rowSize = 4;
-            colSize = 2;
+    override fun createConfigurator(): Widget {
+        var rowSize = sqrt(inventory!!.getSlots().toDouble()).toInt()
+        var colSize = rowSize
+        if (inventory!!.getSlots() == 8) {
+            rowSize = 4
+            colSize = 2
         }
-        var group = new WidgetGroup(0, 0, 18 * rowSize + 16, 18 * colSize + 16);
-        var container = new WidgetGroup(4, 4, 18 * rowSize + 8, 18 * colSize + 8);
-        int index = 0;
-        for (int y = 0; y < colSize; y++) {
-            for (int x = 0; x < rowSize; x++) {
-                container.addWidget(new SlotWidget(inventory, index++, 4 + x * 18, 4 + y * 18, true, true)
+        val group = WidgetGroup(0, 0, 18 * rowSize + 16, 18 * colSize + 16)
+        val container = WidgetGroup(4, 4, 18 * rowSize + 8, 18 * colSize + 8)
+        var index = 0
+        for (y in 0..<colSize) {
+            for (x in 0..<rowSize) {
+                container.addWidget(
+                    SlotWidget(inventory, index++, 4 + x * 18, 4 + y * 18, true, true)
                         .setBackgroundTexture(GuiTextures.SLOT)
-                        .setIngredientIO(IngredientIO.INPUT));
+                        .setIngredientIO(IngredientIO.INPUT)
+                )
             }
         }
 
-        container.setBackground(GuiTextures.BACKGROUND_INVERSE);
-        group.addWidget(container);
+        container.setBackground(GuiTextures.BACKGROUND_INVERSE)
+        group.addWidget(container)
 
-        return group;
+        return group
+    }
+
+    override fun getTitle(): Component? {
+        return title
+    }
+
+    override fun getTooltips(): List<Component?>? {
+        return tooltips1
     }
 }

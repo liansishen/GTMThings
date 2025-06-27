@@ -1,27 +1,24 @@
-package com.hepdd.gtmthings.api.misc;
+package com.hepdd.gtmthings.api.misc
 
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
+import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition
+import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine
+import com.gregtechceu.gtceu.api.registry.GTRegistries
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.block.Block
+import org.apache.commons.lang3.ArrayUtils
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Block;
+object Hatch {
+    @JvmField
+    var Set: Set<Block> = HashSet<Block>().apply {
+        GTRegistries.MACHINES.forEach { d ->
+            if (d.recipeTypes != null || d is MultiblockMachineDefinition) return@forEach
 
-import java.util.HashSet;
-import java.util.Set;
-
-public final class Hatch {
-
-    public static final Set<Block> Set = new HashSet<>();
-
-    static {
-        GTRegistries.MACHINES.forEach(d -> {
-            if (d.getRecipeTypes() != null || d instanceof MultiblockMachineDefinition) return;
-            var block = d.getBlock();
-            if (d.createMetaMachine((IMachineBlockEntity) d.getBlockEntityType().create(BlockPos.ZERO, block.defaultBlockState())) instanceof MultiblockPartMachine) {
-                Set.add(block);
+            val block = d.block
+            if (d.createMetaMachine(d.blockEntityType.create(BlockPos.ZERO, block.defaultBlockState()) as IMachineBlockEntity)
+                        is MultiblockPartMachine) {
+                add(block)
             }
-        });
+        }
     }
 }

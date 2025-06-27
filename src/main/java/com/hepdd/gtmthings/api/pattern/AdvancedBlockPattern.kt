@@ -1,516 +1,590 @@
-package com.hepdd.gtmthings.api.pattern;
+package com.hepdd.gtmthings.api.pattern
 
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
-import com.gregtechceu.gtceu.api.pattern.BlockPattern;
-import com.gregtechceu.gtceu.api.pattern.MultiblockState;
-import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
-import com.gregtechceu.gtceu.api.pattern.predicates.SimplePredicate;
-import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
-import com.gregtechceu.gtceu.common.block.CoilBlock;
+import appeng.api.config.Actionable
+import appeng.api.networking.IGrid
+import appeng.api.stacks.AEItemKey
+import appeng.items.tools.powered.WirelessTerminalItem
+import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController
+import com.gregtechceu.gtceu.api.pattern.BlockPattern
+import com.gregtechceu.gtceu.api.pattern.MultiblockState
+import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate
+import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection
+import com.gregtechceu.gtceu.common.block.CoilBlock
+import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior.AutoBuildSetting
+import com.lowdragmc.lowdraglib.utils.BlockInfo
+import com.mojang.datafixers.util.Pair
+import it.unimi.dsi.fastutil.ints.IntObjectPair
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.NonNullList
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.level.block.state.properties.Property
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraftforge.common.capabilities.ForgeCapabilities
+import net.minecraftforge.common.util.LazyOptional
+import net.minecraftforge.items.IItemHandler
+import net.minecraftforge.items.ItemStackHandler
+import org.apache.commons.lang3.ArrayUtils
+import oshi.util.tuples.Triplet
+import java.util.function.BiPredicate
+import java.util.function.Consumer
+import kotlin.math.max
+import kotlin.math.min
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
+open class AdvancedBlockPattern(
+        predicatesIn: Array<Array<Array<TraceabilityPredicate>?>?>,
+        structureDir: Array<RelativeDirection?>,
+        aisleRepetitions: Array<IntArray?>,
+        centerOffset: IntArray
+    ): BlockPattern(predicatesIn, structureDir, aisleRepetitions, centerOffset) {
 
-import appeng.api.config.Actionable;
-import appeng.api.networking.IGrid;
-import appeng.api.stacks.AEItemKey;
-import appeng.api.storage.MEStorage;
-import appeng.items.tools.powered.WirelessTerminalItem;
-import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior;
-import com.lowdragmc.lowdraglib.utils.BlockInfo;
-import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.ints.IntObjectPair;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import oshi.util.tuples.Triplet;
+    companion object {
+        @JvmStatic
+        var FACINGS: Array<Direction?> = arrayOf<Direction?>(
+            Direction.SOUTH, Direction.NORTH, Direction.WEST, Direction.EAST, Direction.UP,
+            Direction.DOWN
+        )
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
+        @JvmStatic
+        var FACINGS_H: Array<Direction?> =
+            arrayOf<Direction?>(Direction.SOUTH, Direction.NORTH, Direction.WEST, Direction.EAST)
 
-public class AdvancedBlockPattern extends BlockPattern {
+        @JvmStatic
+        fun getAdvancedBlockPattern(blockPattern: BlockPattern?): AdvancedBlockPattern? {
+            try {
+                val clazz: Class<*> = BlockPattern::class.java
+                // blockMatches
+                val blockMatchesField = clazz.getDeclaredField("blockMatches")
+                blockMatchesField.setAccessible(true)
+                val blockMatches = blockMatchesField.get(blockPattern) as Array<Array<Array<TraceabilityPredicate>?>?>
+                // structureDir
+                val structureDirField = clazz.getDeclaredField("structureDir")
+                structureDirField.setAccessible(true)
+                val structureDir = structureDirField.get(blockPattern) as Array<RelativeDirection?>
+                // aisleRepetitions
+                val aisleRepetitionsField = clazz.getDeclaredField("aisleRepetitions")
+                aisleRepetitionsField.setAccessible(true)
+                val aisleRepetitions = aisleRepetitionsField.get(blockPattern) as Array<IntArray?>
+                // centerOffset
+                val centerOffsetField = clazz.getDeclaredField("centerOffset")
+                centerOffsetField.setAccessible(true)
+                val centerOffset = centerOffsetField.get(blockPattern) as IntArray
 
-    static Direction[] FACINGS = { Direction.SOUTH, Direction.NORTH, Direction.WEST, Direction.EAST, Direction.UP,
-            Direction.DOWN };
-    static Direction[] FACINGS_H = { Direction.SOUTH, Direction.NORTH, Direction.WEST, Direction.EAST };
+                return AdvancedBlockPattern(blockMatches, structureDir, aisleRepetitions, centerOffset)
+            } catch (_: Exception) {
+            }
+            return null
+        }
+    }
 
-    public final int[][] aisleRepetitions;
-    public final RelativeDirection[] structureDir;
-    protected final TraceabilityPredicate[][][] blockMatches; // [z][y][x]
-    protected final int fingerLength; // z size
-    protected final int thumbLength; // y size
-    protected final int palmLength; // x size
-    protected final int[] centerOffset; // x, y, z, minZ, maxZ
+    val aisleRepetitions: Array<IntArray?>
+    val structureDir: Array<RelativeDirection?>
+    private val blockMatches: Array<Array<Array<TraceabilityPredicate>?>?> // [z][y][x]
+    private var fingerLength: Int = 0 // z size
+    private var thumbLength: Int = 0 // y size
+    private var palmLength: Int = 0 // x size
+    private var centerOffset: IntArray // x, y, z, minZ, maxZ
 
-    public AdvancedBlockPattern(TraceabilityPredicate[][][] predicatesIn, RelativeDirection[] structureDir, int[][] aisleRepetitions, int[] centerOffset) {
-        super(predicatesIn, structureDir, aisleRepetitions, centerOffset);
-        this.blockMatches = predicatesIn;
-        this.fingerLength = predicatesIn.length;
-        this.structureDir = structureDir;
-        this.aisleRepetitions = aisleRepetitions;
+    init {
+        this.blockMatches = predicatesIn
+        this.fingerLength = predicatesIn.size
+        this.structureDir = structureDir
+        this.aisleRepetitions = aisleRepetitions
 
         if (this.fingerLength > 0) {
-            this.thumbLength = predicatesIn[0].length;
+            this.thumbLength = predicatesIn[0]!!.size
 
             if (this.thumbLength > 0) {
-                this.palmLength = predicatesIn[0][0].length;
+                this.palmLength = predicatesIn[0]!![0]!!.size
             } else {
-                this.palmLength = 0;
+                this.palmLength = 0
             }
         } else {
-            this.thumbLength = 0;
-            this.palmLength = 0;
+            this.thumbLength = 0
+            this.palmLength = 0
         }
 
-        this.centerOffset = centerOffset;
+        this.centerOffset = centerOffset
     }
 
-    public static AdvancedBlockPattern getAdvancedBlockPattern(BlockPattern blockPattern) {
-        try {
-            Class<?> clazz = BlockPattern.class;
-            // blockMatches
-            Field blockMatchesField = clazz.getDeclaredField("blockMatches");
-            blockMatchesField.setAccessible(true);
-            TraceabilityPredicate[][][] blockMatches = (TraceabilityPredicate[][][]) blockMatchesField.get(blockPattern);
-            // structureDir
-            Field structureDirField = clazz.getDeclaredField("structureDir");
-            structureDirField.setAccessible(true);
-            RelativeDirection[] structureDir = (RelativeDirection[]) structureDirField.get(blockPattern);
-            // aisleRepetitions
-            Field aisleRepetitionsField = clazz.getDeclaredField("aisleRepetitions");
-            aisleRepetitionsField.setAccessible(true);
-            int[][] aisleRepetitions = (int[][]) aisleRepetitionsField.get(blockPattern);
-            // centerOffset
-            Field centerOffsetField = clazz.getDeclaredField("centerOffset");
-            centerOffsetField.setAccessible(true);
-            int[] centerOffset = (int[]) centerOffsetField.get(blockPattern);
+    fun autoBuild(
+        player: Player, worldState: MultiblockState,
+        autoBuildSetting: AutoBuildSetting
+    ) {
+        val world = player.level()
+        var minZ = -centerOffset[4]
+        clearWorldState(worldState)
+        val controller = worldState.getController()
+        val centerPos = controller.self().pos
+        val facing = controller.self().getFrontFacing()
+        val upwardsFacing = controller.self().upwardsFacing
+        val isFlipped = controller.self().isFlipped()
+        val cacheGlobal = worldState.globalCount
+        val cacheLayer = worldState.layerCount
+        val blocks = HashMap<BlockPos?, Any?>()
+        val placeBlockPos = HashSet<BlockPos?>()
+        blocks.put(centerPos, controller)
 
-            return new AdvancedBlockPattern(blockMatches, structureDir, aisleRepetitions, centerOffset);
-        } catch (Exception ignored) {}
-        return null;
-    }
-
-    public void autoBuild(Player player, MultiblockState worldState,
-                          AdvancedTerminalBehavior.AutoBuildSetting autoBuildSetting) {
-        Level world = player.level();
-        int minZ = -centerOffset[4];
-        clearWorldState(worldState);
-        IMultiController controller = worldState.getController();
-        BlockPos centerPos = controller.self().getPos();
-        Direction facing = controller.self().getFrontFacing();
-        Direction upwardsFacing = controller.self().getUpwardsFacing();
-        boolean isFlipped = controller.self().isFlipped();
-        Object2IntOpenHashMap<SimplePredicate> cacheGlobal = worldState.getGlobalCount();
-        Object2IntOpenHashMap<SimplePredicate> cacheLayer = worldState.getLayerCount();
-        Map<BlockPos, Object> blocks = new HashMap<>();
-        Set<BlockPos> placeBlockPos = new HashSet<>();
-        blocks.put(centerPos, controller);
-
-        int[] repeat = new int[this.fingerLength];
-        for (int h = 0; h < this.fingerLength; h++) {
-            var minH = aisleRepetitions[h][0];
-            var maxH = aisleRepetitions[h][1];
+        val repeat = IntArray(this.fingerLength)
+        for (h in 0..<this.fingerLength) {
+            val minH = aisleRepetitions[h]!![0]
+            val maxH = aisleRepetitions[h]!![1]
             if (minH != maxH) {
-                repeat[h] = Math.max(minH, Math.min(maxH, autoBuildSetting.getRepeatCount()));
+                repeat[h] = max(minH, min(maxH, autoBuildSetting.repeatCount))
             } else {
-                repeat[h] = minH;
+                repeat[h] = minH
             }
         }
 
-        for (int c = 0, z = minZ++, r; c < this.fingerLength; c++) {
-            for (r = 0; r < repeat[c]; r++) {
-                cacheLayer.clear();
-                for (int b = 0, y = -centerOffset[1]; b < this.thumbLength; b++, y++) {
-                    for (int a = 0, x = -centerOffset[0]; a < this.palmLength; a++, x++) {
-                        TraceabilityPredicate predicate = this.blockMatches[c][b][a];
-                        BlockPos pos = setActualRelativeOffset(x, y, z, facing, upwardsFacing, isFlipped)
-                                .offset(centerPos.getX(), centerPos.getY(), centerPos.getZ());
-                        updateWorldState(worldState, pos, predicate);
-                        ItemStack coilItemStack = null;
+        var c = 0
+        var z = minZ++
+        var r: Int
+        while (c < this.fingerLength) {
+            r = 0
+            while (r < repeat[c]) {
+                cacheLayer.clear()
+                var b = 0
+                var y = -centerOffset[1]
+                while (b < this.thumbLength) {
+                    var a = 0
+                    var x = -centerOffset[0]
+                    while (a < this.palmLength) {
+                        val predicate = this.blockMatches[c]!![b]!![a]
+                        val pos: BlockPos = setActualRelativeOffset(x, y, z, facing, upwardsFacing, isFlipped)
+                            .offset(centerPos.x, centerPos.y, centerPos.z)
+                        updateWorldState(worldState, pos, predicate)
+                        var coilItemStack: ItemStack? = null
                         if (!world.isEmptyBlock(pos)) {
-                            if (world.getBlockState(pos).getBlock() instanceof CoilBlock coilBlock && autoBuildSetting.isReplaceCoilMode()) {
-                                coilItemStack = coilBlock.asItem().getDefaultInstance();
+                            if (world.getBlockState(pos).block is CoilBlock && autoBuildSetting.isReplaceCoilMode
+                            ) {
+                                coilItemStack = world.getBlockState(pos).block.asItem().defaultInstance
                             } else {
-                                blocks.put(pos, world.getBlockState(pos));
-                                for (SimplePredicate limit : predicate.limited) {
-                                    limit.testLimited(worldState);
+                                blocks.put(pos, world.getBlockState(pos))
+                                for (limit in predicate.limited) {
+                                    limit.testLimited(worldState)
                                 }
-                                continue;
+                                a++
+                                x++
+                                continue
                             }
-
                         }
 
-                        boolean find = false;
-                        BlockInfo[] infos = new BlockInfo[0];
-                        for (SimplePredicate limit : predicate.limited) {
-                            if (limit.minLayerCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
-                                int curr = cacheLayer.getInt(limit);
+                        var find = false
+                        var infos: Array<BlockInfo?>? = arrayOfNulls(0)
+                        for (limit in predicate.limited) {
+                            if (limit.minLayerCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates!!.get())) {
+                                val curr = cacheLayer.getInt(limit)
                                 if (curr < limit.minLayerCount &&
-                                        (limit.maxLayerCount == -1 || curr < limit.maxLayerCount)) {
-                                    cacheLayer.addTo(limit, 1);
+                                    (limit.maxLayerCount == -1 || curr < limit.maxLayerCount)
+                                ) {
+                                    cacheLayer.addTo(limit, 1)
                                 } else {
-                                    continue;
+                                    continue
                                 }
                             } else {
-                                continue;
+                                continue
                             }
-                            infos = limit.candidates == null ? null : limit.candidates.get();
-                            find = true;
-                            break;
+                            infos = if (limit.candidates == null) null else limit.candidates!!.get()
+                            find = true
+                            break
                         }
                         if (!find) {
-                            for (SimplePredicate limit : predicate.limited) {
-                                if (limit.minCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
-                                    int curr = cacheGlobal.getInt(limit);
+                            for (limit in predicate.limited) {
+                                if (limit.minCount > 0 && autoBuildSetting.isPlaceHatch(limit.candidates!!.get())) {
+                                    val curr = cacheGlobal.getInt(limit)
                                     if (curr < limit.minCount && (limit.maxCount == -1 || curr < limit.maxCount)) {
-                                        cacheGlobal.addTo(limit, 1);
+                                        cacheGlobal.addTo(limit, 1)
                                     } else {
-                                        continue;
+                                        continue
                                     }
                                 } else {
-                                    continue;
+                                    continue
                                 }
-                                infos = limit.candidates == null ? null : limit.candidates.get();
-                                find = true;
-                                break;
+                                infos = if (limit.candidates == null) null else limit.candidates!!.get()
+                                find = true
+                                break
                             }
                         }
                         if (!find) { // no limited
-                            for (SimplePredicate limit : predicate.limited) {
-                                if (!autoBuildSetting.isPlaceHatch(limit.candidates.get())) {
-                                    continue;
+                            for (limit in predicate.limited) {
+                                if (!autoBuildSetting.isPlaceHatch(limit.candidates!!.get())) {
+                                    continue
                                 }
                                 if (limit.maxLayerCount != -1 &&
-                                        cacheLayer.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxLayerCount) {
-                                    continue;
+                                    cacheLayer.getOrDefault(limit, Int.Companion.MAX_VALUE) == limit.maxLayerCount
+                                ) {
+                                    continue
                                 }
                                 if (limit.maxCount != -1 &&
-                                        cacheGlobal.getOrDefault(limit, Integer.MAX_VALUE) == limit.maxCount) {
-                                    continue;
+                                    cacheGlobal.getOrDefault(limit, Int.Companion.MAX_VALUE) == limit.maxCount
+                                ) {
+                                    continue
                                 }
-                                cacheLayer.addTo(limit, 1);
-                                cacheGlobal.addTo(limit, 1);
-                                infos = ArrayUtils.addAll(infos,
-                                        limit.candidates == null ? null : limit.candidates.get());
+                                cacheLayer.addTo(limit, 1)
+                                cacheGlobal.addTo(limit, 1)
+                                infos = ArrayUtils.addAll<BlockInfo?>(
+                                    infos,
+                                    *if (limit.candidates == null) null else limit.candidates!!.get()
+                                )
                             }
-                            for (SimplePredicate common : predicate.common) {
-                                if (common.candidates != null && predicate.common.size() > 1 && !autoBuildSetting.isPlaceHatch(common.candidates.get())) {
-                                    continue;
+                            for (common in predicate.common) {
+                                if (common.candidates != null && predicate.common.size > 1 && !autoBuildSetting.isPlaceHatch(
+                                        common.candidates!!.get()
+                                    )
+                                ) {
+                                    continue
                                 }
-                                infos = ArrayUtils.addAll(infos,
-                                        common.candidates == null ? null : common.candidates.get());
+                                infos = ArrayUtils.addAll<BlockInfo?>(
+                                    infos,
+                                    *if (common.candidates == null) null else common.candidates!!.get()
+                                )
                             }
                         }
 
-                        List<ItemStack> candidates = autoBuildSetting.apply(infos);
+                        val candidates = autoBuildSetting.apply(infos)
 
-                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null && ItemStack.isSameItem(candidates.get(0), coilItemStack)) continue;
+                        if (autoBuildSetting.isReplaceCoilMode && coilItemStack != null && ItemStack.isSameItem(
+                                candidates[0],
+                                coilItemStack
+                            )
+                        ) {
+                            a++
+                            x++
+                            continue
+                        }
 
                         // check inventory
-                        Triplet<ItemStack, IItemHandler, Integer> result = foundItem(player, candidates, autoBuildSetting.getIsUseAE());
-                        ItemStack found = result.getA();
-                        IItemHandler handler = result.getB();
-                        int foundSlot = result.getC();
+                        val result = foundItem(player, candidates, autoBuildSetting.isUseAE)
+                        val found = result.getA()
+                        val handler = result.getB()
+                        val foundSlot: Int = result.getC()!!
 
-                        if (found == null) continue;
+                        if (found == null) {
+                            a++
+                            x++
+                            continue
+                        }
 
                         // check can get old coilBlock
-                        IItemHandler holderHandler = null;
-                        int holderSlot = -1;
-                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null) {
-                            Pair<IItemHandler, Integer> holderResult = foundHolderSlot(player, coilItemStack);
-                            holderHandler = holderResult.getFirst();
-                            holderSlot = holderResult.getSecond();
+                        var holderHandler: IItemHandler? = null
+                        var holderSlot = -1
+                        if (autoBuildSetting.isReplaceCoilMode && coilItemStack != null) {
+                            val holderResult = foundHolderSlot(player, coilItemStack)
+                            holderHandler = holderResult.getFirst()
+                            holderSlot = holderResult.getSecond()!!
 
                             if (holderHandler != null && holderSlot < 0) {
-                                continue;
+                                a++
+                                x++
+                                continue
                             }
                         }
 
-                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null) {
-                            world.removeBlock(pos, true);
-                            if (holderHandler != null) holderHandler.insertItem(holderSlot, coilItemStack, false);
+                        if (autoBuildSetting.isReplaceCoilMode && coilItemStack != null) {
+                            world.removeBlock(pos, true)
+                            holderHandler?.insertItem(holderSlot, coilItemStack, false)
                         }
 
-                        BlockItem itemBlock = (BlockItem) found.getItem();
-                        BlockPlaceContext context = new BlockPlaceContext(world, player, InteractionHand.MAIN_HAND,
-                                found, BlockHitResult.miss(player.getEyePosition(0), Direction.UP, pos));
-                        InteractionResult interactionResult = itemBlock.place(context);
+                        val itemBlock = found.item as BlockItem
+                        val context = BlockPlaceContext(
+                            world, player, InteractionHand.MAIN_HAND,
+                            found, BlockHitResult.miss(player.getEyePosition(0f), Direction.UP, pos)
+                        )
+                        val interactionResult = itemBlock.place(context)
                         if (interactionResult != InteractionResult.FAIL) {
-                            placeBlockPos.add(pos);
-                            if (handler != null) {
-                                handler.extractItem(foundSlot, 1, false);
-                            }
+                            placeBlockPos.add(pos)
+                            handler?.extractItem(foundSlot, 1, false)
                         }
-                        if (world.getBlockEntity(pos) instanceof IMachineBlockEntity machineBlockEntity) {
-                            blocks.put(pos, machineBlockEntity.getMetaMachine());
+                        if (world.getBlockEntity(pos) is IMachineBlockEntity) {
+                            blocks.put(pos, (world.getBlockEntity(pos) as IMachineBlockEntity).metaMachine)
                         } else {
-                            blocks.put(pos, world.getBlockState(pos));
+                            blocks.put(pos, world.getBlockState(pos))
                         }
 
+                        a++
+                        x++
                     }
+                    b++
+                    y++
                 }
-                z++;
+                z++
+                r++
+            }
+            c++
+        }
+        val frontFacing = controller.self().getFrontFacing()
+        blocks.forEach { (pos: BlockPos?, block: Any?) ->  // adjust facing
+            if (block !is IMultiController) {
+                if (block is BlockState && placeBlockPos.contains(pos)) {
+                    resetFacing(pos, block, frontFacing, BiPredicate { p: BlockPos?, f: Direction? ->
+                        val `object` = blocks.get(p!!.relative(f))
+                        `object` == null ||
+                                (`object` is BlockState && `object`.block === Blocks.AIR)
+                    }, Consumer { state: BlockState? -> world.setBlock(pos, state, 3) })
+                } else if (block is MetaMachine) {
+                    resetFacing(pos, block.blockState, frontFacing, BiPredicate { p: BlockPos?, f: Direction? ->
+                        val `object` = blocks.get(p!!.relative(f))
+                        if (`object` == null || (`object` is BlockState && `object`.isAir)) {
+                            return@BiPredicate block.isFacingValid(f)
+                        }
+                        return@BiPredicate false
+                    }, Consumer { state: BlockState? -> world.setBlock(pos, state, 3) })
+                }
             }
         }
-        Direction frontFacing = controller.self().getFrontFacing();
-        blocks.forEach((pos, block) -> { // adjust facing
-            if (!(block instanceof IMultiController)) {
-                if (block instanceof BlockState && placeBlockPos.contains(pos)) {
-                    resetFacing(pos, (BlockState) block, frontFacing, (p, f) -> {
-                        Object object = blocks.get(p.relative(f));
-                        return object == null ||
-                                (object instanceof BlockState && ((BlockState) object).getBlock() == Blocks.AIR);
-                    }, state -> world.setBlock(pos, state, 3));
-                } else if (block instanceof MetaMachine machine) {
-                    resetFacing(pos, machine.getBlockState(), frontFacing, (p, f) -> {
-                        Object object = blocks.get(p.relative(f));
-                        if (object == null || (object instanceof BlockState blockState && blockState.isAir())) {
-                            return machine.isFacingValid(f);
-                        }
-                        return false;
-                    }, state -> world.setBlock(pos, state, 3));
-                }
-            }
-        });
     }
 
-    private Triplet<ItemStack, IItemHandler, Integer> foundItem(Player player, List<ItemStack> candidates, int isUseAE) {
-        ItemStack found = null;
-        IItemHandler handler = null;
-        int foundSlot = -1;
-        if (!player.isCreative()) {
-            var foundHandler = getMatchStackWithHandler(candidates,
-                    player.getCapability(ForgeCapabilities.ITEM_HANDLER), player, isUseAE);
+    private fun foundItem(
+        player: Player,
+        candidates: MutableList<ItemStack>,
+        isUseAE: Int
+    ): Triplet<ItemStack?, IItemHandler?, Int?> {
+        var found: ItemStack? = null
+        var handler: IItemHandler? = null
+        var foundSlot = -1
+        if (!player.isCreative) {
+            val foundHandler = getMatchStackWithHandler(
+                candidates,
+                player.getCapability(ForgeCapabilities.ITEM_HANDLER), player, isUseAE
+            )
             if (foundHandler != null) {
-                foundSlot = foundHandler.firstInt();
-                handler = foundHandler.second();
-                found = handler.getStackInSlot(foundSlot).copy();
+                foundSlot = foundHandler.firstInt()
+                handler = foundHandler.second()
+                found = handler!!.getStackInSlot(foundSlot).copy()
             }
         } else {
-            for (ItemStack candidate : candidates) {
-                found = candidate.copy();
-                if (!found.isEmpty() && found.getItem() instanceof BlockItem) {
-                    break;
+            for (candidate in candidates) {
+                found = candidate.copy()
+                if (!found.isEmpty && found.item is BlockItem) {
+                    break
                 }
-                found = null;
+                found = null
             }
         }
-        return new Triplet<>(found, handler, foundSlot);
+        return Triplet<ItemStack?, IItemHandler?, Int?>(found, handler, foundSlot)
     }
 
-    private Pair<IItemHandler, Integer> foundHolderSlot(Player player, ItemStack coilItemStack) {
-        IItemHandler handler = null;
-        int foundSlot = -1;
-        if (!player.isCreative()) {
-            handler = player.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
-            for (int i = 0; i < handler.getSlots(); i++) {
-                @NotNull
-                ItemStack stack = handler.getStackInSlot(i);
-                if (stack.isEmpty()) {
+    private fun foundHolderSlot(player: Player, coilItemStack: ItemStack): Pair<IItemHandler?, Int?> {
+        var handler: IItemHandler? = null
+        var foundSlot = -1
+        if (!player.isCreative) {
+            handler = player.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null)
+            for (i in 0..<handler.slots) {
+                val stack = handler.getStackInSlot(i)
+                if (stack.isEmpty) {
                     if (foundSlot < 0) {
-                        foundSlot = i;
+                        foundSlot = i
                     }
-                } else if (ItemStack.isSameItemSameTags(coilItemStack, stack) && (stack.getCount() + 1) <= stack.getMaxStackSize()) {
-                    foundSlot = i;
+                } else if (ItemStack.isSameItemSameTags(
+                        coilItemStack,
+                        stack
+                    ) && (stack.count + 1) <= stack.maxStackSize
+                ) {
+                    foundSlot = i
                 }
             }
         }
 
-        return new Pair<>(handler, foundSlot);
+        return Pair<IItemHandler?, Int?>(handler, foundSlot)
     }
 
-    private void clearWorldState(MultiblockState worldState) {
+    private fun clearWorldState(worldState: MultiblockState?) {
         try {
-            Class<?> clazz = Class.forName("com.gregtechceu.gtceu.api.pattern.MultiblockState");
+            val clazz = Class.forName("com.gregtechceu.gtceu.api.pattern.MultiblockState")
             // Object obj = clazz.newInstance();
-            Method method = clazz.getDeclaredMethod("clean");
-            method.setAccessible(true);
-            method.invoke(worldState);
-        } catch (Exception ignored) {}
+            val method = clazz.getDeclaredMethod("clean")
+            method.setAccessible(true)
+            method.invoke(worldState)
+        } catch (_: java.lang.Exception) {
+        }
     }
 
-    private void updateWorldState(MultiblockState worldState, BlockPos posIn, TraceabilityPredicate predicate) {
+    private fun updateWorldState(worldState: MultiblockState?, posIn: BlockPos?, predicate: TraceabilityPredicate?) {
         try {
-            Class<?> clazz = Class.forName("com.gregtechceu.gtceu.api.pattern.MultiblockState");
-            Method method = clazz.getDeclaredMethod("update", BlockPos.class, TraceabilityPredicate.class);
-            method.setAccessible(true);
-            method.invoke(worldState, posIn, predicate);
-        } catch (Exception ignored) {}
+            val clazz = Class.forName("com.gregtechceu.gtceu.api.pattern.MultiblockState")
+            val method = clazz.getDeclaredMethod("update", BlockPos::class.java, TraceabilityPredicate::class.java)
+            method.setAccessible(true)
+            method.invoke(worldState, posIn, predicate)
+        } catch (_: java.lang.Exception) {
+        }
     }
 
-    private BlockPos setActualRelativeOffset(int x, int y, int z, Direction facing, Direction upwardsFacing,
-                                             boolean isFlipped) {
-        int[] c0 = new int[] { x, y, z }, c1 = new int[3];
+    private fun setActualRelativeOffset(
+        x: Int, y: Int, z: Int, facing: Direction, upwardsFacing: Direction,
+        isFlipped: Boolean
+    ): BlockPos {
+        val c0 = intArrayOf(x, y, z)
+        val c1 = IntArray(3)
         if (facing == Direction.UP || facing == Direction.DOWN) {
-            Direction of = facing == Direction.DOWN ? upwardsFacing : upwardsFacing.getOpposite();
-            for (int i = 0; i < 3; i++) {
-                switch (structureDir[i].getActualDirection(of)) {
-                    case UP -> c1[1] = c0[i];
-                    case DOWN -> c1[1] = -c0[i];
-                    case WEST -> c1[0] = -c0[i];
-                    case EAST -> c1[0] = c0[i];
-                    case NORTH -> c1[2] = -c0[i];
-                    case SOUTH -> c1[2] = c0[i];
+            val of = if (facing == Direction.DOWN) upwardsFacing else upwardsFacing.opposite
+            for (i in 0..2) {
+                when (structureDir[i]!!.getActualDirection(of)) {
+                    Direction.UP -> c1[1] = c0[i]
+                    Direction.DOWN -> c1[1] = -c0[i]
+                    Direction.WEST -> c1[0] = -c0[i]
+                    Direction.EAST -> c1[0] = c0[i]
+                    Direction.NORTH -> c1[2] = -c0[i]
+                    Direction.SOUTH -> c1[2] = c0[i]
                 }
             }
-            int xOffset = upwardsFacing.getStepX();
-            int zOffset = upwardsFacing.getStepZ();
-            int tmp;
+            val xOffset = upwardsFacing.stepX
+            val zOffset = upwardsFacing.stepZ
+            val tmp: Int
             if (xOffset == 0) {
-                tmp = c1[2];
-                c1[2] = zOffset > 0 ? c1[1] : -c1[1];
-                c1[1] = zOffset > 0 ? -tmp : tmp;
+                tmp = c1[2]
+                c1[2] = if (zOffset > 0) c1[1] else -c1[1]
+                c1[1] = if (zOffset > 0) -tmp else tmp
             } else {
-                tmp = c1[0];
-                c1[0] = xOffset > 0 ? c1[1] : -c1[1];
-                c1[1] = xOffset > 0 ? -tmp : tmp;
+                tmp = c1[0]
+                c1[0] = if (xOffset > 0) c1[1] else -c1[1]
+                c1[1] = if (xOffset > 0) -tmp else tmp
             }
             if (isFlipped) {
                 if (upwardsFacing == Direction.NORTH || upwardsFacing == Direction.SOUTH) {
-                    c1[0] = -c1[0]; // flip X-axis
+                    c1[0] = -c1[0] // flip X-axis
                 } else {
-                    c1[2] = -c1[2]; // flip Z-axis
+                    c1[2] = -c1[2] // flip Z-axis
                 }
             }
         } else {
-            for (int i = 0; i < 3; i++) {
-                switch (structureDir[i].getActualDirection(facing)) {
-                    case UP -> c1[1] = c0[i];
-                    case DOWN -> c1[1] = -c0[i];
-                    case WEST -> c1[0] = -c0[i];
-                    case EAST -> c1[0] = c0[i];
-                    case NORTH -> c1[2] = -c0[i];
-                    case SOUTH -> c1[2] = c0[i];
+            for (i in 0..2) {
+                when (structureDir[i]!!.getActualDirection(facing)) {
+                    Direction.UP -> c1[1] = c0[i]
+                    Direction.DOWN -> c1[1] = -c0[i]
+                    Direction.WEST -> c1[0] = -c0[i]
+                    Direction.EAST -> c1[0] = c0[i]
+                    Direction.NORTH -> c1[2] = -c0[i]
+                    Direction.SOUTH -> c1[2] = c0[i]
                 }
             }
             if (upwardsFacing == Direction.WEST || upwardsFacing == Direction.EAST) {
-                int xOffset = upwardsFacing == Direction.EAST ? facing.getClockWise().getStepX() :
-                        facing.getClockWise().getOpposite().getStepX();
-                int zOffset = upwardsFacing == Direction.EAST ? facing.getClockWise().getStepZ() :
-                        facing.getClockWise().getOpposite().getStepZ();
-                int tmp;
+                val xOffset =
+                    if (upwardsFacing == Direction.EAST) facing.clockWise.stepX else facing.clockWise
+                        .opposite.stepX
+                val zOffset =
+                    if (upwardsFacing == Direction.EAST) facing.clockWise.stepZ else facing.clockWise
+                        .opposite.stepZ
+                val tmp: Int
                 if (xOffset == 0) {
-                    tmp = c1[2];
-                    c1[2] = zOffset > 0 ? -c1[1] : c1[1];
-                    c1[1] = zOffset > 0 ? tmp : -tmp;
+                    tmp = c1[2]
+                    c1[2] = if (zOffset > 0) -c1[1] else c1[1]
+                    c1[1] = if (zOffset > 0) tmp else -tmp
                 } else {
-                    tmp = c1[0];
-                    c1[0] = xOffset > 0 ? -c1[1] : c1[1];
-                    c1[1] = xOffset > 0 ? tmp : -tmp;
+                    tmp = c1[0]
+                    c1[0] = if (xOffset > 0) -c1[1] else c1[1]
+                    c1[1] = if (xOffset > 0) tmp else -tmp
                 }
             } else if (upwardsFacing == Direction.SOUTH) {
-                c1[1] = -c1[1];
-                if (facing.getStepX() == 0) {
-                    c1[0] = -c1[0];
+                c1[1] = -c1[1]
+                if (facing.stepX == 0) {
+                    c1[0] = -c1[0]
                 } else {
-                    c1[2] = -c1[2];
+                    c1[2] = -c1[2]
                 }
             }
             if (isFlipped) {
                 if (upwardsFacing == Direction.NORTH || upwardsFacing == Direction.SOUTH) {
                     if (facing == Direction.NORTH || facing == Direction.SOUTH) {
-                        c1[0] = -c1[0]; // flip X-axis
+                        c1[0] = -c1[0] // flip X-axis
                     } else {
-                        c1[2] = -c1[2]; // flip Z-axis
+                        c1[2] = -c1[2] // flip Z-axis
                     }
                 } else {
-                    c1[1] = -c1[1]; // flip Y-axis
+                    c1[1] = -c1[1] // flip Y-axis
                 }
             }
         }
-        return new BlockPos(c1[0], c1[1], c1[2]);
+        return BlockPos(c1[0], c1[1], c1[2])
     }
 
-    @Nullable
-    private static IntObjectPair<IItemHandler> getMatchStackWithHandler(
-                                                                        List<ItemStack> candidates,
-                                                                        LazyOptional<IItemHandler> cap,
-                                                                        Player player, int isUseAE) {
-        IItemHandler handler = cap.resolve().orElse(null);
+    private fun getMatchStackWithHandler(
+        candidates: MutableList<ItemStack>,
+        cap: LazyOptional<IItemHandler?>,
+        player: Player, isUseAE: Int
+    ): IntObjectPair<IItemHandler?>? {
+        val handler = cap.resolve().orElse(null)
         if (handler == null) {
-            return null;
+            return null
         }
-        for (int i = 0; i < handler.getSlots(); i++) {
-            @NotNull
-            ItemStack stack = handler.getStackInSlot(i);
-            if (stack.isEmpty()) continue;
+        for (i in 0..<handler.slots) {
+            val stack = handler.getStackInSlot(i)
+            if (stack.isEmpty) continue
 
-            @NotNull
-            LazyOptional<IItemHandler> stackCap = stack.getCapability(ForgeCapabilities.ITEM_HANDLER);
-            if (stackCap.isPresent()) {
-                var rt = getMatchStackWithHandler(candidates, stackCap, player, isUseAE);
+            val stackCap = stack.getCapability(ForgeCapabilities.ITEM_HANDLER)
+            if (stackCap.isPresent) {
+                val rt = getMatchStackWithHandler(candidates, stackCap, player, isUseAE)
                 if (rt != null) {
-                    return rt;
+                    return rt
                 }
-            } else if (isUseAE == 1 && stack.getItem() instanceof WirelessTerminalItem terminalItem && stack.hasTag() && stack.getTag().contains("accessPoint", 10)) {
-                IGrid grid = terminalItem.getLinkedGrid(stack, player.level(), player);
+            } else if (isUseAE == 1 && stack.item is WirelessTerminalItem && stack.hasTag() && stack.tag!!
+                    .contains("accessPoint", 10)
+            ) {
+                val grid: IGrid? = (stack.item as WirelessTerminalItem).getLinkedGrid(stack, player.level(), player)
                 if (grid != null) {
-                    MEStorage storage = grid.getStorageService().getInventory();
-                    for (ItemStack candidate : candidates) {
+                    val storage = grid.storageService.inventory
+                    for (candidate in candidates) {
                         if (storage.extract(AEItemKey.of(candidate), 1, Actionable.MODULATE, null) > 0) {
-                            NonNullList<ItemStack> stacks = NonNullList.withSize(1, candidate);
-                            IItemHandler handler1 = new ItemStackHandler(stacks);
-                            return IntObjectPair.of(0, handler1);
+                            val stacks = NonNullList.withSize(1, candidate)
+                            val handler1: IItemHandler = ItemStackHandler(stacks)
+                            return IntObjectPair.of<IItemHandler?>(0, handler1)
                         }
                     }
                 }
-
-            } else if (candidates.stream().anyMatch(candidate -> ItemStack.isSameItemSameTags(candidate, stack)) &&
-                    !stack.isEmpty() && stack.getItem() instanceof BlockItem) {
-                        return IntObjectPair.of(i, handler);
-                    }
+            } else if (candidates.stream().anyMatch { candidate: ItemStack? ->
+                    ItemStack.isSameItemSameTags(
+                        candidate,
+                        stack
+                    )
+                } && !stack.isEmpty && stack.item is BlockItem) {
+                return IntObjectPair.of<IItemHandler?>(i, handler)
+            }
         }
-        return null;
+        return null
     }
 
-    private void resetFacing(BlockPos pos, BlockState blockState, Direction facing,
-                             BiPredicate<BlockPos, Direction> checker, Consumer<BlockState> consumer) {
+    private fun resetFacing(
+        pos: BlockPos?, blockState: BlockState, facing: Direction?,
+        checker: BiPredicate<BlockPos?, Direction?>, consumer: Consumer<BlockState?>
+    ) {
         if (blockState.hasProperty(BlockStateProperties.FACING)) {
-            tryFacings(blockState, pos, checker, consumer, BlockStateProperties.FACING,
-                    facing == null ? FACINGS : ArrayUtils.addAll(new Direction[] { facing }, FACINGS));
+            tryFacings(
+                blockState, pos, checker, consumer, BlockStateProperties.FACING,
+                if (facing == null) FACINGS else ArrayUtils.addAll<Direction?>(arrayOf(facing), *FACINGS)
+            )
         } else if (blockState.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
-            tryFacings(blockState, pos, checker, consumer, BlockStateProperties.HORIZONTAL_FACING,
-                    facing == null || facing.getAxis() == Direction.Axis.Y ? FACINGS_H :
-                            ArrayUtils.addAll(new Direction[] { facing }, FACINGS_H));
+            tryFacings(
+                blockState, pos, checker, consumer, BlockStateProperties.HORIZONTAL_FACING,
+                if (facing == null || facing.axis === Direction.Axis.Y) FACINGS_H else ArrayUtils.addAll<Direction?>(
+                    arrayOf(facing), *FACINGS_H
+                )
+            )
         }
     }
 
-    private void tryFacings(BlockState blockState, BlockPos pos, BiPredicate<BlockPos, Direction> checker,
-                            Consumer<BlockState> consumer, Property<Direction> property, Direction[] facings) {
-        Direction found = null;
-        for (Direction facing : facings) {
+    private fun tryFacings(
+        blockState: BlockState, pos: BlockPos?, checker: BiPredicate<BlockPos?, Direction?>,
+        consumer: Consumer<BlockState?>, property: Property<Direction?>, facings: Array<Direction?>
+    ) {
+        var found: Direction? = null
+        for (facing in facings) {
             if (checker.test(pos, facing)) {
-                found = facing;
-                break;
+                found = facing
+                break
             }
         }
         if (found == null) {
-            found = Direction.NORTH;
+            found = Direction.NORTH
         }
-        consumer.accept(blockState.setValue(property, found));
+        consumer.accept(blockState.setValue<Direction?, Direction?>(property, found))
     }
 }

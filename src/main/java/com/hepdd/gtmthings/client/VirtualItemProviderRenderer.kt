@@ -1,57 +1,69 @@
-package com.hepdd.gtmthings.client;
+package com.hepdd.gtmthings.client
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import com.hepdd.gtmthings.GTMThings.Companion.id
+import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior
+import com.lowdragmc.lowdraglib.client.model.ModelFactory
+import com.lowdragmc.lowdraglib.client.renderer.IRenderer
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.Tesselator
+import com.mojang.blaze3d.vertex.VertexFormat
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GameRenderer
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.resources.model.BakedModel
+import net.minecraft.world.inventory.InventoryMenu
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
+import net.minecraftforge.api.distmarker.Dist
+import net.minecraftforge.api.distmarker.OnlyIn
 
-import com.hepdd.gtmthings.GTMThings;
-import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
-import com.lowdragmc.lowdraglib.client.model.ModelFactory;
-import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-import org.joml.Matrix4f;
+class VirtualItemProviderRenderer:IRenderer {
 
-public final class VirtualItemProviderRenderer implements IRenderer {
+    companion object {
+        @JvmStatic
+        var INSTANCE = VirtualItemProviderRenderer()
+    }
 
-    public static final VirtualItemProviderRenderer INSTANCE = new VirtualItemProviderRenderer();
-
-    @Override
     @OnlyIn(Dist.CLIENT)
-    public void renderItem(ItemStack stack, ItemDisplayContext transformType, boolean leftHand, PoseStack poseStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model) {
-        ItemStack item = VirtualItemProviderBehavior.getVirtualItem(stack);
-        poseStack.pushPose();
-        if (!item.isEmpty()) {
-            Minecraft mc = Minecraft.getInstance();
-            BakedModel bakedModel = mc.getItemRenderer().getModel(item, mc.level, mc.player, 0);
-            mc.getItemRenderer().render(item, transformType, leftHand, poseStack, buffer, combinedLight, combinedOverlay, bakedModel);
+    override fun renderItem(
+        stack: ItemStack,
+        transformType: ItemDisplayContext,
+        leftHand: Boolean,
+        poseStack: PoseStack,
+        buffer: MultiBufferSource,
+        combinedLight: Int,
+        combinedOverlay: Int,
+        model: BakedModel?
+    ) {
+        val item = VirtualItemProviderBehavior.getVirtualItem(stack)
+        poseStack.pushPose()
+        if (!item.isEmpty) {
+            val mc = Minecraft.getInstance()
+            val bakedModel = mc.itemRenderer.getModel(item, mc.level, mc.player, 0)
+            mc.itemRenderer
+                .render(item, transformType, leftHand, poseStack, buffer, combinedLight, combinedOverlay, bakedModel)
         }
         if (transformType == ItemDisplayContext.GUI) {
-            poseStack.translate(-0.5F, -0.5F, -0.5F);
-            Tesselator tess = Tesselator.getInstance();
-            BufferBuilder builder = tess.getBuilder();
-            builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            TextureAtlasSprite sprite = ModelFactory.getBlockSprite(GTMThings.id("item/virtual_item_provider"));
-            RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-            float minU = sprite.getU0();
-            float maxU = sprite.getU1();
-            float minV = sprite.getV0();
-            float maxV = sprite.getV1();
-            Matrix4f pos = poseStack.last().pose();
-            builder.vertex(pos, 1, 1, 0).uv(maxU, minV).endVertex();
-            builder.vertex(pos, 0, 1, 0).uv(minU, minV).endVertex();
-            builder.vertex(pos, 0, 0, 0).uv(minU, maxV).endVertex();
-            builder.vertex(pos, 1, 0, 0).uv(maxU, maxV).endVertex();
-            tess.end();
+            poseStack.translate(-0.5f, -0.5f, -0.5f)
+            val tess = Tesselator.getInstance()
+            val builder = tess.builder
+            builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX)
+            RenderSystem.setShader { GameRenderer.getPositionTexShader() }
+            val sprite = ModelFactory.getBlockSprite(id("item/virtual_item_provider"))
+            RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS)
+            val minU = sprite.u0
+            val maxU = sprite.u1
+            val minV = sprite.v0
+            val maxV = sprite.v1
+            val pos = poseStack.last().pose()
+            builder.vertex(pos, 1f, 1f, 0f).uv(maxU, minV).endVertex()
+            builder.vertex(pos, 0f, 1f, 0f).uv(minU, minV).endVertex()
+            builder.vertex(pos, 0f, 0f, 0f).uv(minU, maxV).endVertex()
+            builder.vertex(pos, 1f, 0f, 0f).uv(maxU, maxV).endVertex()
+            tess.end()
         }
-        poseStack.popPose();
+        poseStack.popPose()
     }
 }

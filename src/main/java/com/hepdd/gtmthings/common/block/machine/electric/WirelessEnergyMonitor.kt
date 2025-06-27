@@ -11,8 +11,6 @@ import com.lowdragmc.lowdraglib.gui.util.ClickData
 import com.lowdragmc.lowdraglib.gui.widget.*
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import lombok.Getter
-import lombok.Setter
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.world.level.Level
@@ -89,14 +87,14 @@ open class WirelessEnergyMonitor(holder: IMachineBlockEntity) : MetaMachine(hold
 
     fun addDisplayText(textList: MutableList<Component?>) {
         if (isRemote) return
-        if (textListCache == null || getOffsetTimer() % 10 == 0L) {
+        if (textListCache == null || offsetTimer % 10 == 0L) {
             textListCache = getDisplayText(all, DISPLAY_TEXT_WIDTH)
         }
         textList.addAll(textListCache!!)
     }
 
     override fun getUUID(): UUID? {
-        return this.getOwnerUUID()
+        return this.ownerUUID
     }
 
     override fun display(): Boolean {

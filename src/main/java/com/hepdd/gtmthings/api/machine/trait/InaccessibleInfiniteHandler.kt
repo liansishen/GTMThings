@@ -1,138 +1,122 @@
-package com.hepdd.gtmthings.api.machine.trait;
+package com.hepdd.gtmthings.api.machine.trait
 
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredient;
-import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
+import appeng.api.stacks.AEItemKey
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler
+import com.gregtechceu.gtceu.api.recipe.GTRecipe
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredient
+import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler
+import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Ingredient
+import java.util.function.IntFunction
+import kotlin.math.min
 
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
+class InaccessibleInfiniteHandler(holder: MetaMachine, internalBuffer: KeyStorage):NotifiableItemStackHandler(
+    holder, 1, IO.OUT, IO.NONE, IntFunction { i: Int -> ItemStackHandlerDelegate(internalBuffer) }) {
 
-import appeng.api.stacks.AEItemKey;
-import org.jetbrains.annotations.NotNull;
+    private var delegate: ItemStackHandlerDelegate? = null
 
-import java.util.Collections;
-import java.util.List;
-
-public class InaccessibleInfiniteHandler extends NotifiableItemStackHandler {
-
-    private final ItemStackHandlerDelegate delegate;
-
-    public InaccessibleInfiniteHandler(MetaMachine holder, KeyStorage internalBuffer) {
-        super(holder, 1, IO.OUT, IO.NONE, i -> new ItemStackHandlerDelegate(internalBuffer));
-        internalBuffer.setOnContentsChanged(this::onContentsChanged);
-        delegate = ((ItemStackHandlerDelegate) storage);
+    init {
+        internalBuffer.setOnContentsChanged { this.onContentsChanged() }
+        delegate = (storage as ItemStackHandlerDelegate)
     }
 
-    public static ItemStack getFirstSized(SizedIngredient sizedIngredient) {
-        Ingredient inner = sizedIngredient.getInner();
-        if (inner instanceof SizedIngredient ingredient) {
-            return getFirstSized(ingredient);
+    fun getFirstSized(sizedIngredient: SizedIngredient): ItemStack {
+        val inner = sizedIngredient.getInner()
+        if (inner is SizedIngredient) {
+            return getFirstSized(inner)
         }
-        return getFirst(inner);
+        return getFirst(inner)
     }
 
-    public static ItemStack getFirst(Ingredient ingredient) {
-        for (var stack : ingredient.getItems()) {
-            if (!stack.isEmpty()) {
-                return stack;
+    fun getFirst(ingredient: Ingredient): ItemStack {
+        for (stack in ingredient.items) {
+            if (!stack.isEmpty) {
+                return stack
             }
         }
-        return ItemStack.EMPTY;
+        return ItemStack.EMPTY
     }
 
-    @Override
-    public List<Ingredient> handleRecipe(IO io, GTRecipe recipe, List<?> left, boolean simulate) {
+    override fun handleRecipe(
+        io: IO?,
+        recipe: GTRecipe?,
+        left: MutableList<*>,
+        simulate: Boolean
+    ): MutableList<Ingredient?>? {
         if (!simulate && io == IO.OUT) {
-            for (Object ingredient : left) {
-                if (((Ingredient) ingredient).isEmpty()) continue;
-                ItemStack item;
-                int count;
-                if (ingredient instanceof SizedIngredient sizedIngredient) {
-                    item = getFirstSized(sizedIngredient);
-                    count = sizedIngredient.getAmount();
+            for (ingredient in left) {
+                if ((ingredient as Ingredient).isEmpty) continue
+                val item: ItemStack
+                val count: Int
+                if (ingredient is SizedIngredient) {
+                    item = getFirstSized(ingredient)
+                    count = ingredient.getAmount()
                 } else {
-                    item = getFirst((Ingredient) ingredient);
-                    count = item.getCount();
+                    item = getFirst(ingredient)
+                    count = item.count
                 }
-                if (item.isEmpty()) continue;
-                delegate.insertItem(item, count);
+                if (item.isEmpty) continue
+                delegate!!.insertItem(item, count)
             }
-            delegate.internalBuffer.onChanged();
-            return null;
+            delegate?.internalBuffer?.onChanged()
+            return null
         }
-        return null;
+        return null
     }
 
-    @Override
-    public List<Object> getContents() {
-        return Collections.emptyList();
+    override fun getContents(): MutableList<Any?> {
+        return mutableListOf()
     }
 
-    @Override
-    public double getTotalContentAmount() {
-        return 0;
+    override fun getTotalContentAmount(): Double {
+        return 0.0
     }
 
-    @Override
-    public boolean isEmpty() {
-        return true;
+    override fun isEmpty(): Boolean {
+        return true
     }
 
-    private static class ItemStackHandlerDelegate extends CustomItemStackHandler {
-
-        private final KeyStorage internalBuffer;
-
-        private ItemStackHandlerDelegate(KeyStorage internalBuffer) {
-            super();
-            this.internalBuffer = internalBuffer;
+    open class ItemStackHandlerDelegate(val internalBuffer: KeyStorage) :
+        CustomItemStackHandler() {
+        fun insertItem(stack: ItemStack, count: Int) {
+            val key = AEItemKey.of(stack)
+            val oldValue = internalBuffer.storage.getOrDefault(key, 0)
+            val changeValue = min(Long.Companion.MAX_VALUE - oldValue, count.toLong())
+            internalBuffer.storage.put(key, oldValue + changeValue)
         }
 
-        private void insertItem(ItemStack stack, int count) {
-            var key = AEItemKey.of(stack);
-            long oldValue = internalBuffer.storage.getOrDefault(key, 0);
-            long changeValue = Math.min(Long.MAX_VALUE - oldValue, count);
-            internalBuffer.storage.put(key, oldValue + changeValue);
+        override fun getSlots(): Int {
+            return Short.Companion.MAX_VALUE.toInt()
         }
 
-        @Override
-        public int getSlots() {
-            return Short.MAX_VALUE;
+        override fun getSlotLimit(slot: Int): Int {
+            return Int.Companion.MAX_VALUE
         }
 
-        @Override
-        public int getSlotLimit(int slot) {
-            return Integer.MAX_VALUE;
+        override fun getStackInSlot(slot: Int): ItemStack {
+            return ItemStack.EMPTY
         }
 
-        @Override
-        public @NotNull ItemStack getStackInSlot(int slot) {
-            return ItemStack.EMPTY;
-        }
+        override fun setStackInSlot(slot: Int, stack: ItemStack) {}
 
-        @Override
-        public void setStackInSlot(int slot, @NotNull ItemStack stack) {}
-
-        @Override
-        public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-            var key = AEItemKey.of(stack);
-            int count = stack.getCount();
-            long oldValue = internalBuffer.storage.getOrDefault(key, 0);
-            long changeValue = Math.min(Long.MAX_VALUE - oldValue, count);
+        override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean): ItemStack {
+            val key = AEItemKey.of(stack)
+            val count = stack.count
+            val oldValue = internalBuffer.storage.getOrDefault(key, 0)
+            val changeValue = min(Long.Companion.MAX_VALUE - oldValue, count.toLong())
             if (!simulate) {
-                internalBuffer.storage.put(key, oldValue + changeValue);
-            } else if (count != changeValue) {
-                return stack.copyWithCount((int) (count - changeValue));
+                internalBuffer.storage.put(key, oldValue + changeValue)
+            } else if (count.toLong() != changeValue) {
+                return stack.copyWithCount((count - changeValue).toInt())
             }
-            return ItemStack.EMPTY;
+            return ItemStack.EMPTY
         }
     }
 
-    @Override
-    public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return ItemStack.EMPTY;
+    override fun extractItem(slot: Int, amount: Int, simulate: Boolean): ItemStack {
+        return ItemStack.EMPTY
     }
 }

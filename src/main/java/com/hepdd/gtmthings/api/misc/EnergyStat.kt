@@ -1,59 +1,58 @@
-package com.hepdd.gtmthings.api.misc;
+package com.hepdd.gtmthings.api.misc
 
-import org.jetbrains.annotations.NotNull;
+import java.math.BigDecimal
+import java.math.BigInteger
+import java.math.RoundingMode
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
+class EnergyStat(windowStart: Int) {
 
-public class EnergyStat {
+    private var minute: TimeWheel? = null
+    private var hour: TimeWheel? = null
+    private var day: TimeWheel? = null
+    private var lastChangedCache: BigInteger = BigInteger.ZERO
 
-    private final TimeWheel minute;
-    private final TimeWheel hour;
-    private final TimeWheel day;
-    private BigInteger lastChangedCache = BigInteger.ZERO;
+    var averageEnergy: BigDecimal = BigDecimal.ZERO
 
-    @NotNull
-    BigDecimal avgEnergy = BigDecimal.ZERO;
-
-    public EnergyStat(int windowStart) {
-        minute = new TimeWheel(TimeWheel.TIMESCALE.SECOND, 60, windowStart);
-        hour = new TimeWheel(TimeWheel.TIMESCALE.MINUTE, 60, windowStart);
-        day = new TimeWheel(TimeWheel.TIMESCALE.HOUR, 24, windowStart);
+    init {
+        minute = TimeWheel(TimeWheel.TIMESCALE.SECOND, 60, windowStart)
+        hour = TimeWheel(TimeWheel.TIMESCALE.MINUTE, 60, windowStart)
+        day = TimeWheel(TimeWheel.TIMESCALE.HOUR, 24, windowStart)
     }
 
-    public void tick() {
-        if (minute.tock()) {
-            if (hour.tock()) {
-                day.tock();
+    fun tick() {
+        if (minute!!.tock()) {
+            if (hour!!.tock()) {
+                day!!.tock()
             }
         }
-        avgEnergy = lastChangedCache.compareTo(BigInteger.ZERO) == 0 ?
-                BigDecimal.ZERO :
-                new BigDecimal(lastChangedCache).divide(BigDecimal.valueOf(minute.slotResolution), RoundingMode.HALF_UP);
-        lastChangedCache = BigInteger.ZERO;
+        averageEnergy =
+            if (lastChangedCache.compareTo(BigInteger.ZERO) == 0) BigDecimal.ZERO else BigDecimal(lastChangedCache).divide(
+                BigDecimal.valueOf(minute!!.slotResolution.toLong()),
+                RoundingMode.HALF_UP
+            )
+        lastChangedCache = BigInteger.ZERO
     }
 
-    public void update(BigInteger value, int currentTick) {
-        minute.update(value, currentTick);
-        hour.update(value, currentTick);
-        day.update(value, currentTick);
-        lastChangedCache = lastChangedCache.add(value);
+    fun update(value: BigInteger?, currentTick: Int) {
+        minute!!.update(value, currentTick)
+        hour!!.update(value, currentTick)
+        day!!.update(value, currentTick)
+        lastChangedCache = lastChangedCache.add(value)
     }
 
-    public @NotNull BigDecimal getMinuteAvg() {
-        return minute.getAvgByTick();
+    fun getMinuteAvg(): BigDecimal {
+        return minute!!.getAvgByTick()
     }
 
-    public @NotNull BigDecimal getHourAvg() {
-        return hour.getAvgByTick();
+    fun getHourAvg(): BigDecimal {
+        return hour!!.getAvgByTick()
     }
 
-    public @NotNull BigDecimal getDayAvg() {
-        return day.getAvgByTick();
+    fun getDayAvg(): BigDecimal {
+        return day!!.getAvgByTick()
     }
 
-    public @NotNull BigDecimal getAvgEnergy() {
-        return avgEnergy;
+    fun getAvgEnergy(): BigDecimal {
+        return averageEnergy
     }
 }

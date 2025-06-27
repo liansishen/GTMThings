@@ -1,6 +1,5 @@
-package com.hepdd.gtmthings.api.machine;
+package com.hepdd.gtmthings.api.machine
 
-public interface WirelessEnergyReceiveCoverHolder {
-
-    int getTier();
+interface WirelessEnergyReceiveCoverHolder {
+    fun getTier(): Int
 }

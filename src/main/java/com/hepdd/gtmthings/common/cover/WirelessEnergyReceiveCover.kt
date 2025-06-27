@@ -1,152 +1,145 @@
-package com.hepdd.gtmthings.common.cover;
+package com.hepdd.gtmthings.common.cover
 
-import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.capability.ICoverable;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.cover.CoverBehavior;
-import com.gregtechceu.gtceu.api.cover.CoverDefinition;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
-import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
-import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine;
-import com.gregtechceu.gtceu.common.machine.electric.HullMachine;
+import com.gregtechceu.gtceu.api.GTValues
+import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper
+import com.gregtechceu.gtceu.api.capability.ICoverable
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.cover.CoverBehavior
+import com.gregtechceu.gtceu.api.cover.CoverDefinition
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.TickableSubscription
+import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine
+import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine
+import com.gregtechceu.gtceu.common.machine.electric.HullMachine
+import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder
+import com.hepdd.gtmthings.api.machine.WirelessEnergyReceiveCoverHolder
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.ItemStack
+import java.util.*
+import kotlin.math.min
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
+open class WirelessEnergyReceiveCover(definition: CoverDefinition, coverHolder: ICoverable, attachedSide: Direction, tier: Int, amperage: Int):CoverBehavior(definition, coverHolder, attachedSide),IWirelessEnergyContainerHolder {
 
-import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
-import com.hepdd.gtmthings.api.machine.WirelessEnergyReceiveCoverHolder;
-import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.util.UUID;
+    private var subscription: TickableSubscription? = null
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+    private var wirelessEnergyContainerCache: WirelessEnergyContainer? = null
 
-import static com.gregtechceu.gtceu.api.capability.GTCapabilityHelper.getEnergyContainer;
+    private var machine: MetaMachine? = null
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirelessEnergyContainerHolder {
+    private var energyPerTick: Long = 0
+    private var tier = 0
+    private var amperage = 0
+    private var machineMaxEnergy: Long = 0
 
-    private TickableSubscription subscription;
-
-    @Getter
-    @Setter
-    private WirelessEnergyContainer WirelessEnergyContainerCache;
-
-    private MetaMachine machine;
-
-    private final long energyPerTick;
-    private final int tier;
-    private final int amperage;
-    private long machineMaxEnergy;
-
-    public WirelessEnergyReceiveCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int tier, int amperage) {
-        super(definition, coverHolder, attachedSide);
-        this.tier = tier;
-        this.amperage = amperage;
-        this.energyPerTick = GTValues.VEX[tier] * amperage;
+    init {
+        this.tier = tier
+        this.amperage = amperage
+        this.energyPerTick = GTValues.VEX[tier] * amperage
     }
 
-    @Override
-    public boolean canAttach() {
-        var machine = getMachine();
-        if (machine instanceof TieredEnergyMachine tieredEnergyMachine && tieredEnergyMachine.energyContainer.getHandlerIO() == IO.IN && tieredEnergyMachine.getTier() >= this.tier) {
-            var covers = tieredEnergyMachine.getCoverContainer().getCovers();
-            for (var cover : covers) {
-                if (cover instanceof WirelessEnergyReceiveCover) return false;
+    override fun canAttach(): Boolean {
+        val machine = getMachine()
+        if (machine is TieredEnergyMachine && machine.energyContainer.getHandlerIO() == IO.IN && machine.getTier() >= this.tier) {
+            val covers = machine.getCoverContainer().covers
+            for (cover in covers) {
+                if (cover is WirelessEnergyReceiveCover) return false
             }
-            return true;
-        } else if (machine instanceof BatteryBufferMachine batteryBufferMachine) {
-            return batteryBufferMachine.getTier() >= this.tier;
-        } else if (machine instanceof HullMachine hullMachine) {
-            return hullMachine.getTier() >= this.tier;
-        } else if (machine instanceof WirelessEnergyReceiveCoverHolder holder) {
-            return holder.getTier() >= this.tier;
+            return true
+        } else if (machine is BatteryBufferMachine) {
+            return machine.getTier() >= this.tier
+        } else if (machine is HullMachine) {
+            return machine.getTier() >= this.tier
+        } else if (machine is WirelessEnergyReceiveCoverHolder) {
+            return machine.getTier() >= this.tier
         } else {
-            return false;
+            return false
         }
     }
 
-    @Override
-    public void onAttached(ItemStack itemStack, ServerPlayer player) {
-        super.onAttached(itemStack, player);
-        MetaMachine machine = getMachine();
+    override fun onAttached(itemStack: ItemStack, player: ServerPlayer) {
+        super.onAttached(itemStack, player)
+        val machine = getMachine()
         if (machine != null && getUUID() == null) {
-            machine.setOwnerUUID(player.getUUID());
+            machine.ownerUUID = player.getUUID()
         }
-        updateCoverSub();
+        updateCoverSub()
     }
 
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        updateCoverSub();
+    override fun onLoad() {
+        super.onLoad()
+        updateCoverSub()
     }
 
-    @Override
-    public void onRemoved() {
-        super.onRemoved();
-        machine = null;
-        WirelessEnergyContainerCache = null;
+    override fun onRemoved() {
+        super.onRemoved()
+        machine = null
+        wirelessEnergyContainerCache = null
         if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
+            subscription!!.unsubscribe()
+            subscription = null
         }
     }
 
-    private void updateCoverSub() {
-        subscription = coverHolder.subscribeServerTick(subscription, this::updateEnergy);
+    private fun updateCoverSub() {
+        subscription = coverHolder.subscribeServerTick(subscription) { this.updateEnergy() }
     }
 
-    private void updateEnergy() {
-        if (getUUID() == null) return;
-        var energyContainer = getEnergyContainer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
+    private fun updateEnergy() {
+        if (getUUID() == null) return
+        val energyContainer =
+            GTCapabilityHelper.getEnergyContainer(coverHolder.level, coverHolder.pos, attachedSide)
         if (energyContainer != null) {
-            var machine = getMachine();
-            if (machine instanceof BatteryBufferMachine || machine instanceof HullMachine || machine instanceof WirelessEnergyReceiveCoverHolder) {
-                var changeStored = Math.min(energyContainer.getEnergyCapacity() - energyContainer.getEnergyStored(), this.energyPerTick);
-                if (changeStored <= 0) return;
-                WirelessEnergyContainer container = getWirelessEnergyContainer();
-                if (container == null) return;
-                long changeenergy = container.removeEnergy(changeStored, machine);
-                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, changeenergy / this.amperage, this.amperage);
+            val machine = getMachine()
+            if (machine is BatteryBufferMachine || machine is HullMachine || machine is WirelessEnergyReceiveCoverHolder) {
+                val changeStored =
+                    min(energyContainer.energyCapacity - energyContainer.energyStored, this.energyPerTick)
+                if (changeStored <= 0) return
+                val container = getWirelessEnergyContainer()
+                if (container == null) return
+                val changeenergy = container.removeEnergy(changeStored, machine)
+                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(
+                    null,
+                    changeenergy / this.amperage,
+                    this.amperage.toLong()
+                )
             } else {
-                var changeStored = Math.min(this.machineMaxEnergy - energyContainer.getEnergyStored(), this.energyPerTick);
-                if (changeStored <= 0) return;
-                WirelessEnergyContainer container = getWirelessEnergyContainer();
-                if (container == null) return;
-                long changeenergy = container.removeEnergy(changeStored, machine);
-                if (changeenergy > 0) energyContainer.addEnergy(changeenergy);
+                val changeStored = min(this.machineMaxEnergy - energyContainer.energyStored, this.energyPerTick)
+                if (changeStored <= 0) return
+                val container = getWirelessEnergyContainer()
+                if (container == null) return
+                val changeenergy = container.removeEnergy(changeStored, machine)
+                if (changeenergy > 0) energyContainer.addEnergy(changeenergy)
             }
         }
-        updateCoverSub();
+        updateCoverSub()
     }
 
-    @Override
-    @Nullable
-    public UUID getUUID() {
-        MetaMachine machine = getMachine();
-        if (machine != null) return machine.getOwnerUUID();
-        return null;
+    override fun getUUID(): UUID? {
+        val machine = getMachine()
+        if (machine != null) return machine.ownerUUID
+        return null
     }
 
-    @Override
-    public boolean cover() {
-        return true;
+    override fun cover(): Boolean {
+        return true
     }
 
-    @Nullable
-    private MetaMachine getMachine() {
-        if (machine == null) machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
-        if (machine instanceof TieredEnergyMachine tieredEnergyMachine) {
-            this.machineMaxEnergy = GTValues.VEX[tieredEnergyMachine.getTier()] << 6;
+    private fun getMachine(): MetaMachine? {
+        if (machine == null) machine = MetaMachine.getMachine(coverHolder.level, coverHolder.pos)
+        if (machine is TieredEnergyMachine) {
+            this.machineMaxEnergy = GTValues.VEX[(machine as TieredEnergyMachine).getTier()] shl 6
         }
-        return machine;
+        return machine
+    }
+
+    override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? {
+        return this.wirelessEnergyContainerCache
+    }
+
+    override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer) {
+        this.wirelessEnergyContainerCache = container
     }
 }

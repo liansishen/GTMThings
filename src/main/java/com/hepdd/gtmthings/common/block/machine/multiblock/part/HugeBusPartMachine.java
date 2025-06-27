@@ -232,11 +232,13 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         IDistinctPart.super.attachConfigurators(configuratorPanel);
         if (this.io == IO.IN) {
             configuratorPanel.attachConfigurators(new CircuitFancyConfigurator(circuitInventory.storage));
-            configuratorPanel.attachConfigurators(new ButtonConfigurator(new GuiTextureGroup(GuiTextures.BUTTON, new TextTexture("🔙")), this::refundAll)
-                    .setTooltips(List.of(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.1"))));
+            configuratorPanel.attachConfigurators(
+                    new ButtonConfigurator(
+                            new GuiTextureGroup(GuiTextures.BUTTON, new TextTexture("🔙")), this::refundAll,
+                            List.of(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.1"))));
             configuratorPanel.attachConfigurators(new InventoryFancyConfigurator(
-                    shareInventory.storage, Component.translatable("gui.gtmthings.share_inventory.title"))
-                    .setTooltips(List.of(
+                    shareInventory.storage, Component.translatable("gui.gtmthings.share_inventory.title"),
+                    List.of(
                             Component.translatable("gui.gtmthings.share_inventory.desc.0"),
                             Component.translatable("gui.gtmthings.share_inventory.desc.1"),
                             Component.translatable("gui.gtmthings.share_inventory.desc.2"))));
