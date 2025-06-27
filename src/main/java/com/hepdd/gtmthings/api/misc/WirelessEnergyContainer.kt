@@ -31,9 +31,9 @@ class WirelessEnergyContainer(var uuid: UUID,
 
         @JvmStatic
         fun getOrCreateContainer(uuid: UUID?): WirelessEnergyContainer {
-            return WirelessEnergySavaedData.INSTANCE.containerMap.computeIfAbsent(TeamUtil.getTeamUUID(uuid)) { uuid: UUID ->
+            return WirelessEnergySavaedData.INSTANCE.containerMap.computeIfAbsent(TeamUtil.getTeamUUID(uuid)) { _uuid: UUID ->
                 WirelessEnergyContainer(
-                    uuid
+                    _uuid
                 )
             }
         }

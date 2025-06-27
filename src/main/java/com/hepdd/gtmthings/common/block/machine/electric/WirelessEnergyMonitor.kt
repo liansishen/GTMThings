@@ -103,15 +103,16 @@ open class WirelessEnergyMonitor(holder: IMachineBlockEntity) : MetaMachine(hold
         return false
     }
 
-    override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer?) {
-        this.cache  = container
+    override fun getMonitorLevel(): Level? {
+        return holder.level()
     }
 
     override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? {
+
         return this.cache
     }
 
-    override fun getMonitorLevel(): Level? {
-        return holder.level()
+    override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer) {
+        this.cache  = container
     }
 }

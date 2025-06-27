@@ -1,22 +1,20 @@
-package com.hepdd.gtmthings.api.machine;
+package com.hepdd.gtmthings.api.machine
 
-import com.hepdd.gtmthings.api.capability.IBindable;
-import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
+import com.hepdd.gtmthings.api.capability.IBindable
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer.Companion.getOrCreateContainer
 
-import javax.annotation.Nullable;
+interface IWirelessEnergyContainerHolder: IBindable {
 
-public interface IWirelessEnergyContainerHolder extends IBindable {
+    fun getWirelessEnergyContainerCache(): WirelessEnergyContainer?
 
-    void setWirelessEnergyContainerCache(WirelessEnergyContainer container);
+    fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer)
 
-    WirelessEnergyContainer getWirelessEnergyContainerCache();
-
-    @Nullable
-    default WirelessEnergyContainer getWirelessEnergyContainer() {
-        if (getUUID() != null && getWirelessEnergyContainerCache() == null) {
-            WirelessEnergyContainer container = WirelessEnergyContainer.getOrCreateContainer(getUUID());
-            setWirelessEnergyContainerCache(container);
+    fun getWirelessEnergyContainer(): WirelessEnergyContainer? {
+        if (getWirelessEnergyContainerCache() == null) {
+            val container = getOrCreateContainer(getUUID())
+            setWirelessEnergyContainerCache(container)
         }
-        return getWirelessEnergyContainerCache();
+        return getWirelessEnergyContainer()
     }
 }

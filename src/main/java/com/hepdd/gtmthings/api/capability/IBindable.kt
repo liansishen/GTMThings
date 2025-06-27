@@ -1,19 +1,15 @@
-package com.hepdd.gtmthings.api.capability;
+package com.hepdd.gtmthings.api.capability
 
-import java.util.UUID;
+import java.util.*
 
-import javax.annotation.Nullable;
+interface IBindable {
+    fun getUUID(): UUID?
 
-public interface IBindable {
-
-    @Nullable
-    UUID getUUID();
-
-    default boolean cover() {
-        return false;
+    fun cover(): Boolean {
+        return false
     }
 
-    default boolean display() {
-        return true;
+    fun display(): Boolean {
+        return true
     }
 }

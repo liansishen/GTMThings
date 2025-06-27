@@ -72,12 +72,12 @@ class WirelessEnergyTerminalBehavior: IItemUIFactory {
             return false
         }
 
-        override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer?) {
-            WirelessEnergyContainerCache = container
-        }
-
         override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? {
             return WirelessEnergyContainerCache
+        }
+
+        override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer) {
+            WirelessEnergyContainerCache = container
         }
 
         override fun getMonitorLevel(): Level {

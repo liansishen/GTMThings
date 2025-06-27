@@ -26,14 +26,14 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
         var displayTextWidth = displayTextWidth
         val textListCache: MutableList<Component> = ArrayList()
         displayTextWidth -= 16
-        val container = wirelessEnergyContainer ?: return listOf()
+        val container = getWirelessEnergyContainerCache() ?: return listOf()
         val energyTotal = container.storage
 
         textListCache.add(
             Component.translatable(
                 "gtmthings.machine.wireless_energy_monitor.tooltip.0", TeamUtil.GetName(
                     getMonitorLevel(),
-                    uuid
+                    getUUID()
                 )
             ).withStyle(ChatFormatting.AQUA)
         )
@@ -156,7 +156,7 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
             .sorted(Comparator.comparingLong<Map.Entry<MetaMachine?, ITransferData>> { entry: Map.Entry<MetaMachine?, ITransferData> -> entry.value.Throughput() })
             .toList()) {
             val uuid = value.UUID()
-            if (all || uuid == TeamUtil.getTeamUUID(this.uuid)) {
+            if (all || uuid == TeamUtil.getTeamUUID(this.getUUID())) {
                 textListCache.add(value.info)
             }
         }

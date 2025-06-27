@@ -1,10 +1,9 @@
-package com.hepdd.gtmthings.api.capability;
+package com.hepdd.gtmthings.api.capability
 
-public interface IGTMTJadeIF {
+interface IGTMTJadeIF {
+    fun isTransmitter(): Boolean
 
-    boolean isTransmitter();
+    fun isbinded(): Boolean
 
-    boolean isbinded();
-
-    String getBindPos();
+    fun getBindPos(): String?
 }

@@ -31,6 +31,7 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -52,8 +53,6 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
     }
 
     @Nullable
-    @Getter
-    @Setter
     private WirelessEnergyContainer WirelessEnergyContainerCache;
 
     @Persisted
@@ -118,7 +117,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         var maxStored = energyContainer.getEnergyCapacity();
         var changeStored = Math.min(maxStored - currentStored, energyContainer.getInputVoltage() * energyContainer.getInputAmperage());
         if (changeStored <= 0) return;
-        WirelessEnergyContainer container = getWirelessEnergyContainer();
+        WirelessEnergyContainer container = getWirelessEnergyContainerCache();
         if (container == null) return;
         changeStored = container.removeEnergy(changeStored, this);
         if (changeStored > 0) energyContainer.setEnergyStored(currentStored + changeStored);
@@ -128,7 +127,7 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         var currentStored = energyContainer.getEnergyStored();
         if (currentStored <= 0) return;
         var changeStored = Math.min(energyContainer.getOutputVoltage() * energyContainer.getOutputAmperage(), currentStored);
-        WirelessEnergyContainer container = getWirelessEnergyContainer();
+        WirelessEnergyContainer container = getWirelessEnergyContainerCache();
         if (container == null) return;
         changeStored = container.addEnergy(changeStored, this);
         if (changeStored > 0) energyContainer.setEnergyStored(currentStored - changeStored);
@@ -196,4 +195,15 @@ public class WirelessEnergyHatchPartMachine extends TieredIOPartMachine implemen
         }
         return super.tintColor(index);
     }
+
+    @Override
+    public @Nullable WirelessEnergyContainer getWirelessEnergyContainerCache() {
+        return this.WirelessEnergyContainerCache;
+    }
+
+    @Override
+    public void setWirelessEnergyContainerCache(@NotNull WirelessEnergyContainer container) {
+        this.WirelessEnergyContainerCache = container;
+    }
+
 }
