@@ -1,225 +1,255 @@
-package com.hepdd.gtmthings.common.block.machine.multiblock.part;
+package com.hepdd.gtmthings.common.block.machine.multiblock.part
 
-import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.gui.GuiTextures;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
-import com.gregtechceu.gtceu.api.pattern.MultiblockWorldSavedData;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
-import com.gregtechceu.gtceu.utils.GTUtil;
+import com.gregtechceu.gtceu.api.GTValues
+import com.gregtechceu.gtceu.api.capability.IEnergyContainer
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.gui.GuiTextures
+import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider
+import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer
+import com.gregtechceu.gtceu.api.pattern.MultiblockWorldSavedData
+import com.gregtechceu.gtceu.api.recipe.GTRecipe
+import com.gregtechceu.gtceu.common.item.PortableScannerBehavior
+import com.gregtechceu.gtceu.utils.GTUtil
+import com.lowdragmc.lowdraglib.gui.editor.ColorPattern
+import com.lowdragmc.lowdraglib.gui.modular.ModularUI
+import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup
+import com.lowdragmc.lowdraglib.gui.texture.ResourceBorderTexture
+import com.lowdragmc.lowdraglib.gui.texture.TextTexture
+import com.lowdragmc.lowdraglib.gui.util.ClickData
+import com.lowdragmc.lowdraglib.gui.widget.ButtonWidget
+import com.lowdragmc.lowdraglib.gui.widget.LabelWidget
+import com.lowdragmc.lowdraglib.gui.widget.SelectorWidget
+import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget
+import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
+import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
+import net.minecraft.core.Direction
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.player.Player
+import org.apache.commons.lang3.ArrayUtils
+import java.util.*
+import kotlin.math.min
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
+open class CreativeEnergyHatchPartMachine(holder: IMachineBlockEntity):TieredIOPartMachine(holder, GTValues.MAX, IO.IN),IDataInfoProvider {
 
-import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
-import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
-import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
-import com.lowdragmc.lowdraglib.gui.texture.ResourceBorderTexture;
-import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
-import com.lowdragmc.lowdraglib.gui.widget.ButtonWidget;
-import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
-import com.lowdragmc.lowdraglib.gui.widget.SelectorWidget;
-import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implements IDataInfoProvider {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeEnergyHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
+    companion object {
+        @JvmStatic
+        val MANAGED_FIELD_HOLDER: ManagedFieldHolder =
+            ManagedFieldHolder(CreativeEnergyHatchPartMachine::class.java, TieredIOPartMachine.MANAGED_FIELD_HOLDER)
+    }
 
     @Persisted
-    public final NotifiableEnergyContainer energyContainer;
+    var energyContainer: NotifiableEnergyContainer? = null
+
     @Persisted
-    private long maxEnergy;
+    private var maxEnergy: Long = 0
+
     @Persisted
-    private long voltage = 0;
+    private var voltage: Long = 0
+
     @Persisted
-    @Getter
-    private int amps = 1;
+    private var amps = 1
+
     @Persisted
-    private int setTier = 0;
+    private var setTier = 0
 
-    public CreativeEnergyHatchPartMachine(IMachineBlockEntity holder) {
-        super(holder, GTValues.MAX, IO.IN);
-        this.energyContainer = createEnergyContainer();
+    init {
+        this.energyContainer = createEnergyContainer()
     }
 
-    //////////////////////////////////////
-    // ***** Initialization ******//
-    //////////////////////////////////////
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
+    override fun getFieldHolder(): ManagedFieldHolder {
+        return MANAGED_FIELD_HOLDER
     }
 
-    protected NotifiableEnergyContainer createEnergyContainer() {
-        NotifiableEnergyContainer container;
-        this.voltage = GTValues.VEX[setTier];
-        this.maxEnergy = this.voltage * this.amps;
-        container = new InfinityEnergyContainer(this, this.maxEnergy, this.voltage, this.amps, 0L, 0L);
-        return container;
+    protected fun createEnergyContainer(): NotifiableEnergyContainer {
+        this.voltage = GTValues.VEX[setTier]
+        this.maxEnergy = this.voltage * this.amps
+        val container = InfinityEnergyContainer(this, this.maxEnergy, this.voltage, this.amps.toLong(), 0L, 0L)
+        return container
     }
 
-    @Override
-    public void loadCustomPersistedData(@NotNull CompoundTag tag) {
-        super.loadCustomPersistedData(tag);
-        updateEnergyContainer();
+    override fun loadCustomPersistedData(tag: CompoundTag) {
+        super.loadCustomPersistedData(tag)
+        updateEnergyContainer()
     }
 
-    @Override
-    public ModularUI createUI(Player entityPlayer) {
-        return new ModularUI(176, 136, this, entityPlayer)
-                .background(GuiTextures.BACKGROUND)
-                .widget(new LabelWidget(7, 32, "gtceu.creative.energy.voltage"))
-                .widget(new TextFieldWidget(9, 47, 152, 16, () -> String.valueOf(voltage),
-                        value -> {
-                            setVoltage(Long.parseLong(value));
-                            setTier = GTUtil.getTierByVoltage(this.voltage);
-                        }).setNumbersOnly(8L, Long.MAX_VALUE))
-                .widget(new LabelWidget(7, 74, "gtceu.creative.energy.amperage"))
-                .widget(new ButtonWidget(7, 87, 20, 20,
-                        new GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, new TextTexture("-")),
-                        cd -> setAmps(--amps == -1 ? 0 : amps)))
-                .widget(new TextFieldWidget(31, 89, 114, 16, () -> String.valueOf(amps),
-                        value -> setAmps(Integer.parseInt(value))).setNumbersOnly(1, 67108864))
-                .widget(new ButtonWidget(149, 87, 20, 20,
-                        new GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, new TextTexture("+")),
-                        cd -> {
-                            if (amps < Integer.MAX_VALUE) {
-                                setAmps(++amps);
-                            }
-                        }))
+    override fun createUI(entityPlayer: Player): ModularUI {
+        return ModularUI(176, 136, this, entityPlayer)
+            .background(GuiTextures.BACKGROUND)
+            .widget(LabelWidget(7, 32, "gtceu.creative.energy.voltage"))
+            .widget(
+                TextFieldWidget(
+                    9, 47, 152, 16, { voltage.toString() },
+                    { value: String? ->
+                        setVoltage(value!!.toLong())
+                        setTier = GTUtil.getTierByVoltage(this.voltage).toInt()
+                    }).setNumbersOnly(8L, Long.Companion.MAX_VALUE)
+            )
+            .widget(LabelWidget(7, 74, "gtceu.creative.energy.amperage"))
+            .widget(
+                ButtonWidget(
+                    7, 87, 20, 20,
+                    GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, TextTexture("-"))
+                ) { cd: ClickData? -> setAmps(if (--amps == -1) 0 else amps) }
+            )
+            .widget(
+                TextFieldWidget(
+                    31, 89, 114, 16, { amps.toString() },
+                    { value: String? -> setAmps(value!!.toInt()) }).setNumbersOnly(1, 67108864)
+            )
+            .widget(
+                ButtonWidget(
+                    149, 87, 20, 20,
+                    GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, TextTexture("+"))
+                ) { cd: ClickData? ->
+                    if (amps < Int.Companion.MAX_VALUE) {
+                        setAmps(++amps)
+                    }
+                }
+            )
 
-                .widget(new SelectorWidget(7, 7, 50, 20, Arrays.stream(GTValues.VNF).toList(), -1)
-                        .setOnChanged(tier -> {
-                            setTier = ArrayUtils.indexOf(GTValues.VNF, tier);
-                            setVoltage(GTValues.VEX[setTier]);
-                        })
-                        .setSupplier(() -> GTValues.VNF[setTier])
-                        .setButtonBackground(ResourceBorderTexture.BUTTON_COMMON)
-                        .setBackground(ColorPattern.BLACK.rectTexture())
-                        .setValue(GTValues.VNF[setTier]));
+            .widget(
+                SelectorWidget(7, 7, 50, 20, Arrays.stream(GTValues.VNF).toList(), -1)
+                    .setOnChanged { tier: String? ->
+                        setTier = ArrayUtils.indexOf(GTValues.VNF, tier)
+                        setVoltage(GTValues.VEX[setTier])
+                    }
+                    .setSupplier { GTValues.VNF[setTier] }
+                    .setButtonBackground(ResourceBorderTexture.BUTTON_COMMON)
+                    .setBackground(ColorPattern.BLACK.rectTexture())
+                    .setValue(GTValues.VNF[setTier])
+            )
     }
 
-    private void setVoltage(long voltage) {
-        this.voltage = voltage;
-        this.maxEnergy = this.voltage * this.amps;
-        updateMachine();
+    private fun setVoltage(voltage: Long) {
+        this.voltage = voltage
+        this.maxEnergy = this.voltage * this.amps
+        updateMachine()
     }
 
-    private void setAmps(int amps) {
-        this.amps = amps;
-        this.maxEnergy = this.voltage * this.amps;
-        updateMachine();
+    private fun setAmps(amps: Int) {
+        this.amps = amps
+        this.maxEnergy = this.voltage * this.amps
+        updateMachine()
     }
 
-    private void updateEnergyContainer() {
-        this.energyContainer.resetBasicInfo(this.maxEnergy, this.voltage, this.amps, 0, 0);
-        this.energyContainer.setEnergyStored(this.maxEnergy);
+    private fun updateEnergyContainer() {
+        this.energyContainer!!.resetBasicInfo(this.maxEnergy, this.voltage, this.amps.toLong(), 0, 0)
+        this.energyContainer!!.setEnergyStored(this.maxEnergy)
     }
 
-    private void updateMachine() {
-        updateEnergyContainer();
-        if (getLevel() instanceof ServerLevel serverLevel) {
-            serverLevel.getServer().execute(() -> {
-                for (var c : getControllers()) {
-                    if (c.isFormed()) {
-                        c.getPatternLock().lock();
+    private fun updateMachine() {
+        updateEnergyContainer()
+        if (level is ServerLevel) {
+            val serverLevel = level as ServerLevel
+            serverLevel.server.execute {
+                for (c in getControllers()) {
+                    if (c.isFormed) {
+                        c.patternLock.lock()
                         try {
-                            c.onStructureInvalid();
-                            var mwsd = MultiblockWorldSavedData.getOrCreate(serverLevel);
-                            mwsd.removeMapping(c.getMultiblockState());
-                            mwsd.addAsyncLogic(c);
+                            c.onStructureInvalid()
+                            val mwsd = MultiblockWorldSavedData.getOrCreate(serverLevel)
+                            mwsd.removeMapping(c.multiblockState)
+                            mwsd.addAsyncLogic(c)
                         } finally {
-                            c.getPatternLock().unlock();
+                            c.patternLock.unlock()
                         }
                     }
                 }
-            });
+            }
         }
     }
 
-    //////////////////////////////////////
-    // ********** Misc **********//
-    //////////////////////////////////////
 
-    @Override
-    public int tintColor(int index) {
+    /**/////////////////////////////////// */ // ********** Misc **********//
+    /**/////////////////////////////////// */
+    override fun tintColor(index: Int): Int {
         if (index == 2) {
-            return GTValues.VC[getTier()];
+            return GTValues.VC[getTier()]
         }
-        return super.tintColor(index);
+        return super.tintColor(index)
     }
 
-    @NotNull
-    @Override
-    public List<Component> getDataInfo(PortableScannerBehavior.DisplayMode mode) {
+    override fun getDataInfo(mode: PortableScannerBehavior.DisplayMode): MutableList<Component?> {
         if (mode == PortableScannerBehavior.DisplayMode.SHOW_ALL || mode == PortableScannerBehavior.DisplayMode.SHOW_ELECTRICAL_INFO) {
-            return Collections.singletonList(Component.literal(
-                    String.format("%d/%d EU", energyContainer.getEnergyStored(), energyContainer.getEnergyCapacity())));
+            return mutableListOf(
+                Component.literal(
+                    String.format(
+                        "%d/%d EU",
+                        energyContainer!!.getEnergyStored(),
+                        energyContainer!!.energyCapacity
+                    )
+                )
+            )
         }
-        return new ArrayList<>();
+        return ArrayList<Component?>()
     }
 
-    private static class InfinityEnergyContainer extends NotifiableEnergyContainer {
-
-        public InfinityEnergyContainer(MetaMachine machine, long maxCapacity, long maxInputVoltage, long maxInputAmperage, long maxOutputVoltage, long maxOutputAmperage) {
-            super(machine, maxCapacity, maxInputVoltage, maxInputAmperage, maxOutputVoltage, maxOutputAmperage);
+    open class InfinityEnergyContainer(
+        machine: MetaMachine,
+        maxCapacity: Long,
+        maxInputVoltage: Long,
+        maxInputAmperage: Long,
+        maxOutputVoltage: Long,
+        maxOutputAmperage: Long
+    ) : NotifiableEnergyContainer(
+        machine,
+        maxCapacity,
+        maxInputVoltage,
+        maxInputAmperage,
+        maxOutputVoltage,
+        maxOutputAmperage
+    ) {
+        override fun handleRecipeInner(
+            io: IO,
+            recipe: GTRecipe,
+            left: MutableList<Long?>,
+            simulate: Boolean
+        ): MutableList<Long?>? {
+            val capability: IEnergyContainer = this
+            var sum: Long = left.stream().reduce(0L) { a: Long?, b: Long? -> java.lang.Long.sum(a!!, b!!) }!!
+            if (io == IO.IN) {
+                val canOutput = capability.energyStored
+                if (!simulate) {
+                    capability.addEnergy(-min(canOutput, sum))
+                }
+                sum = sum - canOutput
+            } else if (io == IO.OUT) {
+                val canInput = capability.getEnergyCapacity() - capability.getEnergyStored()
+                if (!simulate) {
+                    capability.addEnergy(min(canInput, sum))
+                }
+                sum = sum - canInput
+            }
+            return (if (sum <= 0) null else mutableListOf(sum))
         }
 
-        @Override
-        public List<Long> handleRecipeInner(IO io, GTRecipe recipe, List<Long> left, boolean simulate) {
-            return super.handleRecipeInner(io, recipe, left, true);
+        override fun changeEnergy(energyToAdd: Long): Long {
+            val oldEnergyStored = getEnergyStored()
+            var newEnergyStored =
+                if (energyCapacity - oldEnergyStored < energyToAdd) energyCapacity else (oldEnergyStored + energyToAdd)
+            if (newEnergyStored < 0) newEnergyStored = 0
+            return newEnergyStored - oldEnergyStored
         }
 
-        @Override
-        public long changeEnergy(long energyToAdd) {
-            long oldEnergyStored = getEnergyStored();
-            long newEnergyStored = (getEnergyCapacity() - oldEnergyStored < energyToAdd) ? getEnergyCapacity() : (oldEnergyStored + energyToAdd);
-            if (newEnergyStored < 0) newEnergyStored = 0;
-            return newEnergyStored - oldEnergyStored;
+        override fun checkOutputSubscription() {}
+
+        override fun serverTick() {}
+
+        override fun acceptEnergyFromNetwork(side: Direction, voltage: Long, amperage: Long): Long {
+            return 0
         }
 
-        @Override
-        public void checkOutputSubscription() {}
-
-        @Override
-        public void serverTick() {}
-
-        @Override
-        public long acceptEnergyFromNetwork(Direction side, long voltage, long amperage) {
-            return 0;
+        override fun outputsEnergy(side: Direction): Boolean {
+            return false
         }
 
-        @Override
-        public boolean outputsEnergy(Direction side) {
-            return false;
-        }
-
-        @Override
-        public boolean inputsEnergy(Direction side) {
-            return false;
+        override fun inputsEnergy(side: Direction): Boolean {
+            return false
         }
     }
 }

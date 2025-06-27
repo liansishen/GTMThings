@@ -1,261 +1,293 @@
-package com.hepdd.gtmthings.common.item;
+package com.hepdd.gtmthings.common.item
 
-import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
-import com.gregtechceu.gtceu.api.gui.GuiTextures;
-import com.gregtechceu.gtceu.api.item.component.IItemUIFactory;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
-import com.gregtechceu.gtceu.api.machine.multiblock.WorkableMultiblockMachine;
-import com.gregtechceu.gtceu.common.block.CoilBlock;
+import com.gregtechceu.gtceu.api.GTCEuAPI
+import com.gregtechceu.gtceu.api.block.ICoilType
+import com.gregtechceu.gtceu.api.block.MetaMachineBlock
+import com.gregtechceu.gtceu.api.gui.GuiTextures
+import com.gregtechceu.gtceu.api.item.component.IItemUIFactory
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController
+import com.gregtechceu.gtceu.api.machine.multiblock.WorkableMultiblockMachine
+import com.gregtechceu.gtceu.common.block.CoilBlock
+import com.hepdd.gtmthings.api.gui.widget.TerminalInputWidget
+import com.hepdd.gtmthings.api.misc.Hatch
+import com.hepdd.gtmthings.api.pattern.AdvancedBlockPattern.Companion.getAdvancedBlockPattern
+import com.lowdragmc.lowdraglib.gui.editor.ColorPattern
+import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory.HeldItemHolder
+import com.lowdragmc.lowdraglib.gui.modular.ModularUI
+import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup
+import com.lowdragmc.lowdraglib.gui.widget.LabelWidget
+import com.lowdragmc.lowdraglib.gui.widget.Widget
+import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
+import com.lowdragmc.lowdraglib.utils.BlockInfo
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.block.Blocks
+import java.util.*
+import java.util.function.Supplier
+import java.util.function.ToIntFunction
+import kotlin.math.min
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
+class AdvancedTerminalBehavior:IItemUIFactory {
 
-import com.hepdd.gtmthings.api.gui.widget.TerminalInputWidget;
-import com.hepdd.gtmthings.api.misc.Hatch;
-import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
-import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
-import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
-import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup;
-import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
-import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.utils.BlockInfo;
-import lombok.Getter;
-import lombok.Setter;
+    override fun useOn(context: UseOnContext): InteractionResult {
+        if (context.player != null && context.player!!.isShiftKeyDown) {
+            val level = context.level
+            val blockPos = context.clickedPos
+            if (context.player != null && !level.isClientSide() &&
+                MetaMachine.getMachine(level, blockPos) is IMultiController
+            ) {
+                val controller = MetaMachine.getMachine(level, blockPos) as IMultiController
+                val autoBuildSetting = getAutoBuildSetting(context.player!!.mainHandItem)
 
-import java.util.*;
-
-import static com.hepdd.gtmthings.api.pattern.AdvancedBlockPattern.getAdvancedBlockPattern;
-
-public class AdvancedTerminalBehavior implements IItemUIFactory {
-
-    public AdvancedTerminalBehavior() {}
-
-    @Override
-    public InteractionResult useOn(UseOnContext context) {
-        if (context.getPlayer() != null && context.getPlayer().isShiftKeyDown()) {
-            Level level = context.getLevel();
-            BlockPos blockPos = context.getClickedPos();
-            if (context.getPlayer() != null && !level.isClientSide() &&
-                    MetaMachine.getMachine(level, blockPos) instanceof IMultiController controller) {
-                AutoBuildSetting autoBuildSetting = getAutoBuildSetting(context.getPlayer().getMainHandItem());
-
-                if (!controller.isFormed()) {
-                    getAdvancedBlockPattern(controller.getPattern()).autoBuild(context.getPlayer(), controller.getMultiblockState(), autoBuildSetting);
-                } else if (MetaMachine.getMachine(level, blockPos) instanceof WorkableMultiblockMachine workableMultiblockMachine && autoBuildSetting.isReplaceCoilMode()) {
-                    getAdvancedBlockPattern(controller.getPattern()).autoBuild(context.getPlayer(), controller.getMultiblockState(), autoBuildSetting);
-                    workableMultiblockMachine.onPartUnload();
+                if (!controller.isFormed) {
+                    getAdvancedBlockPattern(controller.pattern)!!.autoBuild(
+                        context.player!!,
+                        controller.multiblockState,
+                        autoBuildSetting
+                    )
+                } else if (MetaMachine.getMachine(
+                        level,
+                        blockPos
+                    ) is WorkableMultiblockMachine && autoBuildSetting.isReplaceCoilMode()
+                ) {
+                    val workableMultiblockMachine = MetaMachine.getMachine(level,blockPos) as WorkableMultiblockMachine
+                    getAdvancedBlockPattern(controller.pattern)!!.autoBuild(
+                        context.player!!,
+                        controller.multiblockState,
+                        autoBuildSetting
+                    )
+                    workableMultiblockMachine.onPartUnload()
                 }
-
             }
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.sidedSuccess(level.isClientSide)
         }
-        return InteractionResult.PASS;
+        return InteractionResult.PASS
     }
 
-    private AutoBuildSetting getAutoBuildSetting(ItemStack itemStack) {
-        AutoBuildSetting autoBuildSetting = new AutoBuildSetting();
-        var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
-            autoBuildSetting.setCoilTier(tag.getInt("CoilTier"));
-            autoBuildSetting.setRepeatCount(tag.getInt("RepeatCount"));
-            autoBuildSetting.setNoHatchMode(tag.getInt("NoHatchMode"));
-            autoBuildSetting.setReplaceCoilMode(tag.getInt("ReplaceCoilMode"));
-            autoBuildSetting.setIsUseAE(tag.getInt("IsUseAE"));
+    private fun getAutoBuildSetting(itemStack: ItemStack): AutoBuildSetting {
+        val autoBuildSetting = AutoBuildSetting()
+        val tag = itemStack.tag
+        if (tag != null && !tag.isEmpty) {
+            autoBuildSetting.coilTier = tag.getInt("CoilTier")
+            autoBuildSetting.repeatCount = tag.getInt("RepeatCount")
+            autoBuildSetting.noHatchMode = tag.getInt("NoHatchMode")
+            autoBuildSetting.replaceCoilMode = tag.getInt("ReplaceCoilMode")
+            autoBuildSetting.isUseAE = tag.getInt("IsUseAE")
         } else {
-            autoBuildSetting.setCoilTier(0);
-            autoBuildSetting.setRepeatCount(0);
-            autoBuildSetting.setNoHatchMode(1);
-            autoBuildSetting.setReplaceCoilMode(0);
-            autoBuildSetting.setIsUseAE(0);
+            autoBuildSetting.coilTier = 0
+            autoBuildSetting.repeatCount = 0
+            autoBuildSetting.noHatchMode = 1
+            autoBuildSetting.replaceCoilMode = 0
+            autoBuildSetting.isUseAE = 0
         }
-        return autoBuildSetting;
+        return autoBuildSetting
     }
 
-    @Override
-    public ModularUI createUI(HeldItemUIFactory.HeldItemHolder holder, Player entityPlayer) {
-        return new ModularUI(176, 166, holder, entityPlayer).widget(createWidget(entityPlayer));
+    override fun createUI(holder: HeldItemHolder?, entityPlayer: Player): ModularUI {
+        return ModularUI(176, 166, holder, entityPlayer).widget(createWidget(entityPlayer))
     }
 
-    private Widget createWidget(Player entityPlayer) {
-        ItemStack handItem = entityPlayer.getMainHandItem();
-        var group = new WidgetGroup(0, 0, 182 + 8, 117 + 8);
-        int rowIndex = 1;
-        List<Component> lines = new ArrayList<>(List.of());
-        lines.add(Component.translatable("item.gtmthings.advanced_terminal.setting.1.tooltip"));
-        GTCEuAPI.HEATING_COILS.entrySet().stream()
-                .sorted(Comparator.comparingInt(value -> value.getKey().getTier()))
-                .forEach(coil -> lines.add(Component.literal(String.valueOf(coil.getKey().getTier() + 1)).append(":").append(coil.getValue().get().getName())));
+    private fun createWidget(entityPlayer: Player): Widget {
+        val handItem = entityPlayer.mainHandItem
+        val group = WidgetGroup(0, 0, 182 + 8, 117 + 8)
+        var rowIndex = 1
+        val lines: MutableList<Component?> = ArrayList<Component?>(mutableListOf())
+        lines.add(Component.translatable("item.gtmthings.advanced_terminal.setting.1.tooltip"))
+        GTCEuAPI.HEATING_COILS.entries.stream()
+            .sorted(Comparator.comparingInt(ToIntFunction { value: MutableMap.MutableEntry<ICoilType?, Supplier<CoilBlock?>?>? -> value!!.key!!.tier }))
+            .forEach { coil: MutableMap.MutableEntry<ICoilType?, Supplier<CoilBlock?>?>? ->
+                lines.add(
+                    Component.literal((coil!!.key!!.tier + 1).toString()).append(":").append(
+                        coil.value!!.get()!!.name
+                    )
+                )
+            }
 
         group.addWidget(
-                new DraggableScrollableWidgetGroup(4, 4, 182, 117)
-                        .setBackground(GuiTextures.DISPLAY)
-                        .setYScrollBarWidth(2)
-                        .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
-                        .addWidget(new LabelWidget(40, 5, "item.gtmthings.advanced_terminal.setting.title"))
-                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.1")
-                                .setHoverTooltips(lines))
-                        .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getCoilTier(handItem),
-                                (v) -> setCoilTier(v, handItem))
-                                .setMin(0).setMax(GTCEuAPI.HEATING_COILS.size()))
-                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.2")
-                                .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.2.tooltip")))
-                        .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getRepeatCount(handItem),
-                                (v) -> setRepeatCount(v, handItem))
-                                .setMin(0).setMax(99))
-                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.3")
-                                .setHoverTooltips("item.gtmthings.advanced_terminal.setting.3.tooltip"))
-                        .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getIsBuildHatches(handItem),
-                                (v) -> setIsBuildHatches(v, handItem)).setMin(0).setMax(1))
-                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.4")
-                                .setHoverTooltips("item.gtmthings.advanced_terminal.setting.4.tooltip"))
-                        .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getReplaceCoilMode(handItem),
-                                (v) -> setReplaceCoilMode(v, handItem)).setMin(0).setMax(1))
-                        .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.5")
-                                .setHoverTooltips("item.gtmthings.advanced_terminal.setting.5.tooltip"))
-                        .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getIsUseAE(handItem),
-                                (v) -> setIsUseAE(v, handItem)).setMin(0).setMax(1)));
+            DraggableScrollableWidgetGroup(4, 4, 182, 117)
+                .setBackground(GuiTextures.DISPLAY)
+                .setYScrollBarWidth(2)
+                .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1f))
+                .addWidget(LabelWidget(40, 5, "item.gtmthings.advanced_terminal.setting.title"))
+                .addWidget(
+                    LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.1")
+                        .setHoverTooltips(lines)
+                )
+                .addWidget(
+                    TerminalInputWidget(
+                        140, 5 + 16 * rowIndex++, 20, 16, { getCoilTier(handItem) },
+                        { v: Int? -> setCoilTier(v!!, handItem) })
+                        .setMin(0).setMax(GTCEuAPI.HEATING_COILS.size)
+                )
+                .addWidget(
+                    LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.2")
+                        .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.2.tooltip"))
+                )
+                .addWidget(
+                    TerminalInputWidget(
+                        140, 5 + 16 * rowIndex++, 20, 16, { getRepeatCount(handItem) },
+                        { v: Int? -> setRepeatCount(v!!, handItem) })
+                        .setMin(0).setMax(99)
+                )
+                .addWidget(
+                    LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.3")
+                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.3.tooltip")
+                )
+                .addWidget(
+                    TerminalInputWidget(
+                        140, 5 + 16 * rowIndex++, 20, 16, { getIsBuildHatches(handItem) },
+                        { v: Int? -> setIsBuildHatches(v!!, handItem) }).setMin(0).setMax(1)
+                )
+                .addWidget(
+                    LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.4")
+                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.4.tooltip")
+                )
+                .addWidget(
+                    TerminalInputWidget(
+                        140, 5 + 16 * rowIndex++, 20, 16, { getReplaceCoilMode(handItem) },
+                        { v: Int? -> setReplaceCoilMode(v!!, handItem) }).setMin(0).setMax(1)
+                )
+                .addWidget(
+                    LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.5")
+                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.5.tooltip")
+                )
+                .addWidget(
+                    TerminalInputWidget(
+                        140, 5 + 16 * rowIndex++, 20, 16, { getIsUseAE(handItem) },
+                        { v: Int? -> setIsUseAE(v!!, handItem) }).setMin(0).setMax(1)
+                )
+        )
 
-        group.setBackground(GuiTextures.BACKGROUND_INVERSE);
-        return group;
+        group.setBackground(GuiTextures.BACKGROUND_INVERSE)
+        return group
     }
 
-    private int getCoilTier(ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
-            return tag.getInt("CoilTier");
+    private fun getCoilTier(itemStack: ItemStack): Int {
+        val tag = itemStack.tag
+        return if (tag != null && !tag.isEmpty) {
+            tag.getInt("CoilTier")
         } else {
-            return 0;
+            0
         }
     }
 
-    private void setCoilTier(int coilTier, ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag == null) tag = new CompoundTag();
-        tag.putInt("CoilTier", coilTier);
-        itemStack.setTag(tag);
+    private fun setCoilTier(coilTier: Int, itemStack: ItemStack) {
+        var tag = itemStack.tag
+        if (tag == null) tag = CompoundTag()
+        tag.putInt("CoilTier", coilTier)
+        itemStack.tag = tag
     }
 
-    private int getRepeatCount(ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
-            return tag.getInt("RepeatCount");
+    private fun getRepeatCount(itemStack: ItemStack): Int {
+        val tag = itemStack.tag
+        return if (tag != null && !tag.isEmpty) {
+            tag.getInt("RepeatCount")
         } else {
-            return 0;
+            0
         }
     }
 
-    private void setRepeatCount(int repeatCount, ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag == null) tag = new CompoundTag();
-        tag.putInt("RepeatCount", repeatCount);
-        itemStack.setTag(tag);
+    private fun setRepeatCount(repeatCount: Int, itemStack: ItemStack) {
+        var tag = itemStack.tag
+        if (tag == null) tag = CompoundTag()
+        tag.putInt("RepeatCount", repeatCount)
+        itemStack.tag = tag
     }
 
-    private int getIsBuildHatches(ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
-            return tag.getInt("NoHatchMode");
+    private fun getIsBuildHatches(itemStack: ItemStack): Int {
+        val tag = itemStack.tag
+        return if (tag != null && !tag.isEmpty) {
+            tag.getInt("NoHatchMode")
         } else {
-            return 1;
+            1
         }
     }
 
-    private void setIsBuildHatches(int isBuildHatches, ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag == null) tag = new CompoundTag();
-        tag.putInt("NoHatchMode", isBuildHatches);
-        itemStack.setTag(tag);
+    private fun setIsBuildHatches(isBuildHatches: Int, itemStack: ItemStack) {
+        var tag = itemStack.tag
+        if (tag == null) tag = CompoundTag()
+        tag.putInt("NoHatchMode", isBuildHatches)
+        itemStack.tag = tag
     }
 
-    private int getReplaceCoilMode(ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
-            return tag.getInt("ReplaceCoilMode");
+    private fun getReplaceCoilMode(itemStack: ItemStack): Int {
+        val tag = itemStack.tag
+        return if (tag != null && !tag.isEmpty) {
+            tag.getInt("ReplaceCoilMode")
         } else {
-            return 0;
+            0
         }
     }
 
-    private void setReplaceCoilMode(int isReplaceCoil, ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag == null) tag = new CompoundTag();
-        tag.putInt("ReplaceCoilMode", isReplaceCoil);
-        itemStack.setTag(tag);
+    private fun setReplaceCoilMode(isReplaceCoil: Int, itemStack: ItemStack) {
+        var tag = itemStack.tag
+        if (tag == null) tag = CompoundTag()
+        tag.putInt("ReplaceCoilMode", isReplaceCoil)
+        itemStack.tag = tag
     }
 
-    private int getIsUseAE(ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
-            return tag.getInt("IsUseAE");
+    private fun getIsUseAE(itemStack: ItemStack): Int {
+        val tag = itemStack.tag
+        return if (tag != null && !tag.isEmpty) {
+            tag.getInt("IsUseAE")
         } else {
-            return 0;
+            0
         }
     }
 
-    private void setIsUseAE(int isUseAE, ItemStack itemStack) {
-        var tag = itemStack.getTag();
-        if (tag == null) tag = new CompoundTag();
-        tag.putInt("IsUseAE", isUseAE);
-        itemStack.setTag(tag);
+    private fun setIsUseAE(isUseAE: Int, itemStack: ItemStack) {
+        var tag = itemStack.tag
+        if (tag == null) tag = CompoundTag()
+        tag.putInt("IsUseAE", isUseAE)
+        itemStack.tag = tag
     }
 
-    @Setter
-    @Getter
-    public static class AutoBuildSetting {
+    open class AutoBuildSetting {
+        var coilTier = 0
+        var repeatCount = 0
+        var noHatchMode = 1
+        var replaceCoilMode = 0
+        var isUseAE = 0
 
-        private int coilTier, repeatCount, noHatchMode, replaceCoilMode, isUseAE;
-
-        public AutoBuildSetting() {
-            this.coilTier = 0;
-            this.repeatCount = 0;
-            this.noHatchMode = 1;
-            this.replaceCoilMode = 0;
-            this.isUseAE = 0;
-        }
-
-        public List<ItemStack> apply(BlockInfo[] blockInfos) {
-            List<ItemStack> candidates = new ArrayList<>();
+        fun apply(blockInfos: Array<BlockInfo?>?): MutableList<ItemStack?> {
+            val candidates: MutableList<ItemStack?> = ArrayList<ItemStack?>()
             if (blockInfos != null) {
-                if (Arrays.stream(blockInfos).anyMatch(
-                        info -> info.getBlockState().getBlock() instanceof CoilBlock)) {
-                    var tier = Math.min(coilTier - 1, blockInfos.length - 1);
+                if (Arrays.stream(blockInfos)
+                        .anyMatch { info: BlockInfo? -> info?.blockState?.block is CoilBlock }
+                ) {
+                    val tier = min(coilTier - 1, blockInfos.size - 1)
                     if (tier == -1) {
-                        for (int i = 0; i < blockInfos.length - 1; i++) {
-                            candidates.add(blockInfos[i].getItemStackForm());
+                        for (i in 0..<blockInfos.size - 1) {
+                            candidates.add(blockInfos[i]?.itemStackForm)
                         }
                     } else {
-                        candidates.add(blockInfos[tier].getItemStackForm());
+                        candidates.add(blockInfos[tier]?.itemStackForm)
                     }
-                    return candidates;
+                    return candidates
                 }
-                for (BlockInfo info : blockInfos) {
-                    if (info.getBlockState().getBlock() != Blocks.AIR) candidates.add(info.getItemStackForm());
+                for (info in blockInfos) {
+                    if (info?.blockState?.block !== Blocks.AIR) candidates.add(info?.itemStackForm)
                 }
             }
-            return candidates;
+            return candidates
         }
 
-        public boolean isPlaceHatch(BlockInfo[] blockInfos) {
-            if (this.noHatchMode == 0) return true;
-            if (blockInfos != null && blockInfos.length > 0) {
-                var blockInfo = blockInfos[0];
-                return !(blockInfo.getBlockState().getBlock() instanceof MetaMachineBlock machineBlock) || !Hatch.Set.contains(machineBlock);
+        fun isPlaceHatch(blockInfos: Array<BlockInfo>?): Boolean {
+            if (this.noHatchMode == 0) return true
+            if (blockInfos != null && blockInfos.isNotEmpty()) {
+                val blockInfo = blockInfos[0]
+                return blockInfo.blockState.block !is MetaMachineBlock || !Hatch.Set.contains(blockInfo.blockState.block)
             }
-            return true;
+            return true
         }
 
-        public boolean isReplaceCoilMode() {
-            return replaceCoilMode == 1;
+        fun isReplaceCoilMode(): Boolean {
+            return replaceCoilMode == 1
         }
     }
 }

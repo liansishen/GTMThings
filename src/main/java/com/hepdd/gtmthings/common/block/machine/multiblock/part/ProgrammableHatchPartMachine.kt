@@ -1,30 +1,28 @@
-package com.hepdd.gtmthings.common.block.machine.multiblock.part;
+package com.hepdd.gtmthings.common.block.machine.multiblock.part
 
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
-import com.gregtechceu.gtceu.common.machine.multiblock.part.DualHatchPartMachine;
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler
+import com.gregtechceu.gtceu.common.machine.multiblock.part.DualHatchPartMachine
+import com.hepdd.gtmthings.api.machine.trait.ProgrammableCircuitHandler
+import com.hepdd.gtmthings.data.CustomItems
+import net.minecraft.world.item.ItemStack
 
-import com.hepdd.gtmthings.api.machine.trait.ProgrammableCircuitHandler;
-import com.hepdd.gtmthings.data.CustomItems;
-import org.jetbrains.annotations.NotNull;
+class ProgrammableHatchPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, vararg args: Any?):DualHatchPartMachine(holder, tier, io, *args) {
 
-public class ProgrammableHatchPartMachine extends DualHatchPartMachine {
-
-    public ProgrammableHatchPartMachine(IMachineBlockEntity holder, int tier, IO io, Object... args) {
-        super(holder, tier, io, args);
+    override fun createInventory(vararg args: Any): NotifiableItemStackHandler {
+        return NotifiableItemStackHandler(
+            this,
+            inventorySize,
+            io
+        ).setFilter { itemStack: ItemStack? -> !itemStack!!.`is`(CustomItems.VIRTUAL_ITEM_PROVIDER.get()) }
     }
 
-    protected @NotNull NotifiableItemStackHandler createInventory(Object @NotNull... args) {
-        return new NotifiableItemStackHandler(this, getInventorySize(), io).setFilter(itemStack -> !itemStack.is(CustomItems.VIRTUAL_ITEM_PROVIDER.get()));
-    }
-
-    @Override
-    protected @NotNull NotifiableItemStackHandler createCircuitItemHandler(Object... args) {
-        if (args.length > 0 && args[0] instanceof IO io && io == IO.IN) {
-            return new ProgrammableCircuitHandler(this);
+    override fun createCircuitItemHandler(vararg args: Any?): NotifiableItemStackHandler {
+        return if (args.isNotEmpty() && args[0] is IO && io == IO.IN) {
+            ProgrammableCircuitHandler(this)
         } else {
-            return new NotifiableItemStackHandler(this, 0, IO.NONE);
+            NotifiableItemStackHandler(this, 0, IO.NONE)
         }
     }
 }

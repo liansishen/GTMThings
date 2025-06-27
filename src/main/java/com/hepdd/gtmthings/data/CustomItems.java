@@ -32,7 +32,7 @@ public class CustomItems {
     public static final ItemEntry<ComponentItem> VIRTUAL_ITEM_PROVIDER = GTMTHINGS_REGISTRATE.item("virtual_item_provider", ComponentItem::create)
             .properties(p -> p.stacksTo(1))
             .onRegister(attach(VirtualItemProviderBehavior.INSTANCE))
-            .onRegister(attachRenderer(() -> VirtualItemProviderRenderer.INSTANCE))
+            .onRegister(attachRenderer(VirtualItemProviderRenderer::getINSTANCE))
             .register();
 
     public static final ItemEntry<VirtualItemProviderCellItem> VIRTUAL_ITEM_PROVIDER_CELL = GTMTHINGS_REGISTRATE.item("virtual_item_provider_cell", VirtualItemProviderCellItem::new).register();

@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
-class VirtualItemProviderRenderer:IRenderer {
+open class VirtualItemProviderRenderer:IRenderer {
 
     companion object {
         @JvmStatic

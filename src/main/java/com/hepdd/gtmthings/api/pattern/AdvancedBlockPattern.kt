@@ -165,7 +165,7 @@ open class AdvancedBlockPattern(
                         updateWorldState(worldState, pos, predicate)
                         var coilItemStack: ItemStack? = null
                         if (!world.isEmptyBlock(pos)) {
-                            if (world.getBlockState(pos).block is CoilBlock && autoBuildSetting.isReplaceCoilMode
+                            if (world.getBlockState(pos).block is CoilBlock && autoBuildSetting.isReplaceCoilMode()
                             ) {
                                 coilItemStack = world.getBlockState(pos).block.asItem().defaultInstance
                             } else {
@@ -244,20 +244,28 @@ open class AdvancedBlockPattern(
                                 ) {
                                     continue
                                 }
-                                infos = ArrayUtils.addAll<BlockInfo?>(
-                                    infos,
-                                    *if (common.candidates == null) null else common.candidates!!.get()
-                                )
+                                //infos = ArrayUtils.addAll<BlockInfo?>(infos, common.candidates?.get())
+                                if (common.candidates?.get() != null) {
+                                    common.candidates?.get()?.forEach { info -> infos = ArrayUtils.addAll(infos, info) }
+                                } else {
+                                    infos = ArrayUtils.addAll(infos, null)
+                                }
                             }
                         }
 
                         val candidates = autoBuildSetting.apply(infos)
 
-                        if (autoBuildSetting.isReplaceCoilMode && coilItemStack != null && ItemStack.isSameItem(
+                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null && ItemStack.isSameItem(
                                 candidates[0],
                                 coilItemStack
                             )
                         ) {
+                            a++
+                            x++
+                            continue
+                        }
+
+                        if (candidates.isEmpty() || candidates.first() == null) {
                             a++
                             x++
                             continue
@@ -278,7 +286,7 @@ open class AdvancedBlockPattern(
                         // check can get old coilBlock
                         var holderHandler: IItemHandler? = null
                         var holderSlot = -1
-                        if (autoBuildSetting.isReplaceCoilMode && coilItemStack != null) {
+                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null) {
                             val holderResult = foundHolderSlot(player, coilItemStack)
                             holderHandler = holderResult.getFirst()
                             holderSlot = holderResult.getSecond()!!
@@ -290,7 +298,7 @@ open class AdvancedBlockPattern(
                             }
                         }
 
-                        if (autoBuildSetting.isReplaceCoilMode && coilItemStack != null) {
+                        if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null) {
                             world.removeBlock(pos, true)
                             holderHandler?.insertItem(holderSlot, coilItemStack, false)
                         }
@@ -346,7 +354,7 @@ open class AdvancedBlockPattern(
 
     private fun foundItem(
         player: Player,
-        candidates: MutableList<ItemStack>,
+        candidates: MutableList<ItemStack?>,
         isUseAE: Int
     ): Triplet<ItemStack?, IItemHandler?, Int?> {
         var found: ItemStack? = null
@@ -364,8 +372,8 @@ open class AdvancedBlockPattern(
             }
         } else {
             for (candidate in candidates) {
-                found = candidate.copy()
-                if (!found.isEmpty && found.item is BlockItem) {
+                found = candidate?.copy()
+                if (!found!!.isEmpty && found.item is BlockItem) {
                     break
                 }
                 found = null
@@ -508,7 +516,7 @@ open class AdvancedBlockPattern(
     }
 
     private fun getMatchStackWithHandler(
-        candidates: MutableList<ItemStack>,
+        candidates: MutableList<ItemStack?>,
         cap: LazyOptional<IItemHandler?>,
         player: Player, isUseAE: Int
     ): IntObjectPair<IItemHandler?>? {
