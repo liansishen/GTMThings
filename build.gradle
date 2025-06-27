@@ -32,7 +32,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.withType(Copy).all {
-    duplicatesStrategy 'exclude'
+    duplicatesStrategy = 'exclude'
 }
 
 lombok {

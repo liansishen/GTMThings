@@ -366,6 +366,8 @@
   "item.gtmthings.advanced_terminal.setting.3.tooltip": "Whether to enable the no-Hatch mode (0: not enabled, 1: enabled)\nAfter enabling the no-chamber mode, various Hatch will not be placed when they are not unique.",
   "item.gtmthings.advanced_terminal.setting.4": "Coil replace mode",
   "item.gtmthings.advanced_terminal.setting.4.tooltip": "Whether to enable the coil-replace mode (0: not enabled, 1: enabled)\nAfter enabling the coil-replace mode, coil will be replaced by the Coil before.",
+  "item.gtmthings.advanced_terminal.setting.5": "Is use AE items",
+  "item.gtmthings.advanced_terminal.setting.5.tooltip": "Whether to enable to use items in AE (0: not enabled, 1: enabled)\nAfter enabling this, you can autobuild with items in AE storage by an ME terminal.",
   "item.gtmthings.wireless_energy_binding_tool": "Wireless Energy Binding Tool",
   "item.gtmthings.virtual_item_provider": "Virtual Item Provider",
   "item.gtmthings.virtual_item_provider_cell": "Virtual Item Provider Cell",
