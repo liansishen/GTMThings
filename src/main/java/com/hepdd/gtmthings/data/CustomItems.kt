@@ -18,8 +18,10 @@ import com.hepdd.gtmthings.common.item.behaviour.WirelessTransferCoverTooltipBeh
 import com.hepdd.gtmthings.common.registry.GTMTRegistration
 import com.tterrag.registrate.util.entry.ItemEntry
 import com.tterrag.registrate.util.nullness.NonNullConsumer
+import lombok.Getter
 
-class CustomItems {
+@Getter
+open class CustomItems {
 
     companion object {
 

@@ -8,14 +8,12 @@ import com.hepdd.gtmthings.config.ConfigHolder
 import com.hepdd.gtmthings.data.WirelessEnergySavedData
 import com.hepdd.gtmthings.utils.BigIntegerUtils
 import com.hepdd.gtmthings.utils.TeamUtil
-import lombok.Getter
 
 import java.math.BigInteger
 import java.util.*
 import kotlin.math.min
 
-@Getter
-class WirelessEnergyContainer(var uuid: UUID, var storage: BigInteger? = BigInteger.ZERO, var rate: Long = 0, var bindPos: GlobalPos? = null) {
+open class WirelessEnergyContainer(var uuid: UUID, var storage: BigInteger? = BigInteger.ZERO, var rate: Long = 0, var bindPos: GlobalPos? = null) {
     var energyStat: EnergyStat
 
     init {
@@ -38,7 +36,7 @@ class WirelessEnergyContainer(var uuid: UUID, var storage: BigInteger? = BigInte
         }
     }
 
-    fun addEnergy(energy: Long, machine: MetaMachine?): Long {
+    open fun addEnergy(energy: Long, machine: MetaMachine?): Long {
         var change = energy
         ConfigHolder.INSTANCE?.let { if (it.isWirelessRateEnable) change = min(rate.toDouble(), energy.toDouble()).toLong() }
         if (change <= 0) return 0
@@ -53,7 +51,7 @@ class WirelessEnergyContainer(var uuid: UUID, var storage: BigInteger? = BigInte
         return change
     }
 
-    fun removeEnergy(energy: Long, machine: MetaMachine?): Long {
+    open fun removeEnergy(energy: Long, machine: MetaMachine?): Long {
         var change = min(BigIntegerUtils.getLongValue(storage!!).toDouble(), energy.toDouble()).toLong()
         ConfigHolder.INSTANCE?.let {
             if (it.isWirelessRateEnable) {
@@ -73,5 +71,5 @@ class WirelessEnergyContainer(var uuid: UUID, var storage: BigInteger? = BigInte
         return change
     }
 
-    fun getCapacity(): BigInteger? = null
+    open fun getCapacity(): BigInteger? = null
 }

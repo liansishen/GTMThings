@@ -98,7 +98,8 @@ class VirtualItemProviderBehavior :
     companion object {
         val INSTANCE: VirtualItemProviderBehavior = VirtualItemProviderBehavior()
 
-        private fun setVirtualItem(stack: ItemStack, virtualItem: ItemStack): ItemStack {
+        @JvmStatic
+        fun setVirtualItem(stack: ItemStack, virtualItem: ItemStack): ItemStack {
             val tag = stack.getOrCreateTag()
             tag.remove("t")
             val id = BuiltInRegistries.ITEM.getKey(virtualItem.item)
@@ -109,6 +110,7 @@ class VirtualItemProviderBehavior :
             return stack
         }
 
+        @JvmStatic
         fun getVirtualItem(item: ItemStack): ItemStack {
             val tag = item.getOrCreateTag()
             val mod = tag.getString("m")

@@ -16,7 +16,7 @@ import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
 import java.math.BigInteger
 import java.util.*
 
-class WirelessEnergySavedData : SavedData {
+open class WirelessEnergySavedData : SavedData {
     val containerMap: MutableMap<UUID?, WirelessEnergyContainer> = HashMap<UUID?, WirelessEnergyContainer>()
 
     constructor()
@@ -40,7 +40,7 @@ class WirelessEnergySavedData : SavedData {
         return compoundTag
     }
 
-    private fun readTag(engTag: CompoundTag): WirelessEnergyContainer {
+    open fun readTag(engTag: CompoundTag): WirelessEnergyContainer {
         val uuid = engTag.getUUID("uuid")
         val en = engTag.getString("energy")
         val energy = BigInteger(en.ifEmpty { "0" })
@@ -49,7 +49,7 @@ class WirelessEnergySavedData : SavedData {
         return WirelessEnergyContainer(uuid, energy, rate, bindPos)
     }
 
-    private fun toTag(container: WirelessEnergyContainer): CompoundTag {
+    open fun toTag(container: WirelessEnergyContainer): CompoundTag {
         val engTag = CompoundTag()
         val storage = container.storage
         if (storage != BigInteger.ZERO) {

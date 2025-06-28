@@ -21,7 +21,7 @@ import com.hepdd.gtmthings.common.registry.GTMTRegistration
 
 import java.util.function.BiFunction
 
-class WirelessMachines {
+open class WirelessMachines {
 
     companion object {
         @JvmStatic
