@@ -24,18 +24,18 @@ interface ITransferData {
         val machine = machine()
         val eut = throughput()
         val pos = machine?.pos?.toShortString()
-        return Component.translatable(machine?.blockState?.block?.descriptionId)
+        return Component.translatable(machine?.blockState?.block?.descriptionId!!)
             .withStyle(
                 Style.EMPTY.withHoverEvent(
                     HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
                         Component.translatable(
                             "recipe.condition.dimension.tooltip",
-                            machine?.level!!.dimension().location()
-                        ).append(" [").append(pos).append("] ").append(
+                            machine.level!!.dimension().location()
+                        ).append(" [").append(pos!!).append("] ").append(
                             Component.translatable(
                                 "gtmthings.machine.wireless_energy_monitor.tooltip.0",
-                                TeamUtil.GetName(machine.level, UUID())
+                                TeamUtil.getName(machine.level!!, UUID()!!)
                             )
                         )
                     )

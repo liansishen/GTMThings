@@ -1,150 +1,231 @@
-package com.hepdd.gtmthings.data;
+package com.hepdd.gtmthings.data
 
-import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.data.RotationState;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.MachineDefinition;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
-import com.gregtechceu.gtceu.client.renderer.machine.MinerRenderer;
-import com.gregtechceu.gtceu.client.renderer.machine.OverlayTieredMachineRenderer;
-import com.gregtechceu.gtceu.common.machine.multiblock.part.DualHatchPartMachine;
-import com.gregtechceu.gtceu.utils.FormattingUtil;
+import com.gregtechceu.gtceu.GTCEu
+import com.gregtechceu.gtceu.api.GTCEuAPI
+import com.gregtechceu.gtceu.api.GTValues
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.data.RotationState
+import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
+import com.gregtechceu.gtceu.api.machine.MachineDefinition
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility
+import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder
+import com.gregtechceu.gtceu.client.renderer.machine.MinerRenderer
+import com.gregtechceu.gtceu.client.renderer.machine.OverlayTieredMachineRenderer
+import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils
+import com.gregtechceu.gtceu.common.machine.multiblock.part.DualHatchPartMachine
+import com.gregtechceu.gtceu.utils.FormattingUtil
+import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeDualHatchPartMachine
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.ProgrammableHatchPartMachine
+import com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng.MEOutputPartMachine
+import com.hepdd.gtmthings.common.registry.GTMTRegistration
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
+import java.util.function.BiFunction
+import kotlin.math.pow
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
+class CustomMachines {
 
-import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeDualHatchPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.ProgrammableHatchPartMachine;
-import com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng.MEOutputPartMachine;
+    companion object {
+        init {
+            GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.creativeModeTab { CreativeModeTabs.MORE_MACHINES }
+        }
 
-import java.util.Locale;
-import java.util.function.BiFunction;
+        @JvmStatic
+        val ALL_TIERS: IntArray =
+            GTValues.tiersBetween(GTValues.ULV, if (GTCEuAPI.isHighTier()) GTValues.MAX else GTValues.UV)
 
-import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.api.capability.recipe.IO.IN;
-import static com.gregtechceu.gtceu.common.data.machines.GTMachineUtils.*;
-import static com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine.INV_MULTIPLE;
-import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
-import static com.hepdd.gtmthings.data.GTMTRecipeTypes.DIGITAL_MINER_RECIPE;
-
-public class CustomMachines {
-
-    public static final int[] ALL_TIERS = GTValues.tiersBetween(ULV, GTCEuAPI.isHighTier() ? MAX : UV);
-
-    static {
-        GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.MORE_MACHINES);
-    }
-
-    public static final MachineDefinition[] DIGITAL_MINER = registerTieredMachines("digital_miner",
-            DigitalMiner::new,
-            (tier, builder) -> builder
-                    .langValue("%s Digital Miner %s".formatted(VLVH[tier], VLVT[tier]))
+        @JvmStatic
+        val DIGITAL_MINER: Array<MachineDefinition?> = registerTieredMachines(
+            "digital_miner",
+            BiFunction { holder: IMachineBlockEntity, tier: Int -> DigitalMiner(holder, tier) },
+            BiFunction { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
+                builder!!
+                    .langValue("%s Digital Miner %s".format(GTValues.VLVH[tier!!], GTValues.VLVT[tier]))
                     .rotationState(RotationState.NON_Y_AXIS).tier(tier)
-                    .renderer(() -> new MinerRenderer(tier, GTCEu.id("block/machines/miner")))
-                    .tooltipBuilder((stack, tooltip) -> {
-                        int maxArea = (int) (8 * Math.pow(2, tier));
-                        long energyPerTick = GTValues.VEX[tier - 1];
-                        tooltip.add(Component.translatable("gtceu.universal.tooltip.uses_per_tick", energyPerTick)
+                    .renderer { MinerRenderer(tier, GTCEu.id("block/machines/miner")) }
+                    .tooltipBuilder { stack: ItemStack?, tooltip: MutableList<Component?>? ->
+                        val maxArea = (8 * 2.0.pow(tier.toDouble())).toInt()
+                        val energyPerTick = GTValues.VEX[tier - 1]
+                        tooltip!!.add(
+                            Component.translatable("gtceu.universal.tooltip.uses_per_tick", energyPerTick)
                                 .append(Component.literal(", ").withStyle(ChatFormatting.GRAY))
-                                .append(Component.literal("§7每个方块需要§f" + (int) (40 / Math.pow(2, tier)) + "§7刻。")));
-                        tooltip.add(Component.translatable("gtceu.universal.tooltip.voltage_in",
-                                FormattingUtil.formatNumbers(GTValues.VEX[tier]),
-                                GTValues.VNF[tier]));
+                                .append(Component.literal("§7每个方块需要§f" + (40 / 2.0.pow(tier.toDouble())).toInt() + "§7刻。"))
+                        )
                         tooltip.add(
-                                Component.translatable("gtceu.universal.tooltip.working_area_max", maxArea, maxArea));
-                    })
-                    .recipeTypes(DIGITAL_MINER_RECIPE)
-                    .register(),
-            LV, MV, HV);
+                            Component.translatable(
+                                "gtceu.universal.tooltip.voltage_in",
+                                FormattingUtil.formatNumbers(GTValues.VEX[tier]),
+                                GTValues.VNF[tier]
+                            )
+                        )
+                        tooltip.add(
+                            Component.translatable("gtceu.universal.tooltip.working_area_max", maxArea, maxArea)
+                        )
+                    }
+                    .recipeTypes(GTMTRecipeTypes.DIGITAL_MINER_RECIPE)
+                    .register()
+            },
+            GTValues.LV, GTValues.MV, GTValues.HV
+        )
 
-    public static final MachineDefinition ME_EXPORT_BUFFER = GTMTHINGS_REGISTRATE.machine("me_export_buffer", MEOutputPartMachine::new)
+        @JvmStatic
+        val ME_EXPORT_BUFFER: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.machine(
+            "me_export_buffer"
+        ) { holder: IMachineBlockEntity -> MEOutputPartMachine(holder) }
             .rotationState(RotationState.ALL)
             .abilities(PartAbility.EXPORT_ITEMS, PartAbility.EXPORT_FLUIDS)
             .overlayTieredHullRenderer("me.export")
-            .tier(LuV)
-            .register();
+            .tier(GTValues.LuV)
+            .register()
 
-    public static final MachineDefinition[] HUGE_ITEM_IMPORT_BUS = registerTieredMachines("huge_item_import_bus",
-            (holder, tier) -> new HugeBusPartMachine(holder, tier, IO.IN),
-            (tier, builder) -> builder
-                    .langValue(VNF[tier] + " Input Bus")
+        @JvmStatic
+        val HUGE_ITEM_IMPORT_BUS: Array<MachineDefinition?> = registerTieredMachines(
+            "huge_item_import_bus",
+            { holder: IMachineBlockEntity?, tier: Int? -> HugeBusPartMachine(holder!!, tier!!, IO.IN) },
+            { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
+                builder!!
+                    .langValue(GTValues.VNF[tier!!] + " Input Bus")
                     .rotationState(RotationState.ALL)
                     .abilities(
-                            tier == 0 ? new PartAbility[] { PartAbility.IMPORT_ITEMS, PartAbility.STEAM_IMPORT_ITEMS } :
-                                    new PartAbility[] { PartAbility.IMPORT_ITEMS })
+                        *if (tier == 0) arrayOf<PartAbility>(
+                            PartAbility.IMPORT_ITEMS,
+                            PartAbility.STEAM_IMPORT_ITEMS
+                        ) else arrayOf<PartAbility>(PartAbility.IMPORT_ITEMS)
+                    )
                     .overlayTieredHullRenderer("item_bus.import")
-                    .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.import.tooltip"),
-                            Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
-                                    (1 + tier) * INV_MULTIPLE))
-                    .register(),
-            ALL_TIERS);
+                    .tooltips(
+                        Component.translatable("gtmthings.machine.huge_item_bus.import.tooltip"),
+                        Component.translatable(
+                            "gtceu.universal.tooltip.item_storage_capacity",
+                            (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE
+                        )
+                    )
+                    .register()
+            },
+            *ALL_TIERS
+        )
 
-    public static final MachineDefinition[] HUGE_ITEM_EXPORT_BUS = registerTieredMachines("huge_item_export_bus",
-            (holder, tier) -> new HugeBusPartMachine(holder, tier, IO.OUT),
-            (tier, builder) -> builder
-                    .langValue(VNF[tier] + " Output Bus")
+        @JvmStatic
+        val HUGE_ITEM_EXPORT_BUS: Array<MachineDefinition?> = registerTieredMachines(
+            "huge_item_export_bus",
+            { holder: IMachineBlockEntity?, tier: Int? -> HugeBusPartMachine(holder!!, tier!!, IO.OUT) },
+            { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
+                builder!!
+                    .langValue(GTValues.VNF[tier!!] + " Output Bus")
                     .rotationState(RotationState.ALL)
                     .abilities(
-                            tier == 0 ? new PartAbility[] { PartAbility.EXPORT_ITEMS, PartAbility.STEAM_EXPORT_ITEMS } :
-                                    new PartAbility[] { PartAbility.EXPORT_ITEMS })
+                        *if (tier == 0) arrayOf<PartAbility>(
+                            PartAbility.EXPORT_ITEMS,
+                            PartAbility.STEAM_EXPORT_ITEMS
+                        ) else arrayOf<PartAbility>(PartAbility.EXPORT_ITEMS)
+                    )
                     .overlayTieredHullRenderer("item_bus.export")
-                    .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.export.tooltip"),
-                            Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
-                                    (1 + tier) * INV_MULTIPLE))
-                    .register(),
-            ALL_TIERS);
-
-    public static final MachineDefinition[] HUGE_INPUT_DUAL_HATCH = registerTieredMachines("huge_dual_hatch",
-            (holder, tier) -> new HugeDualHatchPartMachine(holder, tier, IO.IN),
-            (tier, builder) -> {
-                builder.langValue(GTValues.VNF[tier] + " Huge Input Dual Hatch")
-                        .rotationState(RotationState.ALL)
-                        .overlayTieredHullRenderer("huge_dual_hatch.import")
-                        .abilities(PartAbility.IMPORT_ITEMS)
-                        .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"));
-                builder.tooltips(Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
-                        (1 + tier) * INV_MULTIPLE))
-                        .tooltips(Component.translatable("gtceu.universal.tooltip.fluid_storage_capacity_mult",
-                                tier, FormattingUtil.formatNumbers(Integer.MAX_VALUE)));
-                return builder.register();
+                    .tooltips(
+                        Component.translatable("gtmthings.machine.huge_item_bus.export.tooltip"),
+                        Component.translatable(
+                            "gtceu.universal.tooltip.item_storage_capacity",
+                            (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE
+                        )
+                    )
+                    .register()
             },
-            ALL_TIERS);
+            *ALL_TIERS
+        )
 
-    public static final MachineDefinition[] PROGRAMMABLEC_HATCH = registerTieredMachines(
-            "programmablec_hatch", (holder, tier) -> new ProgrammableHatchPartMachine(holder, tier, IN),
-            (tier, builder) -> builder
-                    .langValue("%s Programmablec Hatch".formatted(VNF[tier]))
+        @JvmStatic
+        val HUGE_INPUT_DUAL_HATCH: Array<MachineDefinition?> = registerTieredMachines(
+            "huge_dual_hatch",
+            { holder: IMachineBlockEntity?, tier: Int? ->
+                HugeDualHatchPartMachine(
+                    holder!!,
+                    tier!!,
+                    IO.IN
+                )
+            },
+            { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
+                builder!!.langValue(GTValues.VNF[tier!!] + " Huge Input Dual Hatch")
+                    .rotationState(RotationState.ALL)
+                    .overlayTieredHullRenderer("huge_dual_hatch.import")
+                    .abilities(PartAbility.IMPORT_ITEMS)
+                    .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"))
+                builder.tooltips(
+                    Component.translatable(
+                        "gtceu.universal.tooltip.item_storage_capacity",
+                        (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE
+                    )
+                )
+                    .tooltips(
+                        Component.translatable(
+                            "gtceu.universal.tooltip.fluid_storage_capacity_mult",
+                            tier, FormattingUtil.formatNumbers(Int.Companion.MAX_VALUE)
+                        )
+                    )
+                builder.register()
+            },
+            *ALL_TIERS
+        )
+
+        @JvmStatic
+        val PROGRAMMABLEC_HATCH: Array<MachineDefinition?> = registerTieredMachines(
+            "programmablec_hatch",
+            { holder: IMachineBlockEntity?, tier: Int? ->
+                ProgrammableHatchPartMachine(
+                    holder!!,
+                    tier!!,
+                    IO.IN
+                )
+            },
+            { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
+                builder!!
+                    .langValue("%s Programmablec Hatch".format(GTValues.VNF[tier!!]))
                     .rotationState(RotationState.ALL)
                     .abilities(PartAbility.IMPORT_ITEMS)
-                    .renderer(() -> new OverlayTieredMachineRenderer(tier, GTCEu.id("block/machine/part/dual_hatch.import")))
-                    .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"),
-                            Component.translatable("gtceu.universal.tooltip.item_storage_capacity", (int) Math.pow((tier - 4), 2)),
-                            Component.translatable("gtceu.universal.tooltip.fluid_storage_capacity_mult", (tier - 4), DualHatchPartMachine.getTankCapacity(DualHatchPartMachine.INITIAL_TANK_CAPACITY, tier)),
-                            Component.translatable("gtceu.universal.enabled"))
-                    .register(),
-            DUAL_HATCH_TIERS);
+                    .renderer {
+                        OverlayTieredMachineRenderer(
+                            tier,
+                            GTCEu.id("block/machine/part/dual_hatch.import")
+                        )
+                    }
+                    .tooltips(
+                        Component.translatable("gtceu.machine.dual_hatch.import.tooltip"),
+                        Component.translatable(
+                            "gtceu.universal.tooltip.item_storage_capacity",
+                            (tier - 4).toDouble().pow(2.0).toInt()
+                        ),
+                        Component.translatable(
+                            "gtceu.universal.tooltip.fluid_storage_capacity_mult",
+                            (tier - 4),
+                            DualHatchPartMachine.getTankCapacity(DualHatchPartMachine.INITIAL_TANK_CAPACITY, tier)
+                        ),
+                        Component.translatable("gtceu.universal.enabled")
+                    )
+                    .register()
+            },
+            *GTMachineUtils.DUAL_HATCH_TIERS
+        )
 
-    public static MachineDefinition[] registerTieredMachines(String name,
-                                                             BiFunction<IMachineBlockEntity, Integer, MetaMachine> factory,
-                                                             BiFunction<Integer, MachineBuilder<MachineDefinition>, MachineDefinition> builder,
-                                                             int... tiers) {
-        MachineDefinition[] definitions = new MachineDefinition[GTValues.TIER_COUNT];
-        for (int tier : tiers) {
-            var register = GTMTHINGS_REGISTRATE
-                    .machine(GTValues.VN[tier].toLowerCase(Locale.ROOT) + "_" + name,
-                            holder -> factory.apply(holder, tier))
-                    .tier(tier);
-            definitions[tier] = builder.apply(tier, register);
+        fun registerTieredMachines(
+            name: String?,
+            factory: BiFunction<IMachineBlockEntity?, Int?, MetaMachine?>,
+            builder: BiFunction<Int?, MachineBuilder<MachineDefinition?>?, MachineDefinition?>,
+            vararg tiers: Int
+        ): Array<MachineDefinition?> {
+            val definitions = arrayOfNulls<MachineDefinition>(GTValues.TIER_COUNT)
+            for (tier in tiers) {
+                val register = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+                    .machine(
+                        GTValues.VN[tier].lowercase() + "_" + name
+                    ) { holder: IMachineBlockEntity? -> factory.apply(holder, tier) }
+                    .tier(tier)
+                definitions[tier] = builder.apply(tier, register)
+            }
+            return definitions
         }
-        return definitions;
-    }
 
-    public static void init() {}
+        fun init() {}
+    }
 }

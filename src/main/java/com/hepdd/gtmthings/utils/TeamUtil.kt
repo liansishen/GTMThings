@@ -1,57 +1,60 @@
-package com.hepdd.gtmthings.utils;
+package com.hepdd.gtmthings.utils
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import com.lowdragmc.lowdraglib.LDLib
+import dev.ftb.mods.ftbteams.api.FTBTeamsAPI
+import dev.ftb.mods.ftbteams.api.Team
+import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import java.util.*
+import java.util.function.Function
 
-import com.lowdragmc.lowdraglib.LDLib;
-import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
-import dev.ftb.mods.ftbteams.api.Team;
+class TeamUtil {
+    companion object {
 
-import java.util.Optional;
-import java.util.UUID;
-
-public class TeamUtil {
-
-    public static UUID getTeamUUID(UUID playerUUID) {
-        if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
-            var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
-            return team.map(Team::getTeamId).orElse(playerUUID);
-        } else {
-            return playerUUID;
-        }
-    }
-
-    public static Component GetName(Player player) {
-        if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
-            Optional<Team> team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(player.getUUID());
-            if (team.isPresent()) return team.get().getName();
-        }
-        return player.getName();
-    }
-
-    public static Component GetName(Level level, UUID playerUUID) {
-        if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
-            var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
-            if (team.isPresent()) {
-                return team.get().getName();
-            }
-        }
-        Player player = level.getPlayerByUUID(playerUUID);
-        if (player != null) return player.getName();
-        return Component.literal(playerUUID.toString());
-    }
-
-    public static boolean hasOwner(Level level, UUID playerUUID) {
-        if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded()) {
-            var team = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
-            if (team.isPresent()) {
-                return true;
+        @JvmStatic
+        fun getTeamUUID(playerUUID: UUID?): UUID? {
+            if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded) {
+                val team = FTBTeamsAPI.api().manager.getTeamForPlayerID(playerUUID)
+                return team.map(Function { obj: Team? -> obj!!.teamId }).orElse(playerUUID)
             } else {
-                return (level.getPlayerByUUID(playerUUID) != null);
+                return playerUUID
             }
-        } else {
-            return (level.getPlayerByUUID(playerUUID) != null);
+        }
+
+        @JvmStatic
+        fun getName(player: Player): Component? {
+            if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded) {
+                val team = FTBTeamsAPI.api().manager.getTeamForPlayerID(player.getUUID())
+                if (team.isPresent) return team.get().name
+            }
+            return player.name
+        }
+
+        @JvmStatic
+        fun getName(level: Level, playerUUID: UUID): Component? {
+            if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded) {
+                val team = FTBTeamsAPI.api().manager.getTeamForPlayerID(playerUUID)
+                if (team.isPresent) {
+                    return team.get().name
+                }
+            }
+            val player = level.getPlayerByUUID(playerUUID)
+            if (player != null) return player.name
+            return Component.literal(playerUUID.toString())
+        }
+        @JvmStatic
+        fun hasOwner(level: Level, playerUUID: UUID): Boolean {
+            return if (LDLib.isModLoaded("ftbteams") && FTBTeamsAPI.api().isManagerLoaded) {
+                val team = FTBTeamsAPI.api().manager.getTeamForPlayerID(playerUUID)
+                if (team.isPresent) {
+                    true
+                } else {
+                    (level.getPlayerByUUID(playerUUID) != null)
+                }
+            } else {
+                (level.getPlayerByUUID(playerUUID) != null)
+            }
         }
     }
 }

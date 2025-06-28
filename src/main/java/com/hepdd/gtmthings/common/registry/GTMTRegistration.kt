@@ -1,19 +1,21 @@
-package com.hepdd.gtmthings.common.registry;
+package com.hepdd.gtmthings.common.registry
 
-import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
+import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate
+import com.hepdd.gtmthings.GTMThings
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.CreativeModeTab
 
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.CreativeModeTab;
+open class GTMTRegistration {
 
-import com.hepdd.gtmthings.GTMThings;
+    companion object {
+        @JvmStatic
+        var GTMTHINGS_REGISTRATE: GTRegistrate = GTRegistrate.create(GTMThings.MOD_ID)
 
-public class GTMTRegistration {
-
-    public static GTRegistrate GTMTHINGS_REGISTRATE = GTRegistrate.create(GTMThings.MOD_ID);
-
-    static {
-        GTMTRegistration.GTMTHINGS_REGISTRATE.defaultCreativeTab((ResourceKey<CreativeModeTab>) null);
+        init {
+            GTMTHINGS_REGISTRATE.defaultCreativeTab(null as ResourceKey<CreativeModeTab?>?)
+        }
     }
 
-    private GTMTRegistration() {/**/}
+    private fun GTMTRegistration() { /**/
+    }
 }

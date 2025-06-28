@@ -2,7 +2,7 @@ package com.hepdd.gtmthings.api.misc
 
 import com.gregtechceu.gtceu.api.machine.MetaMachine
 import com.hepdd.gtmthings.config.ConfigHolder
-import com.hepdd.gtmthings.data.WirelessEnergySavaedData
+import com.hepdd.gtmthings.data.WirelessEnergySavedData
 import com.hepdd.gtmthings.utils.BigIntegerUtils
 import com.hepdd.gtmthings.utils.TeamUtil
 import lombok.Getter
@@ -30,10 +30,10 @@ class WirelessEnergyContainer(var uuid: UUID,
         @JvmField var server: MinecraftServer? = null
 
         @JvmStatic
-        fun getOrCreateContainer(uuid: UUID?): WirelessEnergyContainer {
-            return WirelessEnergySavaedData.INSTANCE.containerMap.computeIfAbsent(TeamUtil.getTeamUUID(uuid)) { _uuid: UUID ->
+        fun getOrCreateContainer(uuid: UUID?): WirelessEnergyContainer? {
+            return WirelessEnergySavedData.INSTANCE?.containerMap?.computeIfAbsent(TeamUtil.getTeamUUID(uuid)) { _uuid: UUID? ->
                 WirelessEnergyContainer(
-                    _uuid
+                    _uuid!!
                 )
             }
         }
@@ -41,10 +41,10 @@ class WirelessEnergyContainer(var uuid: UUID,
 
     fun addEnergy(energy: Long, machine: MetaMachine?): Long {
         var change = energy
-        if (ConfigHolder.INSTANCE.isWirelessRateEnable) change = min(rate.toDouble(), energy.toDouble()).toLong()
+        ConfigHolder.INSTANCE?.let { if (it.isWirelessRateEnable) change = min(rate.toDouble(), energy.toDouble()).toLong() }
         if (change <= 0) return 0
         storage = storage!!.add(BigInteger.valueOf(change))
-        WirelessEnergySavaedData.INSTANCE.isDirty = true
+        WirelessEnergySavedData.INSTANCE?.isDirty = true
         if (machine != null) {
             energyStat.update(BigInteger.valueOf(change), server!!.tickCount)
         }
@@ -55,12 +55,14 @@ class WirelessEnergyContainer(var uuid: UUID,
     }
 
     fun removeEnergy(energy: Long, machine: MetaMachine?): Long {
-        var change = min(BigIntegerUtils.getLongValue(storage).toDouble(), energy.toDouble()).toLong()
-        if (ConfigHolder.INSTANCE.isWirelessRateEnable) change =
-            min(BigIntegerUtils.getLongValue(storage).toDouble(), min(rate.toDouble(), energy.toDouble())).toLong()
+        var change = min(BigIntegerUtils.getLongValue(storage!!).toDouble(), energy.toDouble()).toLong()
+        ConfigHolder.INSTANCE?.let {
+            if (it.isWirelessRateEnable) change =
+                min(BigIntegerUtils.getLongValue(storage!!).toDouble(), min(rate.toDouble(), energy.toDouble())).toLong()
+        }
         if (change <= 0) return 0
         storage = storage?.subtract(BigInteger.valueOf(change))
-        WirelessEnergySavaedData.INSTANCE.isDirty = true
+        WirelessEnergySavedData.INSTANCE?.isDirty = true
         if (machine != null) {
             energyStat.update(BigInteger.valueOf(change).negate(), server!!.tickCount)
         }

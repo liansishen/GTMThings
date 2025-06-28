@@ -45,7 +45,7 @@ class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(
 
     private var wirelessEnergyContainerCache: WirelessEnergyContainer? = null
 
-    private var energyContainer: NotifiableEnergyContainer? = null
+    private var energyContainer: NotifiableEnergyContainer
 
     init {
         this.energyContainer = createEnergyContainer()
@@ -86,11 +86,11 @@ class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(
     }
 
     private fun updateEnergy() {
-        val currentStored = energyContainer!!.energyStored
+        val currentStored = energyContainer.energyStored
         if (currentStored <= 0) return
         val container = getWirelessEnergyContainer() ?: return
         val changeEnergy = container.addEnergy(currentStored, this)
-        if (changeEnergy > 0) energyContainer!!.energyStored = currentStored - changeEnergy
+        if (changeEnergy > 0) energyContainer.energyStored = currentStored - changeEnergy
     }
 
     override fun shouldOpenUI(player: Player?, hand: InteractionHand?, hit: BlockHitResult?): Boolean {
@@ -114,7 +114,7 @@ class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(
             player.sendSystemMessage(
                 Component.translatable(
                     "gtmthings.machine.wireless_energy_hatch.tooltip.bind",
-                    TeamUtil.GetName(player)
+                    TeamUtil.getName(player)
                 )
             )
             updateEnergySubscription()

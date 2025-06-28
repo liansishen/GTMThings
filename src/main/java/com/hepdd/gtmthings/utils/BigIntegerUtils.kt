@@ -1,15 +1,19 @@
-package com.hepdd.gtmthings.utils;
+package com.hepdd.gtmthings.utils
 
-import java.math.BigInteger;
+import java.math.BigInteger
 
-public class BigIntegerUtils {
+class BigIntegerUtils {
 
-    public static final BigInteger BIG_INTEGER_MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+    companion object {
 
-    public static long getLongValue(BigInteger bigInt) {
-        if (bigInt.compareTo(BIG_INTEGER_MAX_LONG) > 0) {
-            return Long.MAX_VALUE;
+        val BIG_INTEGER_MAX_LONG: BigInteger = BigInteger.valueOf(Long.Companion.MAX_VALUE)
+
+        @JvmStatic
+        fun getLongValue(bigInt: BigInteger): Long {
+            if (bigInt > BIG_INTEGER_MAX_LONG) {
+                return Long.Companion.MAX_VALUE
+            }
+            return bigInt.toLong()
         }
-        return bigInt.longValue();
     }
 }

@@ -1,67 +1,58 @@
-package com.hepdd.gtmthings.common.item;
+package com.hepdd.gtmthings.common.item
 
-import net.minecraft.world.item.ItemStack;
+import appeng.api.stacks.AEItemKey
+import appeng.api.stacks.GenericStack
+import appeng.items.storage.CreativeCellItem
+import appeng.util.ConfigInventory
+import com.hepdd.gtmthings.data.CustomItems
+import net.minecraft.world.item.ItemStack
 
-import appeng.api.stacks.AEItemKey;
-import appeng.api.stacks.GenericStack;
-import appeng.items.storage.CreativeCellItem;
-import appeng.util.ConfigInventory;
-import com.hepdd.gtmthings.data.CustomItems;
-import org.jetbrains.annotations.Nullable;
+class VirtualItemProviderCellItem(props: Properties) : CreativeCellItem(props) {
 
-public final class VirtualItemProviderCellItem extends CreativeCellItem {
-
-    public VirtualItemProviderCellItem(Properties props) {
-        super(props);
+    override fun getConfigInventory(`is`: ItemStack): ConfigInventory? {
+        return Holder(`is`).apply {
+            inv = VirtualConfigInventory(63, this::save)
+            load()
+        }.inv
     }
 
-    @Override
-    public ConfigInventory getConfigInventory(ItemStack is) {
-        Holder holder = new Holder(is);
-        holder.inv = new VirtualConfigInventory(63, holder::save);
-        holder.load();
-        return holder.inv;
-    }
+    private class Holder(private val stack: ItemStack) {
+        var inv: ConfigInventory? = null
 
-    private static class Holder {
-
-        private final ItemStack stack;
-        private ConfigInventory inv;
-
-        Holder(ItemStack stack) {
-            this.stack = stack;
-        }
-
-        void load() {
+        fun load() {
             if (stack.hasTag()) {
-                inv.readFromChildTag(stack.getOrCreateTag(), "list");
+                inv!!.readFromChildTag(stack.getOrCreateTag(), "list")
             }
         }
 
-        void save() {
-            inv.writeToChildTag(stack.getOrCreateTag(), "list");
+        fun save() {
+            inv!!.writeToChildTag(stack.getOrCreateTag(), "list")
         }
     }
 
-    private static class VirtualConfigInventory extends ConfigInventory {
+    private class VirtualConfigInventory(
+        size: Int,
+        listener: Runnable?
+    ) : ConfigInventory(null, Mode.CONFIG_TYPES, size, listener, false) {
 
-        private VirtualConfigInventory(int size, @Nullable Runnable listener) {
-            super(null, Mode.CONFIG_TYPES, size, listener, false);
-        }
+        override fun setStack(slot: Int, stack: GenericStack?) {
+            when {
+                stack == null -> super.setStack(slot, null)
+                stack.what() is AEItemKey && (stack.what() as AEItemKey).run {
+                    item == CustomItems.VIRTUAL_ITEM_PROVIDER.asItem() && hasTag()
+                } -> {
+                    val itemKey = stack.what() as AEItemKey
+                    val typesOnly = mode == Mode.CONFIG_TYPES
+                    itemKey.tag?.putBoolean("marked", true)
 
-        public void setStack(int slot, @Nullable GenericStack stack) {
-            if (stack == null) {
-                super.setStack(slot, null);
-            } else if (stack.what() instanceof AEItemKey itemKey && itemKey.getItem() == CustomItems.VIRTUAL_ITEM_PROVIDER.asItem() && itemKey.hasTag()) {
-                boolean typesOnly = this.mode == Mode.CONFIG_TYPES;
-                itemKey.getTag().putBoolean("marked", true);
-                if (typesOnly && stack.amount() != 0L) {
-                    stack = new GenericStack(itemKey, 0L);
-                } else if (!typesOnly && stack.amount() <= 0L) {
-                    stack = null;
+                    val adjustedStack = when {
+                        typesOnly && stack.amount() != 0L -> GenericStack(itemKey, 0L)
+                        !typesOnly && stack.amount() <= 0L -> null
+                        else -> stack
+                    }
+
+                    super.setStack(slot, adjustedStack)
                 }
-
-                super.setStack(slot, stack);
             }
         }
     }

@@ -254,8 +254,8 @@ class AdvancedTerminalBehavior:IItemUIFactory {
         var replaceCoilMode = 0
         var isUseAE = 0
 
-        fun apply(blockInfos: Array<BlockInfo?>?): MutableList<ItemStack?> {
-            val candidates: MutableList<ItemStack?> = ArrayList<ItemStack?>()
+        fun apply(blockInfos: Array<BlockInfo?>?): MutableList<ItemStack> {
+            val candidates: MutableList<ItemStack> = ArrayList<ItemStack>()
             if (blockInfos != null) {
                 if (Arrays.stream(blockInfos)
                         .anyMatch { info: BlockInfo? -> info?.blockState?.block is CoilBlock }
@@ -263,15 +263,15 @@ class AdvancedTerminalBehavior:IItemUIFactory {
                     val tier = min(coilTier - 1, blockInfos.size - 1)
                     if (tier == -1) {
                         for (i in 0..<blockInfos.size - 1) {
-                            candidates.add(blockInfos[i]?.itemStackForm)
+                            blockInfos[i]?.let { candidates.add(it.itemStackForm) }
                         }
                     } else {
-                        candidates.add(blockInfos[tier]?.itemStackForm)
+                        blockInfos[tier]?.let { candidates.add(it.itemStackForm) }
                     }
                     return candidates
                 }
                 for (info in blockInfos) {
-                    if (info?.blockState?.block !== Blocks.AIR) candidates.add(info?.itemStackForm)
+                    if (info?.blockState?.block !== Blocks.AIR) info?.let { candidates.add(it.itemStackForm) }
                 }
             }
             return candidates

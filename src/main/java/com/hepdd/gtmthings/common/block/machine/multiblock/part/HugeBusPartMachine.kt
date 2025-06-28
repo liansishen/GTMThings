@@ -155,7 +155,7 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
     }
 
     override fun onMachineRemoved() {
-        clearInventory(shareInventory)
+        clearInventory(shareInventory!!)
     }
 
     protected open fun updateInventorySubscription() {

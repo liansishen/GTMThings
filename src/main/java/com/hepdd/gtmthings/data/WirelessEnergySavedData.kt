@@ -1,90 +1,90 @@
-package com.hepdd.gtmthings.data;
+package com.hepdd.gtmthings.data
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.saveddata.SavedData;
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
+import net.minecraft.core.BlockPos
+import net.minecraft.core.GlobalPos
+import net.minecraft.core.registries.Registries
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.Tag
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.level.saveddata.SavedData
+import java.math.BigInteger
+import java.util.*
 
-import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
-import org.jetbrains.annotations.NotNull;
+class WirelessEnergySavedData : SavedData {
+    val containerMap: MutableMap<UUID?, WirelessEnergyContainer> = HashMap<UUID?, WirelessEnergyContainer>()
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+    constructor()
 
-public class WirelessEnergySavaedData extends SavedData {
-
-    public static WirelessEnergySavaedData INSTANCE;
-
-    public static WirelessEnergySavaedData getOrCreate(ServerLevel serverLevel) {
-        return serverLevel.getDataStorage().computeIfAbsent(WirelessEnergySavaedData::new, WirelessEnergySavaedData::new, "gtceu_wireless_energy");
-    }
-
-    public final Map<UUID, WirelessEnergyContainer> containerMap = new HashMap<>();
-
-    public WirelessEnergySavaedData() {}
-
-    public WirelessEnergySavaedData(CompoundTag tag) {
-        ListTag allEnergy = tag.getList("allEnergy", Tag.TAG_COMPOUND);
-        for (int i = 0; i < allEnergy.size(); i++) {
-            WirelessEnergyContainer container = readTag(allEnergy.getCompound(i));
-            containerMap.put(container.getUuid(), container);
+    constructor(tag: CompoundTag) {
+        val allEnergy = tag.getList("allEnergy", Tag.TAG_COMPOUND.toInt())
+        for (i in allEnergy.indices) {
+            val container = readTag(allEnergy.getCompound(i))
+            containerMap.put(container.uuid, container)
         }
     }
 
-    @Override
-    public @NotNull CompoundTag save(@NotNull CompoundTag compoundTag) {
-        ListTag allEnergy = new ListTag();
-        for (WirelessEnergyContainer container : containerMap.values()) {
-            CompoundTag engTag = toTag(container);
-            if (engTag.isEmpty()) continue;
-            allEnergy.add(engTag);
+    override fun save(compoundTag: CompoundTag): CompoundTag {
+        val allEnergy = ListTag()
+        for (container in containerMap.values) {
+            val engTag = toTag(container)
+            if (engTag.isEmpty) continue
+            allEnergy.add(engTag)
         }
-        compoundTag.put("allEnergy", allEnergy);
-        return compoundTag;
+        compoundTag.put("allEnergy", allEnergy)
+        return compoundTag
     }
 
-    protected WirelessEnergyContainer readTag(CompoundTag engTag) {
-        UUID uuid = engTag.getUUID("uuid");
-        String en = engTag.getString("energy");
-        BigInteger energy = new BigInteger(en.isEmpty() ? "0" : en);
-        long rate = engTag.getLong("rate");
-        GlobalPos bindPos = readGlobalPos(engTag.getString("dimension"), engTag.getLong("pos"));
-        return new WirelessEnergyContainer(uuid, energy, rate, bindPos);
+    private fun readTag(engTag: CompoundTag): WirelessEnergyContainer {
+        val uuid = engTag.getUUID("uuid")
+        val en = engTag.getString("energy")
+        val energy = BigInteger(en.ifEmpty { "0" })
+        val rate = engTag.getLong("rate")
+        val bindPos: GlobalPos? = readGlobalPos(engTag.getString("dimension"), engTag.getLong("pos"))
+        return WirelessEnergyContainer(uuid, energy, rate, bindPos)
     }
 
-    protected CompoundTag toTag(WirelessEnergyContainer container) {
-        CompoundTag engTag = new CompoundTag();
-        BigInteger storage = container.getStorage();
-        if (!Objects.equals(storage, BigInteger.ZERO)) {
-            engTag.putString("energy", storage.toString());
+    private fun toTag(container: WirelessEnergyContainer): CompoundTag {
+        val engTag = CompoundTag()
+        val storage = container.storage
+        if (storage != BigInteger.ZERO) {
+            engTag.putString("energy", storage.toString())
         }
-        long rate = container.getRate();
-        if (rate != 0) {
-            engTag.putLong("rate", rate);
+        val rate = container.rate
+        if (rate != 0L) {
+            engTag.putLong("rate", rate)
         }
-        GlobalPos bindPos = container.getBindPos();
+        val bindPos = container.bindPos
         if (bindPos != null) {
-            engTag.putString("dimension", bindPos.dimension().location().toString());
-            engTag.putLong("pos", bindPos.pos().asLong());
+            engTag.putString("dimension", bindPos.dimension().location().toString())
+            engTag.putLong("pos", bindPos.pos().asLong())
         }
-        if (!engTag.isEmpty()) engTag.putUUID("uuid", container.getUuid());
-        return engTag;
+        if (!engTag.isEmpty) engTag.putUUID("uuid", container.uuid)
+        return engTag
     }
 
-    private static GlobalPos readGlobalPos(String dimension, long pos) {
-        if (dimension.isEmpty()) return null;
-        if (pos == 0) return null;
-        ResourceLocation key = ResourceLocation.tryParse(dimension);
-        if (key == null) return null;
-        return GlobalPos.of(ResourceKey.create(Registries.DIMENSION, key), BlockPos.of(pos));
+    companion object {
+        @JvmField
+        var INSTANCE: WirelessEnergySavedData? = null
+
+        fun getOrCreate(serverLevel: ServerLevel): WirelessEnergySavedData {
+            return serverLevel.dataStorage
+                .computeIfAbsent({ tag: CompoundTag? ->
+                    WirelessEnergySavedData(
+                        tag!!
+                    )
+                }, { WirelessEnergySavedData() }, "gtceu_wireless_energy")
+        }
+
+        private fun readGlobalPos(dimension: String, pos: Long): GlobalPos? {
+            if (dimension.isEmpty()) return null
+            if (pos == 0L) return null
+            val key = ResourceLocation.tryParse(dimension)
+            if (key == null) return null
+            return GlobalPos.of(ResourceKey.create(Registries.DIMENSION, key), BlockPos.of(pos))
+        }
     }
 }

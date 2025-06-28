@@ -150,7 +150,7 @@ open class WirelessEnergyHatchPartMachine(holder: IMachineBlockEntity, tier: Int
             player.sendSystemMessage(
                 Component.translatable(
                     "gtmthings.machine.wireless_energy_hatch.tooltip.bind",
-                    TeamUtil.GetName(player)
+                    TeamUtil.getName(player)
                 )
             )
             updateEnergySubscription()

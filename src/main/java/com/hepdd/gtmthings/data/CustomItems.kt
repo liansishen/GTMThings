@@ -1,152 +1,243 @@
-package com.hepdd.gtmthings.data;
+package com.hepdd.gtmthings.data
 
-import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.item.ComponentItem;
-import com.gregtechceu.gtceu.api.item.component.ICustomRenderer;
-import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
-import com.gregtechceu.gtceu.common.item.TooltipBehavior;
+import com.gregtechceu.gtceu.GTCEu
+import com.gregtechceu.gtceu.api.GTCEuAPI
+import com.gregtechceu.gtceu.api.GTValues
+import com.gregtechceu.gtceu.api.item.ComponentItem
+import com.gregtechceu.gtceu.api.item.component.ICustomRenderer
+import com.gregtechceu.gtceu.common.data.GTItems
+import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior
+import com.gregtechceu.gtceu.common.item.TooltipBehavior
+import com.hepdd.gtmthings.client.VirtualItemProviderRenderer
+import com.hepdd.gtmthings.common.item.*
+import com.hepdd.gtmthings.common.item.behaviour.WirelessTransferCoverPlaceBehavior
+import com.hepdd.gtmthings.common.item.behaviour.WirelessTransferCoverTooltipBehavior
+import com.hepdd.gtmthings.common.registry.GTMTRegistration
+import com.tterrag.registrate.util.entry.ItemEntry
+import com.tterrag.registrate.util.nullness.NonNullConsumer
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.Item
 
-import net.minecraft.network.chat.Component;
+class CustomItems {
 
-import com.hepdd.gtmthings.client.VirtualItemProviderRenderer;
-import com.hepdd.gtmthings.common.item.*;
-import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverPlaceBehavior;
-import com.hepdd.gtmthings.common.item.Behaviour.WirelessTransferCoverTooltipBehavior;
-import com.tterrag.registrate.util.entry.ItemEntry;
-import com.tterrag.registrate.util.nullness.NonNullConsumer;
+    companion object {
 
-import java.util.Locale;
+        fun <T : ComponentItem> attachRenderer(customRenderer: ICustomRenderer): NonNullConsumer<T?> {
+            return if (!GTCEu.isClientSide()) NonNullConsumer.noop<T?>() else NonNullConsumer { item: T? ->
+                item!!.attachComponents(
+                    customRenderer
+                )
+            }
+        }
 
-import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.common.data.GTItems.attach;
-import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
+        @JvmStatic
+        val VIRTUAL_ITEM_PROVIDER: ItemEntry<ComponentItem> =
+            GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.item<ComponentItem>(
+                "virtual_item_provider"
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
+                .properties { p: Item.Properties -> p.stacksTo(1) }
+                .onRegister(GTItems.attach<ComponentItem>(VirtualItemProviderBehavior.INSTANCE))
+                .onRegister(attachRenderer<ComponentItem>(VirtualItemProviderRenderer::INSTANCE))
+                .register()
 
-public class CustomItems {
+        @JvmStatic
+        val VIRTUAL_ITEM_PROVIDER_CELL: ItemEntry<VirtualItemProviderCellItem> =
+            GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.item<VirtualItemProviderCellItem>(
+                "virtual_item_provider_cell"
+            ) { props: Item.Properties -> VirtualItemProviderCellItem(props) }.register()
 
-    public static <T extends ComponentItem> NonNullConsumer<T> attachRenderer(ICustomRenderer customRenderer) {
-        return !GTCEu.isClientSide() ? NonNullConsumer.noop() : (item) -> item.attachComponents(customRenderer);
+        @JvmStatic
+        val PROGRAMMABLE_COVER: ItemEntry<ComponentItem> =
+            GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.item<ComponentItem>(
+                "programmable_cover"
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
+                .onRegister(GTItems.attach<ComponentItem>(CoverPlaceBehavior(GTMTCovers.PROGRAMMABLE_COVER)))
+                .register()
+
+        @JvmStatic
+        var WIRELESS_ITEM_TRANSFER_COVER: ItemEntry<ComponentItem> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+            .item<ComponentItem>(
+                "wireless_item_transfer_cover"
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
+            .onRegister(
+                GTItems.attach<ComponentItem>(
+                    WirelessTransferCoverPlaceBehavior(GTMTCovers.WIRELESS_ITEM_TRANSFER),
+                    CoverPlaceBehavior(GTMTCovers.WIRELESS_ITEM_TRANSFER),
+                    WirelessTransferCoverTooltipBehavior { lines: MutableList<Component?>? ->
+                        lines!!.add(Component.translatable("item.gtmthings.wireless_transfer.item.tooltip.1"))
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"))
+                    }
+                )
+            )
+            .register()
+
+        @JvmStatic
+        var WIRELESS_FLUID_TRANSFER_COVER: ItemEntry<ComponentItem> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+            .item<ComponentItem>(
+                "wireless_fluid_transfer_cover"
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
+            .onRegister(
+                GTItems.attach<ComponentItem>(
+                    WirelessTransferCoverPlaceBehavior(GTMTCovers.WIRELESS_FLUID_TRANSFER),
+                    CoverPlaceBehavior(GTMTCovers.WIRELESS_FLUID_TRANSFER),
+                    WirelessTransferCoverTooltipBehavior { lines: MutableList<Component?>? ->
+                        lines!!.add(Component.translatable("item.gtmthings.wireless_transfer.fluid.tooltip.1"))
+                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"))
+                    }
+                )
+            )
+            .register()
+
+        @JvmStatic
+        var ADVANCED_WIRELESS_ITEM_TRANSFER_COVER: ItemEntry<ComponentItem> =
+            GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+                .item<ComponentItem>(
+                    "advanced_wireless_item_transfer_cover"
+                ) { properties: Item.Properties -> ComponentItem.create(properties) }
+                .onRegister(
+                    GTItems.attach<ComponentItem>(
+                        WirelessTransferCoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
+                        CoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
+                        WirelessTransferCoverTooltipBehavior { lines: MutableList<Component?>? ->
+                            lines!!.add(Component.translatable("item.gtmthings.wireless_transfer.item.tooltip.1"))
+                            lines.add(Component.translatable("item.gtmthings.advanced_wireless_transfer.tooltip.1"))
+                            lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"))
+                        }
+                    )
+                )
+                .register()
+
+        @JvmStatic
+        var ADVANCED_WIRELESS_FLUID_TRANSFER_COVER: ItemEntry<ComponentItem> =
+            GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+                .item<ComponentItem>(
+                    "advanced_wireless_fluid_transfer_cover"
+                ) { properties: Item.Properties -> ComponentItem.create(properties) }
+                .onRegister(
+                    GTItems.attach<ComponentItem>(
+                        WirelessTransferCoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
+                        CoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
+                        WirelessTransferCoverTooltipBehavior { lines: MutableList<Component?>? ->
+                            lines!!.add(Component.translatable("item.gtmthings.wireless_transfer.fluid.tooltip.1"))
+                            lines.add(Component.translatable("item.gtmthings.advanced_wireless_transfer.tooltip.1"))
+                            lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"))
+                        }
+                    )
+                )
+                .register()
+
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_LV: ItemEntry<ComponentItem> = registerTieredCover(GTValues.LV, 1)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_MV: ItemEntry<ComponentItem> = registerTieredCover(GTValues.MV, 1)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_HV: ItemEntry<ComponentItem> = registerTieredCover(GTValues.HV, 1)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_EV: ItemEntry<ComponentItem> = registerTieredCover(GTValues.EV, 1)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_IV: ItemEntry<ComponentItem> = registerTieredCover(GTValues.IV, 1)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_LUV: ItemEntry<ComponentItem> = registerTieredCover(GTValues.LuV, 1)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_ZPM: ItemEntry<ComponentItem> = registerTieredCover(GTValues.ZPM, 1)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UV: ItemEntry<ComponentItem> = registerTieredCover(GTValues.UV, 1)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UHV: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.UHV, 1) else null
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UEV: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.UEV, 1) else null
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UIV: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.UIV, 1) else null
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UXV: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.UXV, 1) else null
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_OPV: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.OpV, 1) else null
+
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_LV_4A: ItemEntry<ComponentItem> = registerTieredCover(GTValues.LV, 4)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_MV_4A: ItemEntry<ComponentItem> = registerTieredCover(GTValues.MV, 4)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_HV_4A: ItemEntry<ComponentItem> = registerTieredCover(GTValues.HV, 4)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_EV_4A: ItemEntry<ComponentItem> = registerTieredCover(GTValues.EV, 4)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_IV_4A: ItemEntry<ComponentItem> = registerTieredCover(GTValues.IV, 4)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_LUV_4A: ItemEntry<ComponentItem> = registerTieredCover(GTValues.LuV, 4)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_ZPM_4A: ItemEntry<ComponentItem> = registerTieredCover(GTValues.ZPM, 4)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UV_4A: ItemEntry<ComponentItem> = registerTieredCover(GTValues.UV, 4)
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UHV_4A: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.UHV, 4) else null
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UEV_4A: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.UEV, 4) else null
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UIV_4A: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.UIV, 4) else null
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_UXV_4A: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.UXV, 4) else null
+        @JvmStatic
+        var WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A: ItemEntry<ComponentItem>? =
+            if (GTCEuAPI.isHighTier()) registerTieredCover(GTValues.OpV, 4) else null
+
+        private fun registerTieredCover(tier: Int, amperage: Int): ItemEntry<ComponentItem> {
+            return GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+                .item(
+                    GTValues.VN[tier].lowercase() + "_" + (if (amperage == 1) "" else amperage.toString() + "a_") + "wireless_energy_receive_cover"
+                ) { properties: Item.Properties -> ComponentItem.create(properties) }
+                .lang(GTValues.VNF[tier] + " " + "Wireless Energy Receive Cover")
+                .onRegister(
+                    GTItems.attach(
+                        TooltipBehavior { lines: MutableList<Component?>? ->
+                            lines!!.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.1"))
+                            lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.2"))
+                            lines.add(
+                                Component.translatable(
+                                    "item.gtmthings.wireless_energy_receive_cover.tooltip.3",
+                                    GTValues.VEX[tier] * amperage
+                                )
+                            )
+                        },
+                        CoverPlaceBehavior(if (amperage == 1) GTMTCovers.WIRELESS_ENERGY_RECEIVE[tier - 1] else GTMTCovers.WIRELESS_ENERGY_RECEIVE_4A[tier - 1])
+                    )
+                ).register()
+        }
+
+        @JvmStatic
+        var ADVANCED_TERMINAL: ItemEntry<ComponentItem> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+            .item<ComponentItem>(
+                "advanced_terminal"
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
+            .properties { p: Item.Properties -> p.stacksTo(1) }
+            .onRegister(GTItems.attach<ComponentItem>(AdvancedTerminalBehavior())).register()
+
+        @JvmStatic
+        var WIRELESS_ENERGY_TERMINAL: ItemEntry<ComponentItem> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+            .item<ComponentItem>(
+                "wireless_energy_terminal"
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
+            .properties { p: Item.Properties -> p.stacksTo(1) }
+            .onRegister(GTItems.attach<ComponentItem>(WirelessEnergyTerminalBehavior()))
+            .onRegister(GTItems.attach<ComponentItem>(WirelessEnergyBindingToolBehavior())).register()
+
+        @JvmStatic
+        var WIRELESS_ENERGY_BINDING_TOOL: ItemEntry<ComponentItem> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
+            .item<ComponentItem>(
+                "wireless_energy_binding_tool"
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
+            .properties { p: Item.Properties -> p.stacksTo(1) }
+            .onRegister(GTItems.attach<ComponentItem>(WirelessEnergyBindingToolBehavior())).register()
+
+        fun init() {}
     }
-
-    public static final ItemEntry<ComponentItem> VIRTUAL_ITEM_PROVIDER = GTMTHINGS_REGISTRATE.item("virtual_item_provider", ComponentItem::create)
-            .properties(p -> p.stacksTo(1))
-            .onRegister(attach(VirtualItemProviderBehavior.INSTANCE))
-            .onRegister(attachRenderer(VirtualItemProviderRenderer::getINSTANCE))
-            .register();
-
-    public static final ItemEntry<VirtualItemProviderCellItem> VIRTUAL_ITEM_PROVIDER_CELL = GTMTHINGS_REGISTRATE.item("virtual_item_provider_cell", VirtualItemProviderCellItem::new).register();
-
-    public static final ItemEntry<ComponentItem> PROGRAMMABLE_COVER = GTMTHINGS_REGISTRATE.item("programmable_cover", ComponentItem::create)
-            .onRegister(attach(new CoverPlaceBehavior(GTMTCovers.PROGRAMMABLE_COVER)))
-            .register();
-
-    public static ItemEntry<ComponentItem> WIRELESS_ITEM_TRANSFER_COVER = GTMTHINGS_REGISTRATE
-            .item("wireless_item_transfer_cover", ComponentItem::create)
-            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(GTMTCovers.WIRELESS_ITEM_TRANSFER),
-                    new CoverPlaceBehavior(GTMTCovers.WIRELESS_ITEM_TRANSFER),
-                    new WirelessTransferCoverTooltipBehavior(lines -> {
-                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.item.tooltip.1"));
-                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
-                    })))
-            .register();
-
-    public static ItemEntry<ComponentItem> WIRELESS_FLUID_TRANSFER_COVER = GTMTHINGS_REGISTRATE
-            .item("wireless_fluid_transfer_cover", ComponentItem::create)
-            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(GTMTCovers.WIRELESS_FLUID_TRANSFER),
-                    new CoverPlaceBehavior(GTMTCovers.WIRELESS_FLUID_TRANSFER),
-                    new WirelessTransferCoverTooltipBehavior(lines -> {
-                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.fluid.tooltip.1"));
-                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
-                    })))
-            .register();
-
-    public static ItemEntry<ComponentItem> ADVANCED_WIRELESS_ITEM_TRANSFER_COVER = GTMTHINGS_REGISTRATE
-            .item("advanced_wireless_item_transfer_cover", ComponentItem::create)
-            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
-                    new CoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_ITEM_TRANSFER),
-                    new WirelessTransferCoverTooltipBehavior(lines -> {
-                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.item.tooltip.1"));
-                        lines.add(Component.translatable("item.gtmthings.advanced_wireless_transfer.tooltip.1"));
-                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
-                    })))
-            .register();
-
-    public static ItemEntry<ComponentItem> ADVANCED_WIRELESS_FLUID_TRANSFER_COVER = GTMTHINGS_REGISTRATE
-            .item("advanced_wireless_fluid_transfer_cover", ComponentItem::create)
-            .onRegister(attach(new WirelessTransferCoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
-                    new CoverPlaceBehavior(GTMTCovers.ADVANCED_WIRELESS_FLUID_TRANSFER),
-                    new WirelessTransferCoverTooltipBehavior(lines -> {
-                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.fluid.tooltip.1"));
-                        lines.add(Component.translatable("item.gtmthings.advanced_wireless_transfer.tooltip.1"));
-                        lines.add(Component.translatable("item.gtmthings.wireless_transfer.tooltip.2"));
-                    })))
-            .register();
-
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LV = registerTieredCover(LV, 1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_MV = registerTieredCover(MV, 1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_HV = registerTieredCover(HV, 1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_EV = registerTieredCover(EV, 1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_IV = registerTieredCover(IV, 1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LUV = registerTieredCover(LuV, 1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_ZPM = registerTieredCover(ZPM, 1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UV = registerTieredCover(UV, 1);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UHV = GTCEuAPI.isHighTier() ?
-            registerTieredCover(UHV, 1) : null;
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UEV = GTCEuAPI.isHighTier() ?
-            registerTieredCover(UEV, 1) : null;
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UIV = GTCEuAPI.isHighTier() ?
-            registerTieredCover(UIV, 1) : null;
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UXV = GTCEuAPI.isHighTier() ?
-            registerTieredCover(UXV, 1) : null;
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV = GTCEuAPI.isHighTier() ?
-            registerTieredCover(OpV, 1) : null;
-
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LV_4A = registerTieredCover(LV, 4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_MV_4A = registerTieredCover(MV, 4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_HV_4A = registerTieredCover(HV, 4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_EV_4A = registerTieredCover(EV, 4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_IV_4A = registerTieredCover(IV, 4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_LUV_4A = registerTieredCover(LuV, 4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_ZPM_4A = registerTieredCover(ZPM, 4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UV_4A = registerTieredCover(UV, 4);
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UHV_4A = GTCEuAPI.isHighTier() ?
-            registerTieredCover(UHV, 4) : null;
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UEV_4A = GTCEuAPI.isHighTier() ?
-            registerTieredCover(UEV, 4) : null;
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UIV_4A = GTCEuAPI.isHighTier() ?
-            registerTieredCover(UIV, 4) : null;
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_UXV_4A = GTCEuAPI.isHighTier() ?
-            registerTieredCover(UXV, 4) : null;
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A = GTCEuAPI.isHighTier() ?
-            registerTieredCover(OpV, 4) : null;
-
-    private static ItemEntry<ComponentItem> registerTieredCover(int tier, int amperage) {
-        return GTMTHINGS_REGISTRATE
-                .item(GTValues.VN[tier].toLowerCase(Locale.ROOT) + "_" + (amperage == 1 ? "" : amperage + "a_") + "wireless_energy_receive_cover", ComponentItem::create)
-                .lang(VNF[tier] + " " + "Wireless Energy Receive Cover")
-                .onRegister(attach(new TooltipBehavior(lines -> {
-                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.1"));
-                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.2"));
-                    lines.add(Component.translatable("item.gtmthings.wireless_energy_receive_cover.tooltip.3", GTValues.VEX[tier] * amperage));
-                }), new CoverPlaceBehavior(amperage == 1 ? GTMTCovers.WIRELESS_ENERGY_RECEIVE[tier - 1] : GTMTCovers.WIRELESS_ENERGY_RECEIVE_4A[tier - 1]))).register();
-    }
-
-    public static ItemEntry<ComponentItem> ADVANCED_TERMINAL = GTMTHINGS_REGISTRATE
-            .item("advanced_terminal", ComponentItem::create)
-            .properties(p -> p.stacksTo(1))
-            .onRegister(attach(new AdvancedTerminalBehavior())).register();
-
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_TERMINAL = GTMTHINGS_REGISTRATE
-            .item("wireless_energy_terminal", ComponentItem::create)
-            .properties(p -> p.stacksTo(1))
-            .onRegister(attach(new WirelessEnergyTerminalBehavior()))
-            .onRegister(attach(new WirelessEnergyBindingToolBehavior())).register();
-
-    public static ItemEntry<ComponentItem> WIRELESS_ENERGY_BINDING_TOOL = GTMTHINGS_REGISTRATE
-            .item("wireless_energy_binding_tool", ComponentItem::create)
-            .properties(p -> p.stacksTo(1))
-            .onRegister(attach(new WirelessEnergyBindingToolBehavior())).register();
-
-    public static void init() {}
 }

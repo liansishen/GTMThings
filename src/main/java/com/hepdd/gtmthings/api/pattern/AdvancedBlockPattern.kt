@@ -87,34 +87,33 @@ open class AdvancedBlockPattern(
         }
     }
 
-    val aisleRepetitions: Array<IntArray?>
-    val structureDir: Array<RelativeDirection?>
-    private val blockMatches: Array<Array<Array<TraceabilityPredicate>?>?> // [z][y][x]
-    private var fingerLength: Int = 0 // z size
-    private var thumbLength: Int = 0 // y size
-    private var palmLength: Int = 0 // x size
-    private var centerOffset: IntArray // x, y, z, minZ, maxZ
+    val advaisleRepetitions: Array<IntArray?>
+    val advstructureDir: Array<RelativeDirection?>
+    private val advblockMatches: Array<Array<Array<TraceabilityPredicate>?>?> = predicatesIn // [z][y][x]
+    private var advfingerLength: Int = 0 // z size
+    private var advthumbLength: Int = 0 // y size
+    private var advpalmLength: Int = 0 // x size
+    private var advcenterOffset: IntArray // x, y, z, minZ, maxZ
 
     init {
-        this.blockMatches = predicatesIn
-        this.fingerLength = predicatesIn.size
-        this.structureDir = structureDir
-        this.aisleRepetitions = aisleRepetitions
+        this.advfingerLength = predicatesIn.size
+        this.advstructureDir = structureDir
+        this.advaisleRepetitions = aisleRepetitions
 
-        if (this.fingerLength > 0) {
-            this.thumbLength = predicatesIn[0]!!.size
+        if (this.advfingerLength > 0) {
+            this.advthumbLength = predicatesIn[0]!!.size
 
-            if (this.thumbLength > 0) {
-                this.palmLength = predicatesIn[0]!![0]!!.size
+            if (this.advthumbLength > 0) {
+                this.advpalmLength = predicatesIn[0]!![0]!!.size
             } else {
-                this.palmLength = 0
+                this.advpalmLength = 0
             }
         } else {
-            this.thumbLength = 0
-            this.palmLength = 0
+            this.advthumbLength = 0
+            this.advpalmLength = 0
         }
 
-        this.centerOffset = centerOffset
+        this.advcenterOffset = centerOffset
     }
 
     fun autoBuild(
@@ -122,7 +121,7 @@ open class AdvancedBlockPattern(
         autoBuildSetting: AutoBuildSetting
     ) {
         val world = player.level()
-        var minZ = -centerOffset[4]
+        var minZ = -advcenterOffset[4]
         clearWorldState(worldState)
         val controller = worldState.getController()
         val centerPos = controller.self().pos
@@ -131,14 +130,14 @@ open class AdvancedBlockPattern(
         val isFlipped = controller.self().isFlipped()
         val cacheGlobal = worldState.globalCount
         val cacheLayer = worldState.layerCount
-        val blocks = HashMap<BlockPos?, Any?>()
+        val blocks = HashMap<BlockPos, Any?>()
         val placeBlockPos = HashSet<BlockPos?>()
         blocks.put(centerPos, controller)
 
-        val repeat = IntArray(this.fingerLength)
-        for (h in 0..<this.fingerLength) {
-            val minH = aisleRepetitions[h]!![0]
-            val maxH = aisleRepetitions[h]!![1]
+        val repeat = IntArray(this.advfingerLength)
+        for (h in 0..<this.advfingerLength) {
+            val minH = advaisleRepetitions[h]!![0]
+            val maxH = advaisleRepetitions[h]!![1]
             if (minH != maxH) {
                 repeat[h] = max(minH, min(maxH, autoBuildSetting.repeatCount))
             } else {
@@ -149,17 +148,17 @@ open class AdvancedBlockPattern(
         var c = 0
         var z = minZ++
         var r: Int
-        while (c < this.fingerLength) {
+        while (c < this.advfingerLength) {
             r = 0
             while (r < repeat[c]) {
                 cacheLayer.clear()
                 var b = 0
-                var y = -centerOffset[1]
-                while (b < this.thumbLength) {
+                var y = -advcenterOffset[1]
+                while (b < this.advthumbLength) {
                     var a = 0
-                    var x = -centerOffset[0]
-                    while (a < this.palmLength) {
-                        val predicate = this.blockMatches[c]!![b]!![a]
+                    var x = -advcenterOffset[0]
+                    while (a < this.advpalmLength) {
+                        val predicate = this.advblockMatches[c]!![b]!![a]
                         val pos: BlockPos = setActualRelativeOffset(x, y, z, facing, upwardsFacing, isFlipped)
                             .offset(centerPos.x, centerPos.y, centerPos.z)
                         updateWorldState(worldState, pos, predicate)
@@ -265,7 +264,7 @@ open class AdvancedBlockPattern(
                             continue
                         }
 
-                        if (candidates.isEmpty() || candidates.first() == null) {
+                        if (candidates.isEmpty()) {
                             a++
                             x++
                             continue
@@ -331,22 +330,22 @@ open class AdvancedBlockPattern(
             c++
         }
         val frontFacing = controller.self().getFrontFacing()
-        blocks.forEach { (pos: BlockPos?, block: Any?) ->  // adjust facing
+        blocks.forEach { (pos: BlockPos, block: Any?) ->  // adjust facing
             if (block !is IMultiController) {
                 if (block is BlockState && placeBlockPos.contains(pos)) {
-                    resetFacing(pos, block, frontFacing, BiPredicate { p: BlockPos?, f: Direction? ->
-                        val `object` = blocks.get(p!!.relative(f))
+                    resetFacing(pos, block, frontFacing, BiPredicate { p: BlockPos?, f: Direction ->
+                        val `object` = blocks[p!!.relative(f)]
                         `object` == null ||
                                 (`object` is BlockState && `object`.block === Blocks.AIR)
-                    }, Consumer { state: BlockState? -> world.setBlock(pos, state, 3) })
+                    }, Consumer { state: BlockState -> world.setBlock(pos, state, 3) })
                 } else if (block is MetaMachine) {
-                    resetFacing(pos, block.blockState, frontFacing, BiPredicate { p: BlockPos?, f: Direction? ->
+                    resetFacing(pos, block.blockState, frontFacing, BiPredicate { p: BlockPos?, f: Direction ->
                         val `object` = blocks.get(p!!.relative(f))
                         if (`object` == null || (`object` is BlockState && `object`.isAir)) {
                             return@BiPredicate block.isFacingValid(f)
                         }
                         return@BiPredicate false
-                    }, Consumer { state: BlockState? -> world.setBlock(pos, state, 3) })
+                    }, Consumer { state: BlockState -> world.setBlock(pos, state, 3) })
                 }
             }
         }
@@ -354,7 +353,7 @@ open class AdvancedBlockPattern(
 
     private fun foundItem(
         player: Player,
-        candidates: MutableList<ItemStack?>,
+        candidates: MutableList<ItemStack>,
         isUseAE: Int
     ): Triplet<ItemStack?, IItemHandler?, Int?> {
         var found: ItemStack? = null
@@ -372,7 +371,7 @@ open class AdvancedBlockPattern(
             }
         } else {
             for (candidate in candidates) {
-                found = candidate?.copy()
+                found = candidate.copy()
                 if (!found!!.isEmpty && found.item is BlockItem) {
                     break
                 }
@@ -383,10 +382,9 @@ open class AdvancedBlockPattern(
     }
 
     private fun foundHolderSlot(player: Player, coilItemStack: ItemStack): Pair<IItemHandler?, Int?> {
-        var handler: IItemHandler? = null
-        var foundSlot = -1
         if (!player.isCreative) {
-            handler = player.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null)
+            val handler: IItemHandler = player.getCapability(ForgeCapabilities.ITEM_HANDLER) as IItemHandler
+            var foundSlot = -1
             for (i in 0..<handler.slots) {
                 val stack = handler.getStackInSlot(i)
                 if (stack.isEmpty) {
@@ -401,9 +399,10 @@ open class AdvancedBlockPattern(
                     foundSlot = i
                 }
             }
+            return Pair<IItemHandler?, Int?>(handler, foundSlot)
+        } else {
+            return Pair<IItemHandler?, Int?>(null, -1)
         }
-
-        return Pair<IItemHandler?, Int?>(handler, foundSlot)
     }
 
     private fun clearWorldState(worldState: MultiblockState?) {
@@ -436,7 +435,7 @@ open class AdvancedBlockPattern(
         if (facing == Direction.UP || facing == Direction.DOWN) {
             val of = if (facing == Direction.DOWN) upwardsFacing else upwardsFacing.opposite
             for (i in 0..2) {
-                when (structureDir[i]!!.getActualDirection(of)) {
+                when (advstructureDir[i]!!.getActualDirection(of)) {
                     Direction.UP -> c1[1] = c0[i]
                     Direction.DOWN -> c1[1] = -c0[i]
                     Direction.WEST -> c1[0] = -c0[i]
@@ -466,7 +465,7 @@ open class AdvancedBlockPattern(
             }
         } else {
             for (i in 0..2) {
-                when (structureDir[i]!!.getActualDirection(facing)) {
+                when (advstructureDir[i]!!.getActualDirection(facing)) {
                     Direction.UP -> c1[1] = c0[i]
                     Direction.DOWN -> c1[1] = -c0[i]
                     Direction.WEST -> c1[0] = -c0[i]
@@ -516,7 +515,7 @@ open class AdvancedBlockPattern(
     }
 
     private fun getMatchStackWithHandler(
-        candidates: MutableList<ItemStack?>,
+        candidates: MutableList<ItemStack>,
         cap: LazyOptional<IItemHandler?>,
         player: Player, isUseAE: Int
     ): IntObjectPair<IItemHandler?>? {
@@ -544,17 +543,17 @@ open class AdvancedBlockPattern(
                         if (storage.extract(AEItemKey.of(candidate), 1, Actionable.MODULATE, null) > 0) {
                             val stacks = NonNullList.withSize(1, candidate)
                             val handler1: IItemHandler = ItemStackHandler(stacks)
-                            return IntObjectPair.of<IItemHandler?>(0, handler1)
+                            return IntObjectPair.of<IItemHandler>(0, handler1)
                         }
                     }
                 }
-            } else if (candidates.stream().anyMatch { candidate: ItemStack? ->
+            } else if (candidates.stream().anyMatch { candidate: ItemStack ->
                     ItemStack.isSameItemSameTags(
                         candidate,
                         stack
                     )
                 } && !stack.isEmpty && stack.item is BlockItem) {
-                return IntObjectPair.of<IItemHandler?>(i, handler)
+                return IntObjectPair.of<IItemHandler>(i, handler)
             }
         }
         return null

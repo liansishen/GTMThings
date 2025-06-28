@@ -31,34 +31,36 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
 
         textListCache.add(
             Component.translatable(
-                "gtmthings.machine.wireless_energy_monitor.tooltip.0", TeamUtil.GetName(
-                    getMonitorLevel(),
-                    getUUID()
+                "gtmthings.machine.wireless_energy_monitor.tooltip.0", TeamUtil.getName(
+                    getMonitorLevel()!!,
+                    getUUID()!!
                 )
             ).withStyle(ChatFormatting.AQUA)
         )
         textListCache.add(
             FormatUtil.formatWithConstantWidth(
                 "gtmthings.machine.wireless_energy_monitor.tooltip.1", displayTextWidth, Component.literal(
-                    FormatUtil.formatBigIntegerNumberOrSic(energyTotal)
+                    FormatUtil.formatBigIntegerNumberOrSic(energyTotal!!)
                 )
             ).withStyle(ChatFormatting.GOLD)
         )
-        if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
-            val rate = container.rate
-            textListCache.add(
-                FormatUtil.formatWithConstantWidth(
-                    "gtmthings.machine.wireless_energy_monitor.tooltip.2",
-                    displayTextWidth,
-                    Component.literal(
-                        FormatUtil.formatBigIntegerNumberOrSic(BigInteger.valueOf(rate))
-                    ),
-                    Component.literal((rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate).toInt()]).toString()),
-                    Component.literal(
-                        GTValues.VNF[GTUtil.getFloorTierByVoltage(rate).toInt()]
-                    )
-                ).withStyle(ChatFormatting.GRAY)
-            )
+        ConfigHolder.INSTANCE?.let {
+            if (it.isWirelessRateEnable) {
+                val rate = container.rate
+                textListCache.add(
+                    FormatUtil.formatWithConstantWidth(
+                        "gtmthings.machine.wireless_energy_monitor.tooltip.2",
+                        displayTextWidth,
+                        Component.literal(
+                            FormatUtil.formatBigIntegerNumberOrSic(BigInteger.valueOf(rate))
+                        ),
+                        Component.literal((rate / GTValues.VEX[GTUtil.getFloorTierByVoltage(rate).toInt()]).toString()),
+                        Component.literal(
+                            GTValues.VNF[GTUtil.getFloorTierByVoltage(rate).toInt()]
+                        )
+                    ).withStyle(ChatFormatting.GRAY)
+                )
+            }
         }
 
         val stat = container.energyStat
@@ -127,7 +129,7 @@ interface IWirelessMonitor: IWirelessEnergyContainerHolder {
             )
         }
 
-        if (ConfigHolder.INSTANCE.isWirelessRateEnable && container.bindPos != null) {
+        if (ConfigHolder.INSTANCE?.isWirelessRateEnable == true && container.bindPos != null) {
             val pos = container.bindPos!!.pos().toShortString()
             textListCache.add(
                 Component.translatable(

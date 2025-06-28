@@ -1,46 +1,38 @@
-package com.hepdd.gtmthings.common.block.machine.trait;
+package com.hepdd.gtmthings.common.block.machine.trait
 
-import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
-import com.gregtechceu.gtceu.utils.FluidStackHashStrategy;
+import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank
+import com.gregtechceu.gtceu.api.recipe.GTRecipe
+import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient
+import com.gregtechceu.gtceu.utils.FluidStackHashStrategy
+import it.unimi.dsi.fastutil.objects.Object2IntMap
+import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap
+import net.minecraftforge.fluids.FluidStack
 
-import net.minecraftforge.fluids.FluidStack;
+class CatalystFluidStackHandler(machine: MetaMachine, slots: Int, capacity: Int, io: IO?, capabilityIO: IO?):NotifiableFluidTank(machine, slots, capacity, io, capabilityIO) {
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
-
-import java.util.List;
-
-/**
- * @author EasterFG on 2024/10/3
- */
-public class CatalystFluidStackHandler extends NotifiableFluidTank {
-
-    public CatalystFluidStackHandler(MetaMachine machine, int slots, int capacity, IO io, IO capabilityIO) {
-        super(machine, slots, capacity, io, capabilityIO);
-    }
-
-    @Override
-    public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left, boolean simulate) {
-        Object2IntMap<FluidStack> map = new Object2IntOpenCustomHashMap<>(FluidStackHashStrategy.comparingAllButAmount());
-        CustomFluidTank[] storages = getStorages();
-        for (CustomFluidTank storage : storages) {
-            map.putIfAbsent(storage.getFluid(), 1);
+    override fun handleRecipeInner(
+        io: IO?,
+        recipe: GTRecipe,
+        left: MutableList<FluidIngredient?>?,
+        simulate: Boolean
+    ): MutableList<FluidIngredient?>? {
+        val map: Object2IntMap<FluidStack?> =
+            Object2IntOpenCustomHashMap<FluidStack?>(FluidStackHashStrategy.comparingAllButAmount())
+        val storages = getStorages()
+        for (storage in storages) {
+            map.putIfAbsent(storage.getFluid(), 1)
         }
 
-        for (Content content : recipe.getInputContents(FluidRecipeCapability.CAP)) {
-            var ingredient = (FluidIngredient) content.getContent();
-            for (FluidStack is : map.keySet()) {
-                if (ingredient.test(is) && content.chance > 0) return left;
+        for (content in recipe.getInputContents(FluidRecipeCapability.CAP)) {
+            val ingredient = content.getContent() as FluidIngredient
+            for (`is` in map.keys) {
+                if (ingredient.test(`is`) && content.chance > 0) return left
             }
         }
 
-        return super.handleRecipeInner(io, recipe, left, simulate);
+        return super.handleRecipeInner(io, recipe, left, simulate)
     }
 }

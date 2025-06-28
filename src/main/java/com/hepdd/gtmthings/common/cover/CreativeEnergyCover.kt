@@ -1,114 +1,108 @@
-package com.hepdd.gtmthings.common.cover;
+package com.hepdd.gtmthings.common.cover
 
-import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.capability.ICoverable;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.cover.CoverBehavior;
-import com.gregtechceu.gtceu.api.cover.CoverDefinition;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
-import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
-
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
-
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
-import static com.gregtechceu.gtceu.api.capability.GTCapabilityHelper.getEnergyContainer;
+import com.gregtechceu.gtceu.api.GTValues
+import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper
+import com.gregtechceu.gtceu.api.capability.ICoverable
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.cover.CoverBehavior
+import com.gregtechceu.gtceu.api.cover.CoverDefinition
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.TickableSubscription
+import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine
+import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
+import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
+import net.minecraft.MethodsReturnNonnullByDefault
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.ItemStack
+import javax.annotation.ParametersAreNonnullByDefault
+import kotlin.math.min
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CreativeEnergyCover extends CoverBehavior {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeEnergyCover.class,
-            CoverBehavior.MANAGED_FIELD_HOLDER);
-
-    private TickableSubscription subscription;
+class CreativeEnergyCover(definition: CoverDefinition, coverHolder: ICoverable, attachedSide: Direction) :
+    CoverBehavior(definition, coverHolder, attachedSide) {
+    private var subscription: TickableSubscription? = null
 
     @Persisted
-    private long energyPerTick;
-    @Persisted
-    private int tier;
-    @Persisted
-    private int amperage;
-    @Persisted
-    private long machineMaxEnergy;
+    private var energyPerTick: Long
 
-    @Override
-    public @NotNull ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
+    @Persisted
+    private var tier: Int
+
+    @Persisted
+    private val amperage = 1
+
+    @Persisted
+    private var machineMaxEnergy: Long = 0
+
+    override fun getFieldHolder(): ManagedFieldHolder {
+        return MANAGED_FIELD_HOLDER
     }
 
-    public CreativeEnergyCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide) {
-        super(definition, coverHolder, attachedSide);
-        this.tier = GTValues.LV;
-        this.amperage = 1;
-        this.energyPerTick = GTValues.VEX[tier] * amperage;
+    init {
+        this.tier = GTValues.LV
+        this.energyPerTick = GTValues.VEX[tier] * amperage
     }
 
-    @Override
-    public boolean canAttach() {
-        var machine = getMachine();
-        if (machine instanceof TieredEnergyMachine tieredEnergyMachine && tieredEnergyMachine.energyContainer.getHandlerIO() == IO.IN) {
-            var covers = tieredEnergyMachine.getCoverContainer().getCovers();
-            for (var cover : covers) {
-                if (cover instanceof CreativeEnergyCover) return false;
+    override fun canAttach(): Boolean {
+        val machine = this.machine
+        if (machine is TieredEnergyMachine && machine.energyContainer.getHandlerIO() == IO.IN) {
+            val covers = machine.getCoverContainer().covers
+            for (cover in covers) {
+                if (cover is CreativeEnergyCover) return false
             }
-            return true;
+            return true
         } else {
-            return false;
+            return false
         }
     }
 
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        updateCoverSub();
+    override fun onLoad() {
+        super.onLoad()
+        updateCoverSub()
     }
 
-    @Override
-    public void onRemoved() {
-        super.onRemoved();
+    override fun onRemoved() {
+        super.onRemoved()
         if (subscription != null) {
-            subscription.unsubscribe();
+            subscription!!.unsubscribe()
         }
     }
 
-    @Override
-    public void onAttached(ItemStack itemStack, ServerPlayer player) {
-        super.onAttached(itemStack, player);
-        var machine = getMachine();
-        if (machine instanceof TieredEnergyMachine tieredEnergyMachine) {
-            this.tier = tieredEnergyMachine.getTier();
-            this.energyPerTick = GTValues.VEX[this.tier] * amperage;
-            this.machineMaxEnergy = GTValues.VEX[tieredEnergyMachine.getTier()] << 6;
+    override fun onAttached(itemStack: ItemStack, player: ServerPlayer) {
+        super.onAttached(itemStack, player)
+        val machine = this.machine
+        if (machine is TieredEnergyMachine) {
+            this.tier = machine.getTier()
+            this.energyPerTick = GTValues.VEX[this.tier] * amperage
+            this.machineMaxEnergy = GTValues.VEX[machine.getTier()] shl 6
         }
-        updateCoverSub();
+        updateCoverSub()
     }
 
-    private void updateCoverSub() {
-        subscription = coverHolder.subscribeServerTick(subscription, this::updateEnergy);
+    private fun updateCoverSub() {
+        subscription = coverHolder.subscribeServerTick(subscription) { this.updateEnergy() }
     }
 
-    private void updateEnergy() {
-        var energyContainer = getEnergyContainer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
+    private fun updateEnergy() {
+        val energyContainer =
+            GTCapabilityHelper.getEnergyContainer(coverHolder.level, coverHolder.pos, attachedSide)
         if (energyContainer != null) {
-            var changeStored = Math.min(this.machineMaxEnergy - energyContainer.getEnergyStored(), this.energyPerTick);
-            if (changeStored <= 0) return;
-            energyContainer.addEnergy(changeStored);
+            val changeStored = min(this.machineMaxEnergy - energyContainer.energyStored, this.energyPerTick)
+            if (changeStored <= 0) return
+            energyContainer.addEnergy(changeStored)
         }
-        updateCoverSub();
+        updateCoverSub()
     }
 
-    @Nullable
-    private MetaMachine getMachine() {
-        return MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+    private val machine: MetaMachine?
+        get() = MetaMachine.getMachine(coverHolder.level, coverHolder.pos)
+
+    companion object {
+        private val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
+            CreativeEnergyCover::class.java,
+            CoverBehavior.MANAGED_FIELD_HOLDER
+        )
     }
 }

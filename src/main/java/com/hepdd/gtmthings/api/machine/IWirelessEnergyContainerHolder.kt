@@ -13,7 +13,7 @@ interface IWirelessEnergyContainerHolder: IBindable {
     fun getWirelessEnergyContainer(): WirelessEnergyContainer? {
         if (getWirelessEnergyContainerCache() == null) {
             val container = getOrCreateContainer(getUUID())
-            setWirelessEnergyContainerCache(container)
+            container?.let { setWirelessEnergyContainerCache(it) }
         }
         return getWirelessEnergyContainerCache()
     }
