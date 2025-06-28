@@ -8,4 +8,10 @@ spotless {
         endWithNewline()
         eclipse('4.31').configFile(file("$rootDir/gradle/spotless/spotless.eclipseformat.xml"))
     }
+    kotlin {
+        target 'src/main/java/**/*.kt'
+        ktlint().setEditorConfigPath("$rootDir/gradle/spotless/spotless.ktlint")
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }

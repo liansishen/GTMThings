@@ -1,21 +1,21 @@
 package com.hepdd.gtmthings.api.misc
 
-import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.world.item.ItemStack
+
+import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler
+import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper
+
 import java.util.function.Function
 import kotlin.math.min
 
-class UnlimitedItemStackTransfer(size: Int):CustomItemStackHandler(size) {
+class UnlimitedItemStackTransfer(size: Int) : CustomItemStackHandler(size) {
 
     private val filter: Function<ItemStack?, Boolean?>? = null
 
-    override fun isItemValid(slot: Int, stack: ItemStack): Boolean {
-        return filter == null || filter.apply(stack) == true
-    }
+    override fun isItemValid(slot: Int, stack: ItemStack): Boolean = filter == null || filter.apply(stack) == true
 
     override fun extractItem(slot: Int, amount: Int, simulate: Boolean): ItemStack {
         if (amount == 0) return ItemStack.EMPTY
@@ -46,13 +46,9 @@ class UnlimitedItemStackTransfer(size: Int):CustomItemStackHandler(size) {
         }
     }
 
-    override fun getSlotLimit(slot: Int): Int {
-        return Int.Companion.MAX_VALUE
-    }
+    override fun getSlotLimit(slot: Int): Int = Int.Companion.MAX_VALUE
 
-    override fun getStackLimit(slot: Int, stack: ItemStack): Int {
-        return Int.Companion.MAX_VALUE
-    }
+    override fun getStackLimit(slot: Int, stack: ItemStack): Int = Int.Companion.MAX_VALUE
 
     override fun serializeNBT(): CompoundTag {
         val nbtTagList = ListTag()

@@ -1,5 +1,7 @@
 package com.hepdd.gtmthings.data
 
+import net.minecraft.core.Direction
+
 import com.gregtechceu.gtceu.GTCEu
 import com.gregtechceu.gtceu.api.GTCEuAPI
 import com.gregtechceu.gtceu.api.GTValues
@@ -13,11 +15,11 @@ import com.hepdd.gtmthings.GTMThings.Companion.id
 import com.hepdd.gtmthings.common.cover.*
 import com.hepdd.gtmthings.common.registry.GTMTRegistration
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction
-import net.minecraft.core.Direction
+
 import java.util.*
 
 class GTMTCovers {
-    
+
     companion object {
         init {
             GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.creativeModeTab { CreativeModeTabs.WIRELESS_TAB }
@@ -26,7 +28,7 @@ class GTMTCovers {
         @JvmStatic
         val ALL_TIERS: IntArray = GTValues.tiersBetween(
             GTValues.LV,
-            if (GTCEuAPI.isHighTier()) GTValues.OpV else GTValues.UV
+            if (GTCEuAPI.isHighTier()) GTValues.OpV else GTValues.UV,
         )
 
         @JvmStatic
@@ -36,9 +38,10 @@ class GTMTCovers {
                 CreativeEnergyCover(
                     definition,
                     coverHolder,
-                    attachedSide
+                    attachedSide,
                 )
-            }, SimpleCoverRenderer(id("block/cover/overlay_creative_energy"))
+            },
+            SimpleCoverRenderer(id("block/cover/overlay_creative_energy")),
         )
 
         @JvmStatic
@@ -48,19 +51,24 @@ class GTMTCovers {
                 ProgrammableCover(
                     definition,
                     coverHolder,
-                    attachedSide
+                    attachedSide,
                 )
-            }, SimpleCoverRenderer(GTCEu.id("item/programmed_circuit/1"))
+            },
+            SimpleCoverRenderer(GTCEu.id("item/programmed_circuit/1")),
         )
 
         @JvmStatic
         val WIRELESS_ENERGY_RECEIVE: Array<CoverDefinition> = registerTieredWirelessCover(
-            "wireless_energy_receive", 1, ALL_TIERS
+            "wireless_energy_receive",
+            1,
+            ALL_TIERS,
         )
 
         @JvmStatic
         val WIRELESS_ENERGY_RECEIVE_4A: Array<CoverDefinition> = registerTieredWirelessCover(
-            "4a_wireless_energy_receive", 4, ALL_TIERS
+            "4a_wireless_energy_receive",
+            4,
+            ALL_TIERS,
         )
 
         @JvmStatic
@@ -71,9 +79,10 @@ class GTMTCovers {
                     holder,
                     coverable,
                     side,
-                    WirelessTransferCover.TRANSFER_ITEM
+                    WirelessTransferCover.TRANSFER_ITEM,
                 )
-            }, SimpleCoverRenderer(id("block/cover/overlay_wireless_item_transfer"))
+            },
+            SimpleCoverRenderer(id("block/cover/overlay_wireless_item_transfer")),
         )
 
         @JvmStatic
@@ -84,9 +93,10 @@ class GTMTCovers {
                     holder,
                     coverable,
                     side,
-                    WirelessTransferCover.TRANSFER_FLUID
+                    WirelessTransferCover.TRANSFER_FLUID,
                 )
-            }, SimpleCoverRenderer(id("block/cover/overlay_wireless_fluid_transfer"))
+            },
+            SimpleCoverRenderer(id("block/cover/overlay_wireless_fluid_transfer")),
         )
 
         @JvmStatic
@@ -97,9 +107,10 @@ class GTMTCovers {
                     holder,
                     coverable,
                     side,
-                    WirelessTransferCover.TRANSFER_ITEM
+                    WirelessTransferCover.TRANSFER_ITEM,
                 )
-            }, SimpleCoverRenderer(id("block/cover/overlay_wireless_item_transfer"))
+            },
+            SimpleCoverRenderer(id("block/cover/overlay_wireless_item_transfer")),
         )
 
         @JvmStatic
@@ -110,53 +121,41 @@ class GTMTCovers {
                     holder,
                     coverable,
                     side,
-                    WirelessTransferCover.TRANSFER_FLUID
+                    WirelessTransferCover.TRANSFER_FLUID,
                 )
-            }, SimpleCoverRenderer(id("block/cover/overlay_wireless_fluid_transfer"))
+            },
+            SimpleCoverRenderer(id("block/cover/overlay_wireless_fluid_transfer")),
         )
 
-        fun register(
-            id: String, behaviorCreator: CoverBehaviourProvider?,
-            coverRenderer: ICoverRenderer?
-        ): CoverDefinition {
+        fun register(id: String, behaviorCreator: CoverBehaviourProvider?, coverRenderer: ICoverRenderer?): CoverDefinition {
             val definition = CoverDefinition(id(id), behaviorCreator, coverRenderer)
             GTRegistries.COVERS.register(id(id), definition)
             return definition
         }
 
-        fun registerTieredWirelessCover(id: String?, amperage: Int, tiers: IntArray): Array<CoverDefinition> {
-            return tiers.map { tier ->
-                val name = "$id.${GTValues.VN[tier].lowercase(Locale.ROOT)}"
-                register(
-                    name,
-                    { holder, coverable, side ->
-                        WirelessEnergyReceiveCover(holder, coverable, side, tier, amperage)
-                    },
-                    SimpleCoverRenderer(
-                        id(
-                            "block/cover/overlay_${if (amperage == 1) "" else "4a_"}wireless_energy_receive"
-                        )
-                    )
-                )
-            }.toTypedArray()
-        }
+        fun registerTieredWirelessCover(id: String?, amperage: Int, tiers: IntArray): Array<CoverDefinition> = tiers.map { tier ->
+            val name = "$id.${GTValues.VN[tier].lowercase(Locale.ROOT)}"
+            register(
+                name,
+                { holder, coverable, side ->
+                    WirelessEnergyReceiveCover(holder, coverable, side, tier, amperage)
+                },
+                SimpleCoverRenderer(
+                    id(
+                        "block/cover/overlay_${if (amperage == 1) "" else "4a_"}wireless_energy_receive",
+                    ),
+                ),
+            )
+        }.toTypedArray()
 
-        fun registerTiered(
-            id: String,
-            behaviorCreator: CoverDefinition.TieredCoverBehaviourProvider,
-            coverRenderer: Int2ObjectFunction<ICoverRenderer>,
-            amperage: Int,
-            vararg tiers: Int
-        ): Array<CoverDefinition> {
-            return tiers.map { tier ->
-                val name = "$id.${GTValues.VN[tier].lowercase(Locale.ROOT)}"
-                register(
-                    name,
-                    { def, coverable, side -> behaviorCreator.create(def, coverable, side, tier) },
-                    coverRenderer.apply(tier)
-                )
-            }.toTypedArray()
-        }
+        fun registerTiered(id: String, behaviorCreator: CoverDefinition.TieredCoverBehaviourProvider, coverRenderer: Int2ObjectFunction<ICoverRenderer>, amperage: Int, vararg tiers: Int): Array<CoverDefinition> = tiers.map { tier ->
+            val name = "$id.${GTValues.VN[tier].lowercase(Locale.ROOT)}"
+            register(
+                name,
+                { def, coverable, side -> behaviorCreator.create(def, coverable, side, tier) },
+                coverRenderer.apply(tier),
+            )
+        }.toTypedArray()
 
         fun init() {}
     }

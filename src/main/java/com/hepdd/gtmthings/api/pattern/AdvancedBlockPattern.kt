@@ -1,21 +1,5 @@
 package com.hepdd.gtmthings.api.pattern
 
-import appeng.api.config.Actionable
-import appeng.api.networking.IGrid
-import appeng.api.stacks.AEItemKey
-import appeng.items.tools.powered.WirelessTerminalItem
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
-import com.gregtechceu.gtceu.api.machine.MetaMachine
-import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController
-import com.gregtechceu.gtceu.api.pattern.BlockPattern
-import com.gregtechceu.gtceu.api.pattern.MultiblockState
-import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate
-import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection
-import com.gregtechceu.gtceu.common.block.CoilBlock
-import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior.AutoBuildSetting
-import com.lowdragmc.lowdraglib.utils.BlockInfo
-import com.mojang.datafixers.util.Pair
-import it.unimi.dsi.fastutil.ints.IntObjectPair
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
@@ -34,25 +18,42 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.items.ItemStackHandler
+
+import appeng.api.config.Actionable
+import appeng.api.networking.IGrid
+import appeng.api.stacks.AEItemKey
+import appeng.items.tools.powered.WirelessTerminalItem
+import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
+import com.gregtechceu.gtceu.api.machine.MetaMachine
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController
+import com.gregtechceu.gtceu.api.pattern.BlockPattern
+import com.gregtechceu.gtceu.api.pattern.MultiblockState
+import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate
+import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection
+import com.gregtechceu.gtceu.common.block.CoilBlock
+import com.hepdd.gtmthings.common.item.AdvancedTerminalBehavior.AutoBuildSetting
+import com.lowdragmc.lowdraglib.utils.BlockInfo
+import com.mojang.datafixers.util.Pair
+import it.unimi.dsi.fastutil.ints.IntObjectPair
 import org.apache.commons.lang3.ArrayUtils
 import oshi.util.tuples.Triplet
+
 import java.util.function.BiPredicate
 import java.util.function.Consumer
 import kotlin.math.max
 import kotlin.math.min
 
-open class AdvancedBlockPattern(
-        predicatesIn: Array<Array<Array<TraceabilityPredicate>?>?>,
-        structureDir: Array<RelativeDirection?>,
-        aisleRepetitions: Array<IntArray?>,
-        centerOffset: IntArray
-    ): BlockPattern(predicatesIn, structureDir, aisleRepetitions, centerOffset) {
+open class AdvancedBlockPattern(predicatesIn: Array<Array<Array<TraceabilityPredicate>?>?>, structureDir: Array<RelativeDirection?>, aisleRepetitions: Array<IntArray?>, centerOffset: IntArray) : BlockPattern(predicatesIn, structureDir, aisleRepetitions, centerOffset) {
 
     companion object {
         @JvmStatic
         var FACINGS: Array<Direction?> = arrayOf<Direction?>(
-            Direction.SOUTH, Direction.NORTH, Direction.WEST, Direction.EAST, Direction.UP,
-            Direction.DOWN
+            Direction.SOUTH,
+            Direction.NORTH,
+            Direction.WEST,
+            Direction.EAST,
+            Direction.UP,
+            Direction.DOWN,
         )
 
         @JvmStatic
@@ -116,10 +117,7 @@ open class AdvancedBlockPattern(
         this.advcenterOffset = centerOffset
     }
 
-    fun autoBuild(
-        player: Player, worldState: MultiblockState,
-        autoBuildSetting: AutoBuildSetting
-    ) {
+    fun autoBuild(player: Player, worldState: MultiblockState, autoBuildSetting: AutoBuildSetting) {
         val world = player.level()
         var minZ = -advcenterOffset[4]
         clearWorldState(worldState)
@@ -233,17 +231,17 @@ open class AdvancedBlockPattern(
                                 cacheGlobal.addTo(limit, 1)
                                 infos = ArrayUtils.addAll<BlockInfo?>(
                                     infos,
-                                    *if (limit.candidates == null) null else limit.candidates!!.get()
+                                    *if (limit.candidates == null) null else limit.candidates!!.get(),
                                 )
                             }
                             for (common in predicate.common) {
                                 if (common.candidates != null && predicate.common.size > 1 && !autoBuildSetting.isPlaceHatch(
-                                        common.candidates!!.get()
+                                        common.candidates!!.get(),
                                     )
                                 ) {
                                     continue
                                 }
-                                //infos = ArrayUtils.addAll<BlockInfo?>(infos, common.candidates?.get())
+                                // infos = ArrayUtils.addAll<BlockInfo?>(infos, common.candidates?.get())
                                 if (common.candidates?.get() != null) {
                                     common.candidates?.get()?.forEach { info -> infos = ArrayUtils.addAll(infos, info) }
                                 } else {
@@ -256,7 +254,7 @@ open class AdvancedBlockPattern(
 
                         if (autoBuildSetting.isReplaceCoilMode() && coilItemStack != null && ItemStack.isSameItem(
                                 candidates[0],
-                                coilItemStack
+                                coilItemStack,
                             )
                         ) {
                             a++
@@ -304,8 +302,11 @@ open class AdvancedBlockPattern(
 
                         val itemBlock = found.item as BlockItem
                         val context = BlockPlaceContext(
-                            world, player, InteractionHand.MAIN_HAND,
-                            found, BlockHitResult.miss(player.getEyePosition(0f), Direction.UP, pos)
+                            world,
+                            player,
+                            InteractionHand.MAIN_HAND,
+                            found,
+                            BlockHitResult.miss(player.getEyePosition(0f), Direction.UP, pos),
                         )
                         val interactionResult = itemBlock.place(context)
                         if (interactionResult != InteractionResult.FAIL) {
@@ -330,39 +331,50 @@ open class AdvancedBlockPattern(
             c++
         }
         val frontFacing = controller.self().getFrontFacing()
-        blocks.forEach { (pos: BlockPos, block: Any?) ->  // adjust facing
+        blocks.forEach { (pos: BlockPos, block: Any?) ->
+            // adjust facing
             if (block !is IMultiController) {
                 if (block is BlockState && placeBlockPos.contains(pos)) {
-                    resetFacing(pos, block, frontFacing, BiPredicate { p: BlockPos?, f: Direction ->
-                        val `object` = blocks[p!!.relative(f)]
-                        `object` == null ||
+                    resetFacing(
+                        pos,
+                        block,
+                        frontFacing,
+                        BiPredicate { p: BlockPos?, f: Direction ->
+                            val `object` = blocks[p!!.relative(f)]
+                            `object` == null ||
                                 (`object` is BlockState && `object`.block === Blocks.AIR)
-                    }, Consumer { state: BlockState -> world.setBlock(pos, state, 3) })
+                        },
+                        Consumer { state: BlockState -> world.setBlock(pos, state, 3) },
+                    )
                 } else if (block is MetaMachine) {
-                    resetFacing(pos, block.blockState, frontFacing, BiPredicate { p: BlockPos?, f: Direction ->
-                        val `object` = blocks.get(p!!.relative(f))
-                        if (`object` == null || (`object` is BlockState && `object`.isAir)) {
-                            return@BiPredicate block.isFacingValid(f)
-                        }
-                        return@BiPredicate false
-                    }, Consumer { state: BlockState -> world.setBlock(pos, state, 3) })
+                    resetFacing(
+                        pos,
+                        block.blockState,
+                        frontFacing,
+                        BiPredicate { p: BlockPos?, f: Direction ->
+                            val `object` = blocks.get(p!!.relative(f))
+                            if (`object` == null || (`object` is BlockState && `object`.isAir)) {
+                                return@BiPredicate block.isFacingValid(f)
+                            }
+                            return@BiPredicate false
+                        },
+                        Consumer { state: BlockState -> world.setBlock(pos, state, 3) },
+                    )
                 }
             }
         }
     }
 
-    private fun foundItem(
-        player: Player,
-        candidates: MutableList<ItemStack>,
-        isUseAE: Int
-    ): Triplet<ItemStack?, IItemHandler?, Int?> {
+    private fun foundItem(player: Player, candidates: MutableList<ItemStack>, isUseAE: Int): Triplet<ItemStack?, IItemHandler?, Int?> {
         var found: ItemStack? = null
         var handler: IItemHandler? = null
         var foundSlot = -1
         if (!player.isCreative) {
             val foundHandler = getMatchStackWithHandler(
                 candidates,
-                player.getCapability(ForgeCapabilities.ITEM_HANDLER), player, isUseAE
+                player.getCapability(ForgeCapabilities.ITEM_HANDLER),
+                player,
+                isUseAE,
             )
             if (foundHandler != null) {
                 foundSlot = foundHandler.firstInt()
@@ -393,7 +405,7 @@ open class AdvancedBlockPattern(
                     }
                 } else if (ItemStack.isSameItemSameTags(
                         coilItemStack,
-                        stack
+                        stack,
                     ) && (stack.count + 1) <= stack.maxStackSize
                 ) {
                     foundSlot = i
@@ -426,10 +438,7 @@ open class AdvancedBlockPattern(
         }
     }
 
-    private fun setActualRelativeOffset(
-        x: Int, y: Int, z: Int, facing: Direction, upwardsFacing: Direction,
-        isFlipped: Boolean
-    ): BlockPos {
+    private fun setActualRelativeOffset(x: Int, y: Int, z: Int, facing: Direction, upwardsFacing: Direction, isFlipped: Boolean): BlockPos {
         val c0 = intArrayOf(x, y, z)
         val c1 = IntArray(3)
         if (facing == Direction.UP || facing == Direction.DOWN) {
@@ -476,11 +485,19 @@ open class AdvancedBlockPattern(
             }
             if (upwardsFacing == Direction.WEST || upwardsFacing == Direction.EAST) {
                 val xOffset =
-                    if (upwardsFacing == Direction.EAST) facing.clockWise.stepX else facing.clockWise
-                        .opposite.stepX
+                    if (upwardsFacing == Direction.EAST) {
+                        facing.clockWise.stepX
+                    } else {
+                        facing.clockWise
+                            .opposite.stepX
+                    }
                 val zOffset =
-                    if (upwardsFacing == Direction.EAST) facing.clockWise.stepZ else facing.clockWise
-                        .opposite.stepZ
+                    if (upwardsFacing == Direction.EAST) {
+                        facing.clockWise.stepZ
+                    } else {
+                        facing.clockWise
+                            .opposite.stepZ
+                    }
                 val tmp: Int
                 if (xOffset == 0) {
                     tmp = c1[2]
@@ -514,11 +531,7 @@ open class AdvancedBlockPattern(
         return BlockPos(c1[0], c1[1], c1[2])
     }
 
-    private fun getMatchStackWithHandler(
-        candidates: MutableList<ItemStack>,
-        cap: LazyOptional<IItemHandler?>,
-        player: Player, isUseAE: Int
-    ): IntObjectPair<IItemHandler?>? {
+    private fun getMatchStackWithHandler(candidates: MutableList<ItemStack>, cap: LazyOptional<IItemHandler?>, player: Player, isUseAE: Int): IntObjectPair<IItemHandler?>? {
         val handler = cap.resolve().orElse(null)
         if (handler == null) {
             return null
@@ -550,38 +563,46 @@ open class AdvancedBlockPattern(
             } else if (candidates.stream().anyMatch { candidate: ItemStack ->
                     ItemStack.isSameItemSameTags(
                         candidate,
-                        stack
+                        stack,
                     )
-                } && !stack.isEmpty && stack.item is BlockItem) {
+                } && !stack.isEmpty && stack.item is BlockItem
+            ) {
                 return IntObjectPair.of<IItemHandler>(i, handler)
             }
         }
         return null
     }
 
-    private fun resetFacing(
-        pos: BlockPos?, blockState: BlockState, facing: Direction?,
-        checker: BiPredicate<BlockPos?, Direction?>, consumer: Consumer<BlockState?>
-    ) {
+    private fun resetFacing(pos: BlockPos?, blockState: BlockState, facing: Direction?, checker: BiPredicate<BlockPos?, Direction?>, consumer: Consumer<BlockState?>) {
         if (blockState.hasProperty(BlockStateProperties.FACING)) {
             tryFacings(
-                blockState, pos, checker, consumer, BlockStateProperties.FACING,
-                if (facing == null) FACINGS else ArrayUtils.addAll<Direction?>(arrayOf(facing), *FACINGS)
+                blockState,
+                pos,
+                checker,
+                consumer,
+                BlockStateProperties.FACING,
+                if (facing == null) FACINGS else ArrayUtils.addAll<Direction?>(arrayOf(facing), *FACINGS),
             )
         } else if (blockState.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
             tryFacings(
-                blockState, pos, checker, consumer, BlockStateProperties.HORIZONTAL_FACING,
-                if (facing == null || facing.axis === Direction.Axis.Y) FACINGS_H else ArrayUtils.addAll<Direction?>(
-                    arrayOf(facing), *FACINGS_H
-                )
+                blockState,
+                pos,
+                checker,
+                consumer,
+                BlockStateProperties.HORIZONTAL_FACING,
+                if (facing == null || facing.axis === Direction.Axis.Y) {
+                    FACINGS_H
+                } else {
+                    ArrayUtils.addAll<Direction?>(
+                        arrayOf(facing),
+                        *FACINGS_H,
+                    )
+                },
             )
         }
     }
 
-    private fun tryFacings(
-        blockState: BlockState, pos: BlockPos?, checker: BiPredicate<BlockPos?, Direction?>,
-        consumer: Consumer<BlockState?>, property: Property<Direction?>, facings: Array<Direction?>
-    ) {
+    private fun tryFacings(blockState: BlockState, pos: BlockPos?, checker: BiPredicate<BlockPos?, Direction?>, consumer: Consumer<BlockState?>, property: Property<Direction?>, facings: Array<Direction?>) {
         var found: Direction? = null
         for (facing in facings) {
             if (checker.test(pos, facing)) {

@@ -4,7 +4,7 @@ import com.hepdd.gtmthings.api.capability.IBindable
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer.Companion.getOrCreateContainer
 
-interface IWirelessEnergyContainerHolder: IBindable {
+interface IWirelessEnergyContainerHolder : IBindable {
 
     fun getWirelessEnergyContainerCache(): WirelessEnergyContainer?
 

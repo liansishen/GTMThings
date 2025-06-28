@@ -1,5 +1,10 @@
 package com.hepdd.gtmthings.data
 
+import net.minecraft.data.recipes.FinishedRecipe
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraftforge.common.Tags
+
 import appeng.core.definitions.AEBlocks
 import appeng.core.definitions.AEItems
 import com.gregtechceu.gtceu.api.GTCEuAPI
@@ -16,10 +21,7 @@ import com.gregtechceu.gtceu.data.recipe.CustomTags
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper
 import com.hepdd.gtmthings.GTMThings.Companion.id
 import com.tterrag.registrate.util.entry.ItemEntry
-import net.minecraft.data.recipes.FinishedRecipe
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
-import net.minecraftforge.common.Tags
+
 import java.util.*
 import java.util.function.Consumer
 
@@ -339,8 +341,8 @@ object GTMTRecipe {
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_IV,
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_LUV,
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_ZPM,
-                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UV
-                )
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UV,
+                ),
             )
         if (GTCEuAPI.isHighTier()) {
             WIRELESS_ENERGY_RECEIVE_COVER.addAll(
@@ -349,8 +351,8 @@ object GTMTRecipe {
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UEV!!,
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UIV!!,
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UXV!!,
-                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_OPV!!
-                )
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_OPV!!,
+                ),
             )
         }
 
@@ -364,8 +366,8 @@ object GTMTRecipe {
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_IV_4A,
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_LUV_4A,
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_ZPM_4A,
-                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UV_4A
-                )
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UV_4A,
+                ),
             )
         if (GTCEuAPI.isHighTier()) {
             WIRELESS_ENERGY_RECEIVE_COVER_4A.addAll(
@@ -374,8 +376,8 @@ object GTMTRecipe {
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UEV_4A!!,
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UIV_4A!!,
                     CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_UXV_4A!!,
-                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A!!
-                )
+                    CustomItems.WIRELESS_ENERGY_RECEIVE_COVER_OPV_4A!!,
+                ),
             )
         }
 
@@ -383,9 +385,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_input_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    )
-                )
+                        Locale.getDefault(),
+                    ),
+                ),
             )
                 .inputItems(GTMachines.ENERGY_INPUT_HATCH[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER[tier - 1].asStack())
@@ -399,9 +401,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_output_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    )
-                )
+                        Locale.getDefault(),
+                    ),
+                ),
             )
                 .inputItems(GTMachines.ENERGY_OUTPUT_HATCH[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER[tier - 1].asStack())
@@ -417,9 +419,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "programmablec_hatch_" + GTValues.VN[GTValues.MAX].lowercase(
-                        Locale.getDefault()
-                    ) + "_4a"
-                )
+                        Locale.getDefault(),
+                    ) + "_4a",
+                ),
             )
                 .inputItems(GTMachines.DUAL_IMPORT_HATCH[GTValues.MAX].asStack())
                 .inputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
@@ -436,9 +438,9 @@ object GTMTRecipe {
                 GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                     id(
                         "programmablec_hatch_" + GTValues.VN[tier].lowercase(
-                            Locale.getDefault()
-                        ) + "_4a"
-                    )
+                            Locale.getDefault(),
+                        ) + "_4a",
+                    ),
                 )
                     .inputItems(GTMachines.DUAL_IMPORT_HATCH[tier].asStack())
                     .inputItems(CustomItems.VIRTUAL_ITEM_PROVIDER.asStack())
@@ -452,9 +454,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_input_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_4a"
-                )
+                        Locale.getDefault(),
+                    ) + "_4a",
+                ),
             )
                 .inputItems(GTMachines.ENERGY_INPUT_HATCH_4A[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER[tier - 1].asStack(2))
@@ -468,9 +470,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_input_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_16a"
-                )
+                        Locale.getDefault(),
+                    ) + "_16a",
+                ),
             )
                 .inputItems(GTMachines.ENERGY_INPUT_HATCH_16A[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A[tier - 1].asStack(2))
@@ -484,9 +486,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_output_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_4a"
-                )
+                        Locale.getDefault(),
+                    ) + "_4a",
+                ),
             )
                 .inputItems(GTMachines.ENERGY_OUTPUT_HATCH_4A[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER[tier - 1].asStack(2))
@@ -500,9 +502,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_output_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_16a"
-                )
+                        Locale.getDefault(),
+                    ) + "_16a",
+                ),
             )
                 .inputItems(GTMachines.ENERGY_OUTPUT_HATCH_16A[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A[tier - 1].asStack(2))
@@ -518,9 +520,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_input_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_256a"
-                )
+                        Locale.getDefault(),
+                    ) + "_256a",
+                ),
             )
                 .inputItems(GTMachines.LASER_INPUT_HATCH_256[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A[tier - 1].asStack(4))
@@ -536,9 +538,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_input_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_1024a"
-                )
+                        Locale.getDefault(),
+                    ) + "_1024a",
+                ),
             )
                 .inputItems(GTMachines.LASER_INPUT_HATCH_1024[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A[tier - 1].asStack(8))
@@ -554,9 +556,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_input_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_4096a"
-                )
+                        Locale.getDefault(),
+                    ) + "_4096a",
+                ),
             )
                 .inputItems(GTMachines.LASER_INPUT_HATCH_4096[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A[tier - 1].asStack(16))
@@ -572,9 +574,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_output_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_256a"
-                )
+                        Locale.getDefault(),
+                    ) + "_256a",
+                ),
             )
                 .inputItems(GTMachines.LASER_OUTPUT_HATCH_256[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A[tier - 1].asStack(4))
@@ -590,9 +592,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_output_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_1024a"
-                )
+                        Locale.getDefault(),
+                    ) + "_1024a",
+                ),
             )
                 .inputItems(GTMachines.LASER_OUTPUT_HATCH_1024[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A[tier - 1].asStack(8))
@@ -608,9 +610,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "wireless_energy_output_hatch_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    ) + "_4096a"
-                )
+                        Locale.getDefault(),
+                    ) + "_4096a",
+                ),
             )
                 .inputItems(GTMachines.LASER_OUTPUT_HATCH_4096[tier].asStack())
                 .inputItems(WIRELESS_ENERGY_RECEIVE_COVER_4A[tier - 1].asStack(16))
@@ -663,9 +665,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "huge_item_import_bus_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    )
-                )
+                        Locale.getDefault(),
+                    ),
+                ),
             )
                 .inputItems(GTMachines.ITEM_IMPORT_BUS[tier].asStack())
                 .inputItems(if (tier > GTValues.EV) GTMachines.QUANTUM_CHEST[tier] else GTMachines.SUPER_CHEST[tier])
@@ -677,9 +679,9 @@ object GTMTRecipe {
             GTRecipeTypes.ASSEMBLER_RECIPES.recipeBuilder(
                 id(
                     "huge_item_export_bus_" + GTValues.VN[tier].lowercase(
-                        Locale.getDefault()
-                    )
-                )
+                        Locale.getDefault(),
+                    ),
+                ),
             )
                 .inputItems(GTMachines.ITEM_EXPORT_BUS[tier].asStack())
                 .inputItems(if (tier > GTValues.EV) GTMachines.QUANTUM_CHEST[tier] else GTMachines.SUPER_CHEST[tier])
@@ -767,7 +769,7 @@ object GTMTRecipe {
             'G', Tags.Items.GLASS_PANES,
             'B', ItemStack(Items.BOOK),
             'P', MaterialEntry(TagPrefix.plate, GTMaterials.Steel),
-            'W', MaterialEntry(TagPrefix.wireGtSingle, GTMaterials.Tin)
+            'W', MaterialEntry(TagPrefix.wireGtSingle, GTMaterials.Tin),
         )
 
         VanillaRecipeHelper.addShapedRecipe(
@@ -777,7 +779,7 @@ object GTMTRecipe {
             CustomItems.Companion.WIRELESS_ENERGY_BINDING_TOOL.asStack(),
             "A",
             'A',
-            Items.PAPER
+            Items.PAPER,
         )
     }
 }

@@ -1,5 +1,13 @@
 package com.hepdd.gtmthings.common.item
 
+import net.minecraft.core.BlockPos
+import net.minecraft.core.GlobalPos
+import net.minecraft.network.chat.Component
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.BlockGetter
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem
@@ -8,13 +16,7 @@ import com.gregtechceu.gtceu.common.machine.electric.BatteryBufferMachine
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.PowerSubstationMachine
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer.Companion.getOrCreateContainer
 import com.hepdd.gtmthings.config.ConfigHolder
-import net.minecraft.core.BlockPos
-import net.minecraft.core.GlobalPos
-import net.minecraft.network.chat.Component
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.context.UseOnContext
-import net.minecraft.world.level.BlockGetter
+
 import java.math.BigInteger
 
 class WirelessEnergyBindingToolBehavior : IInteractionItem {
@@ -31,8 +33,8 @@ class WirelessEnergyBindingToolBehavior : IInteractionItem {
                     Component.translatable(
                         "item.gtmthings.wireless_transfer.tooltip.bind.1",
                         Component.translatable(context.getLevel().getBlockState(pos).getBlock().getDescriptionId()),
-                        pos.toShortString()
-                    )
+                        pos.toShortString(),
+                    ),
                 )
                 return InteractionResult.CONSUME
             }

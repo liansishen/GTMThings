@@ -1,12 +1,12 @@
 package com.hepdd.gtmthings.api.misc
 
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.block.Block
+
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition
 import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine
 import com.gregtechceu.gtceu.api.registry.GTRegistries
-import net.minecraft.core.BlockPos
-import net.minecraft.world.level.block.Block
-import org.apache.commons.lang3.ArrayUtils
 
 object Hatch {
     @JvmField
@@ -16,7 +16,8 @@ object Hatch {
 
             val block = d.block
             if (d.createMetaMachine(d.blockEntityType.create(BlockPos.ZERO, block.defaultBlockState()) as IMachineBlockEntity)
-                        is MultiblockPartMachine) {
+                    is MultiblockPartMachine
+            ) {
                 add(block)
             }
         }

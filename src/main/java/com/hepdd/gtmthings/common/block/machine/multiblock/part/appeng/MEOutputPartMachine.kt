@@ -1,5 +1,7 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng
 
+import net.minecraft.core.Direction
+
 import appeng.api.config.Actionable
 import appeng.api.networking.IGridNodeListener
 import appeng.api.networking.IManagedGridNode
@@ -26,10 +28,13 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
 import com.lowdragmc.lowdraglib.utils.Position
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
-import net.minecraft.core.Direction
+
 import java.util.*
 
-open class MEOutputPartMachine(holder: IMachineBlockEntity):DualHatchPartMachine(holder, GTValues.LuV, IO.OUT),IInteractedMachine, IGridConnectedMachine {
+open class MEOutputPartMachine(holder: IMachineBlockEntity) :
+    DualHatchPartMachine(holder, GTValues.LuV, IO.OUT),
+    IInteractedMachine,
+    IGridConnectedMachine {
 
     companion object {
         @JvmStatic
@@ -56,17 +61,11 @@ open class MEOutputPartMachine(holder: IMachineBlockEntity):DualHatchPartMachine
         this.actionSource = IActionSource.ofMachine { nodeHolder!!.getMainNode().node }
     }
 
-    protected fun createNodeHolder(): GridNodeHolder {
-        return GridNodeHolder(this)
-    }
+    protected fun createNodeHolder(): GridNodeHolder = GridNodeHolder(this)
 
-    override fun getMainNode(): IManagedGridNode {
-        return nodeHolder!!.getMainNode()
-    }
+    override fun getMainNode(): IManagedGridNode = nodeHolder!!.getMainNode()
 
-    override fun isOnline(): Boolean {
-        return isMachineOnline
-    }
+    override fun isOnline(): Boolean = isMachineOnline
 
     override fun setOnline(online: Boolean) {
         isMachineOnline = online
@@ -86,9 +85,10 @@ open class MEOutputPartMachine(holder: IMachineBlockEntity):DualHatchPartMachine
         }
     }
 
-
-    /**////////////////////////////// */ // ***** Machine LifeCycle ****//
-    /**////////////////////////////// */
+    /**/
+    // /////////////////////////// */ // ***** Machine LifeCycle ****//
+    /**/
+    // /////////////////////////// */
     override fun createInventory(vararg args: Any?): NotifiableItemStackHandler {
         this.internalBuffer = KeyStorage()
         return InaccessibleInfiniteHandler(this, internalBuffer!!)
@@ -110,28 +110,31 @@ open class MEOutputPartMachine(holder: IMachineBlockEntity):DualHatchPartMachine
             if (!internalBuffer!!.isEmpty) {
                 for (entry in internalBuffer!!) {
                     grid.storageService.inventory.insert(
-                        entry.key, entry.longValue,
-                        Actionable.MODULATE, actionSource
+                        entry.key,
+                        entry.longValue,
+                        Actionable.MODULATE,
+                        actionSource,
                     )
                 }
             }
             if (!internalTankBuffer!!.isEmpty) {
                 for (entry in internalTankBuffer!!) {
                     grid.storageService.inventory.insert(
-                        entry.key, entry.longValue,
-                        Actionable.MODULATE, actionSource
+                        entry.key,
+                        entry.longValue,
+                        Actionable.MODULATE,
+                        actionSource,
                     )
                 }
             }
         }
     }
 
-
-    /**////////////////////////////// */ // ********** Sync ME *********//
-    /**////////////////////////////// */
-    protected fun shouldSubscribe(): Boolean {
-        return isWorkingEnabled && isOnline && (!(internalBuffer!!.storage.isEmpty() && internalTankBuffer!!.storage.isEmpty()))
-    }
+    /**/
+    // /////////////////////////// */ // ********** Sync ME *********//
+    /**/
+    // /////////////////////////// */
+    protected fun shouldSubscribe(): Boolean = isWorkingEnabled && isOnline && (!(internalBuffer!!.storage.isEmpty() && internalTankBuffer!!.storage.isEmpty()))
 
     override fun autoIO() {
         if (!this.shouldSyncME()) return
@@ -154,9 +157,7 @@ open class MEOutputPartMachine(holder: IMachineBlockEntity):DualHatchPartMachine
         mainNode.setExposedOnSides(EnumSet.of(newFacing))
     }
 
-    override fun isWorkingEnabled(): Boolean {
-        return true
-    }
+    override fun isWorkingEnabled(): Boolean = true
 
     override fun createUIWidget(): Widget {
         val group = WidgetGroup(Position(0, 0))
@@ -164,8 +165,8 @@ open class MEOutputPartMachine(holder: IMachineBlockEntity):DualHatchPartMachine
         group.addWidget(
             LabelWidget(
                 0,
-                0
-            ) { if (this.isMachineOnline) "gtceu.gui.me_network.online" else "gtceu.gui.me_network.offline" }
+                0,
+            ) { if (this.isMachineOnline) "gtceu.gui.me_network.online" else "gtceu.gui.me_network.offline" },
         )
 
         group.addWidget(AEListGridWidget.Item(5, 20, 3, this.internalBuffer))
@@ -173,7 +174,5 @@ open class MEOutputPartMachine(holder: IMachineBlockEntity):DualHatchPartMachine
         return group
     }
 
-    override fun isRemote(): Boolean {
-        return holder.level()?.isClientSide ?: true
-    }
+    override fun isRemote(): Boolean = holder.level()?.isClientSide ?: true
 }

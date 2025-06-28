@@ -1,9 +1,5 @@
 package com.hepdd.gtmthings.forge
 
-import com.hepdd.gtmthings.GTMThings
-import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
-import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior
-import com.hepdd.gtmthings.data.WirelessEnergySavedData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.Level
 import net.minecraftforge.event.TickEvent
@@ -11,6 +7,11 @@ import net.minecraftforge.event.TickEvent.ServerTickEvent
 import net.minecraftforge.event.level.LevelEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber
+
+import com.hepdd.gtmthings.GTMThings
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
+import com.hepdd.gtmthings.common.item.WirelessEnergyBindingToolBehavior
+import com.hepdd.gtmthings.data.WirelessEnergySavedData
 
 @EventBusSubscriber(modid = GTMThings.MOD_ID, bus = EventBusSubscriber.Bus.FORGE)
 class ForgeCommonEventListener {
@@ -28,7 +29,7 @@ class ForgeCommonEventListener {
                             if (pos != null) {
                                 rate = WirelessEnergyBindingToolBehavior.getRate(
                                     event.server.getLevel(pos.dimension()),
-                                    pos.pos()
+                                    pos.pos(),
                                 )
                             }
                             container.rate = rate

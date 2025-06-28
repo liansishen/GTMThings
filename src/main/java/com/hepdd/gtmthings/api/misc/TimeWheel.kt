@@ -59,14 +59,21 @@ class TimeWheel(slotResolution: Int, slotNum: Int, windowStart: Int) {
     }
 
     fun getAvgByTick(): BigDecimal {
-        if (lastUpdateTick - firstUpdateTick < slotResolution * slotNum) return BigDecimal(sum).divide(
-            BigDecimal.valueOf(
-                (lastUpdateTick - firstUpdateTick + 1).toLong()
-            ), RoundingMode.HALF_UP
-        )
-        return if (slots!!.isEmpty()) BigDecimal.ZERO else BigDecimal(sum).divide(
-            BigDecimal.valueOf(slots!!.size.toLong() * slotResolution + lastUpdateTick % slotResolution - slotResolution),
-            RoundingMode.HALF_UP
-        )
+        if (lastUpdateTick - firstUpdateTick < slotResolution * slotNum) {
+            return BigDecimal(sum).divide(
+                BigDecimal.valueOf(
+                    (lastUpdateTick - firstUpdateTick + 1).toLong(),
+                ),
+                RoundingMode.HALF_UP,
+            )
+        }
+        return if (slots!!.isEmpty()) {
+            BigDecimal.ZERO
+        } else {
+            BigDecimal(sum).divide(
+                BigDecimal.valueOf(slots!!.size.toLong() * slotResolution + lastUpdateTick % slotResolution - slotResolution),
+                RoundingMode.HALF_UP,
+            )
+        }
     }
 }

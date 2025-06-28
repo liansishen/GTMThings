@@ -1,5 +1,9 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part
 
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.player.Player
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.gui.GuiTextures
@@ -23,13 +27,13 @@ import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget
 import com.lowdragmc.lowdraglib.syncdata.ISubscription
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import net.minecraft.ChatFormatting
-import net.minecraft.network.chat.Component
-import net.minecraft.world.entity.player.Player
 import org.apache.commons.lang3.ArrayUtils
+
 import java.util.*
 
-open class CreativeLaserHatchPartMachine(holder: IMachineBlockEntity):TieredIOPartMachine(holder, GTValues.MAX, IO.IN),IDataInfoProvider {
+open class CreativeLaserHatchPartMachine(holder: IMachineBlockEntity) :
+    TieredIOPartMachine(holder, GTValues.MAX, IO.IN),
+    IDataInfoProvider {
 
     companion object {
         @JvmStatic
@@ -47,7 +51,7 @@ open class CreativeLaserHatchPartMachine(holder: IMachineBlockEntity):TieredIOPa
             ChatFormatting.DARK_GREEN.toString() + "UIV",
             ChatFormatting.YELLOW.toString() + "UXV",
             ChatFormatting.BLUE.toString() + ChatFormatting.BOLD + "OpV",
-            ChatFormatting.RED.toString() + ChatFormatting.BOLD + "MAX"
+            ChatFormatting.RED.toString() + ChatFormatting.BOLD + "MAX",
         )
     }
 
@@ -71,7 +75,6 @@ open class CreativeLaserHatchPartMachine(holder: IMachineBlockEntity):TieredIOPa
         this.maxEnergy = voltage * 64L * amps
         this.buffer = NotifiableLaserContainer.receiverContainer(this, this.maxEnergy!!, voltage, amps.toLong())
     }
-
 
     override fun onUnload() {
         super.onUnload()
@@ -102,68 +105,77 @@ open class CreativeLaserHatchPartMachine(holder: IMachineBlockEntity):TieredIOPa
         }
     }
 
-    override fun canShared(): Boolean {
-        return false
-    }
+    override fun canShared(): Boolean = false
 
-    override fun getFieldHolder(): ManagedFieldHolder {
-        return MANAGED_FIELD_HOLDER
-    }
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
-    override fun createUI(entityPlayer: Player): ModularUI {
-        return ModularUI(176, 136, this, entityPlayer)
-            .background(GuiTextures.BACKGROUND)
-            .widget(LabelWidget(7, 32, "gtceu.creative.energy.voltage"))
-            .widget(
-                TextFieldWidget(
-                    9, 47, 152, 16, { voltage.toString() },
-                    { value: String? ->
-                        voltage = value!!.toLong()
-                        setTier = GTUtil.getTierByVoltage(voltage).toInt()
-                    }).setNumbersOnly(8192L, Long.Companion.MAX_VALUE)
-            )
-            .widget(LabelWidget(7, 74, "gtceu.creative.energy.amperage"))
-            .widget(
-                ButtonWidget(
-                    7, 87, 20, 20,
-                    GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, TextTexture("-"))
-                ) { cd: ClickData? -> amps = if (--amps == -1) 0 else amps }
-            )
-            .widget(
-                TextFieldWidget(
-                    31, 89, 114, 16, { amps.toString() },
-                    { value: String? -> amps = value!!.toInt() }).setNumbersOnly(256, 67108864)
-            )
-            .widget(
-                ButtonWidget(
-                    149, 87, 20, 20,
-                    GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, TextTexture("+"))
-                ) { cd: ClickData? ->
-                    if (amps < Int.Companion.MAX_VALUE) {
-                        amps++
-                    }
+    override fun createUI(entityPlayer: Player): ModularUI = ModularUI(176, 136, this, entityPlayer)
+        .background(GuiTextures.BACKGROUND)
+        .widget(LabelWidget(7, 32, "gtceu.creative.energy.voltage"))
+        .widget(
+            TextFieldWidget(
+                9,
+                47,
+                152,
+                16,
+                { voltage.toString() },
+                { value: String? ->
+                    voltage = value!!.toLong()
+                    setTier = GTUtil.getTierByVoltage(voltage).toInt()
+                },
+            ).setNumbersOnly(8192L, Long.Companion.MAX_VALUE),
+        )
+        .widget(LabelWidget(7, 74, "gtceu.creative.energy.amperage"))
+        .widget(
+            ButtonWidget(
+                7,
+                87,
+                20,
+                20,
+                GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, TextTexture("-")),
+            ) { cd: ClickData? -> amps = if (--amps == -1) 0 else amps },
+        )
+        .widget(
+            TextFieldWidget(
+                31,
+                89,
+                114,
+                16,
+                { amps.toString() },
+                { value: String? -> amps = value!!.toInt() },
+            ).setNumbersOnly(256, 67108864),
+        )
+        .widget(
+            ButtonWidget(
+                149,
+                87,
+                20,
+                20,
+                GuiTextureGroup(ResourceBorderTexture.BUTTON_COMMON, TextTexture("+")),
+            ) { cd: ClickData? ->
+                if (amps < Int.Companion.MAX_VALUE) {
+                    amps++
                 }
-            )
-
-            .widget(
-                SelectorWidget(7, 7, 30, 20, Arrays.stream(VNF).toList(), -1)
-                    .setOnChanged { tier: String? ->
-                        setTier = ArrayUtils.indexOf(VNF, tier) + 5
-                        voltage = GTValues.VEX[setTier]
-                    }
-                    .setSupplier { VNF[setTier - 5] }
-                    .setButtonBackground(ResourceBorderTexture.BUTTON_COMMON)
-                    .setBackground(ColorPattern.BLACK.rectTexture())
-                    .setValue(VNF[setTier - 5])
-            )
-    }
+            },
+        )
+        .widget(
+            SelectorWidget(7, 7, 30, 20, Arrays.stream(VNF).toList(), -1)
+                .setOnChanged { tier: String? ->
+                    setTier = ArrayUtils.indexOf(VNF, tier) + 5
+                    voltage = GTValues.VEX[setTier]
+                }
+                .setSupplier { VNF[setTier - 5] }
+                .setButtonBackground(ResourceBorderTexture.BUTTON_COMMON)
+                .setBackground(ColorPattern.BLACK.rectTexture())
+                .setValue(VNF[setTier - 5]),
+        )
 
     override fun getDataInfo(mode: PortableScannerBehavior.DisplayMode): MutableList<Component?> {
         if (mode == PortableScannerBehavior.DisplayMode.SHOW_ALL || mode == PortableScannerBehavior.DisplayMode.SHOW_ELECTRICAL_INFO) {
             return mutableListOf(
                 Component.literal(
-                    String.format("%d/%d EU", buffer!!.getEnergyStored(), buffer!!.energyCapacity)
-                )
+                    String.format("%d/%d EU", buffer!!.getEnergyStored(), buffer!!.energyCapacity),
+                ),
             )
         }
         return ArrayList<Component?>()

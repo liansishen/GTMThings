@@ -1,5 +1,15 @@
 package com.hepdd.gtmthings.client
 
+import net.minecraft.client.Camera
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GameRenderer
+import net.minecraft.core.BlockPos
+import net.minecraftforge.api.distmarker.Dist
+import net.minecraftforge.api.distmarker.OnlyIn
+import net.minecraftforge.client.event.RenderLevelStageEvent
+import net.minecraftforge.eventbus.api.SubscribeEvent
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.hepdd.gtmthings.GTMThings
 import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor
@@ -10,15 +20,6 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.Tesselator
 import com.mojang.blaze3d.vertex.VertexFormat
-import net.minecraft.client.Camera
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GameRenderer
-import net.minecraft.core.BlockPos
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.client.event.RenderLevelStageEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber
 
 @EventBusSubscriber(modid = GTMThings.MOD_ID, bus = EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 @OnlyIn(Dist.CLIENT)
@@ -70,7 +71,7 @@ class ForgeClientEventHandler {
                 0.2f,
                 1.0f,
                 0.25f,
-                true
+                true,
             )
             tesselator.end()
             buffer.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL)
@@ -88,7 +89,7 @@ class ForgeClientEventHandler {
                 0.0f,
                 0.0f,
                 1.0f,
-                0.5f
+                0.5f,
             )
             tesselator.end()
             RenderSystem.enableCull()

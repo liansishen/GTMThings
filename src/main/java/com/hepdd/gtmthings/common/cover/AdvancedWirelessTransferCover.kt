@@ -1,5 +1,22 @@
 package com.hepdd.gtmthings.common.cover
 
+import net.minecraft.MethodsReturnNonnullByDefault
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.registries.Registries
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.ItemStack
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.FluidUtil
+import net.minecraftforge.fluids.capability.IFluidHandler
+import net.minecraftforge.items.IItemHandler
+import net.minecraftforge.items.ItemHandlerHelper
+
 import com.gregtechceu.gtceu.api.capability.ICoverable
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.cover.CoverBehavior
@@ -27,36 +44,16 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import net.minecraft.MethodsReturnNonnullByDefault
-import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
-import net.minecraft.core.registries.Registries
-import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.MinecraftServer
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.item.ItemStack
-import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fluids.capability.IFluidHandler
-import net.minecraftforge.items.IItemHandler
-import net.minecraftforge.items.ItemHandlerHelper
+
 import java.util.*
 import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-class AdvancedWirelessTransferCover(
-    definition: CoverDefinition,
-    coverHolder: ICoverable,
-    attachedSide: Direction,
-    @field:Persisted private val transferType: Int
-) : CoverBehavior(definition, coverHolder, attachedSide), IUICover {
-    override fun getFieldHolder(): ManagedFieldHolder {
-        return MANAGED_FIELD_HOLDER
-    }
+class AdvancedWirelessTransferCover(definition: CoverDefinition, coverHolder: ICoverable, attachedSide: Direction, @field:Persisted private val transferType: Int) :
+    CoverBehavior(definition, coverHolder, attachedSide),
+    IUICover {
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
     private var subscription: TickableSubscription? = null
     private var targetLever: ServerLevel? = null
@@ -210,8 +207,10 @@ class AdvancedWirelessTransferCover(
     private fun transferAny(source: IFluidHandler, destination: IFluidHandler) {
         filterHandlerFluid.getFilter()?.let {
             GTTransferUtils.transferFluidsFiltered(
-                source, destination,
-                it, Int.Companion.MAX_VALUE
+                source,
+                destination,
+                it,
+                Int.Companion.MAX_VALUE,
             )
         }
     }
@@ -245,12 +244,10 @@ class AdvancedWirelessTransferCover(
             return FluidUtil.getFluidHandler(targetLever, targetPos, facing!!.opposite).resolve().orElse(null)
         }
 
-    override fun createUIWidget(): Widget {
-        return if (transferType == TRANSFER_ITEM) {
-            createItemUIWidget()
-        } else {
-            createFluidUIWidget()
-        }
+    override fun createUIWidget(): Widget = if (transferType == TRANSFER_ITEM) {
+        createItemUIWidget()
+    } else {
+        createFluidUIWidget()
     }
 
     fun createItemUIWidget(): Widget {
@@ -279,7 +276,8 @@ class AdvancedWirelessTransferCover(
 
     companion object {
         val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
-            AdvancedWirelessTransferCover::class.java, CoverBehavior.MANAGED_FIELD_HOLDER
+            AdvancedWirelessTransferCover::class.java,
+            CoverBehavior.MANAGED_FIELD_HOLDER,
         )
 
         const val TRANSFER_ITEM: Int = 1

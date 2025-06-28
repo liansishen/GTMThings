@@ -1,5 +1,11 @@
 package com.hepdd.gtmthings.data
 
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.FluidUtil
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.data.RotationState
 import com.gregtechceu.gtceu.api.item.ComponentItem
@@ -22,11 +28,7 @@ import com.tterrag.registrate.providers.ProviderType
 import com.tterrag.registrate.providers.RegistrateItemModelProvider
 import com.tterrag.registrate.util.entry.ItemEntry
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer
-import net.minecraft.network.chat.Component
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
-import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.FluidUtil
+
 import java.util.function.Function
 import java.util.function.Supplier
 
@@ -39,7 +41,7 @@ class CreativeMachines {
 
         @JvmStatic
         val CREATIVE_FLUID_INPUT_HATCH: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.machine(
-            "creative_fluid_input_hatch"
+            "creative_fluid_input_hatch",
         ) { holder: IMachineBlockEntity? -> CreativeInputHatchPartMachine(holder!!) }
             .rotationState(RotationState.ALL)
             .overlayTieredHullRenderer("fluid_hatch.import_9x")
@@ -50,7 +52,7 @@ class CreativeMachines {
 
         @JvmStatic
         val CREATIVE_ITEM_INPUT_BUS: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.machine(
-            "creative_item_input_bus"
+            "creative_item_input_bus",
         ) { holder: IMachineBlockEntity? -> CreativeInputBusPartMachine(holder!!) }
             .rotationState(RotationState.ALL)
             .overlayTieredHullRenderer("item_bus.import")
@@ -62,7 +64,7 @@ class CreativeMachines {
         // energy input hatch
         @JvmStatic
         val CREATIVE_ENERGY_INPUT_HATCH: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.machine(
-            "creative_energy_hatch"
+            "creative_energy_hatch",
         ) { holder: IMachineBlockEntity? -> CreativeEnergyHatchPartMachine(holder!!) }
             .rotationState(RotationState.ALL)
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
@@ -74,7 +76,7 @@ class CreativeMachines {
         // laser input hatch
         @JvmStatic
         val CREATIVE_LASER_INPUT_HATCH: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.machine(
-            "creative_laser_hatch"
+            "creative_laser_hatch",
         ) { holder: IMachineBlockEntity? -> CreativeLaserHatchPartMachine(holder!!) }
             .rotationState(RotationState.ALL)
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
@@ -86,32 +88,32 @@ class CreativeMachines {
         @JvmStatic
         var CREATIVE_ENERGY_COVER: ItemEntry<ComponentItem?> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
             .item<ComponentItem?>(
-                "creative_energy_cover"
+                "creative_energy_cover",
             ) { properties: Item.Properties? -> ComponentItem.create(properties) }
             .onRegister(
                 GTItems.attach<ComponentItem?>(
                     CoverPlaceBehavior(GTMTCovers.CREATIVE_ENERGY),
-                    TooltipBehavior { lines: MutableList<Component?>? -> lines!!.add(Component.translatable("gtmthings.creative_tooltip")) }
-                )
+                    TooltipBehavior { lines: MutableList<Component?>? -> lines!!.add(Component.translatable("gtmthings.creative_tooltip")) },
+                ),
             )
             .register()
 
         @JvmStatic
         var CREATIVE_FLUID_CELL: ItemEntry<ComponentItem?> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
             .item<ComponentItem?>(
-                "creative_fluid_cell"
+                "creative_fluid_cell",
             ) { properties: Item.Properties? -> ComponentItem.create(properties) }
             .color { Supplier { GTItems.cellColor() } }
             .setData<RegistrateItemModelProvider?>(
                 ProviderType.ITEM_MODEL,
-                NonNullBiConsumer.noop<DataGenContext<Item?, ComponentItem?>?, RegistrateItemModelProvider?>()
+                NonNullBiConsumer.noop<DataGenContext<Item?, ComponentItem?>?, RegistrateItemModelProvider?>(),
             )
             .onRegister(
                 GTItems.attach<ComponentItem?>(
                     cellName(),
                     CreativeFluidStats(),
-                    ItemFluidContainer()
-                )
+                    ItemFluidContainer(),
+                ),
             )
             .register()
 

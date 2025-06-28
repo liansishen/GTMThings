@@ -1,5 +1,16 @@
 package com.hepdd.gtmthings.common.cover
 
+import net.minecraft.MethodsReturnNonnullByDefault
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.ItemStack
+
 import com.gregtechceu.gtceu.api.capability.ICoverable
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.cover.CoverBehavior
@@ -20,27 +31,13 @@ import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import net.minecraft.MethodsReturnNonnullByDefault
-import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
-import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.MinecraftServer
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.item.ItemStack
+
 import java.util.*
 import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-class WirelessTransferCover(
-    definition: CoverDefinition,
-    coverHolder: ICoverable,
-    attachedSide: Direction,
-    @field:Persisted private val transferType: Int
-) : CoverBehavior(definition, coverHolder, attachedSide) {
+class WirelessTransferCover(definition: CoverDefinition, coverHolder: ICoverable, attachedSide: Direction, @field:Persisted private val transferType: Int) : CoverBehavior(definition, coverHolder, attachedSide) {
     private var subscription: TickableSubscription? = null
     private var targetLever: ServerLevel? = null
 
@@ -53,9 +50,7 @@ class WirelessTransferCover(
     @Persisted
     private var facing: Direction? = null
 
-    override fun getFieldHolder(): ManagedFieldHolder {
-        return MANAGED_FIELD_HOLDER
-    }
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
     override fun canAttach(): Boolean {
         val targetMachine = MetaMachine.getMachine(coverHolder.level, coverHolder.pos)
@@ -148,7 +143,7 @@ class WirelessTransferCover(
                     { f: ItemStack? -> true },
                     this.targetLever,
                     this.targetPos,
-                    this.facing
+                    this.facing,
                 )
             } else {
                 val fluidTransfer =
@@ -160,7 +155,7 @@ class WirelessTransferCover(
                     { f: FluidStack? -> true },
                     this.targetLever,
                     this.targetPos,
-                    this.facing
+                    this.facing,
                 )
             }
         }
@@ -169,7 +164,7 @@ class WirelessTransferCover(
     companion object {
         private val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
             WirelessTransferCover::class.java,
-            CoverBehavior.MANAGED_FIELD_HOLDER
+            CoverBehavior.MANAGED_FIELD_HOLDER,
         )
 
         const val TRANSFER_ITEM: Int = 1

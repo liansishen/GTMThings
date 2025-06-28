@@ -1,5 +1,17 @@
 package com.hepdd.gtmthings.common.block.machine.electric
 
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.BlockHitResult
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
@@ -14,31 +26,23 @@ import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
 import com.hepdd.gtmthings.utils.TeamUtil
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
-import net.minecraft.network.chat.Component
-import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.phys.BlockHitResult
+
 import java.util.*
 
-class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(holder, GTValues.MAX, IO.IN), IInteractedMachine, IMachineLife, IWirelessEnergyContainerHolder {
+class WirelessEnergyInterface(holder: IMachineBlockEntity) :
+    TieredIOPartMachine(holder, GTValues.MAX, IO.IN),
+    IInteractedMachine,
+    IMachineLife,
+    IWirelessEnergyContainerHolder {
 
     companion object {
         @JvmStatic
         val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
             WirelessEnergyInterface::class.java,
-            MetaMachine.MANAGED_FIELD_HOLDER
+            MetaMachine.MANAGED_FIELD_HOLDER,
         )
 
-        fun getFieldHolder(): ManagedFieldHolder {
-            return MANAGED_FIELD_HOLDER
-        }
+        fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
     }
 
     private var updEnergySubs: TickableSubscription? = null
@@ -54,8 +58,10 @@ class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(
     private fun createEnergyContainer(): NotifiableEnergyContainer {
         val container =
             NotifiableEnergyContainer.receiverContainer(
-                this, Long.MAX_VALUE,
-                GTValues.VEX[tier], 67108864
+                this,
+                Long.MAX_VALUE,
+                GTValues.VEX[tier],
+                67108864,
             )
         container.setSideInputCondition { s: Direction -> s == frontFacing && isWorkingEnabled }
         container.setCapabilityValidator { s: Direction? -> s == null || s == frontFacing }
@@ -93,18 +99,9 @@ class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(
         if (changeEnergy > 0) energyContainer.energyStored = currentStored - changeEnergy
     }
 
-    override fun shouldOpenUI(player: Player?, hand: InteractionHand?, hit: BlockHitResult?): Boolean {
-        return false
-    }
+    override fun shouldOpenUI(player: Player?, hand: InteractionHand?, hit: BlockHitResult?): Boolean = false
 
-    override fun onUse(
-        state: BlockState?,
-        world: Level?,
-        pos: BlockPos?,
-        player: Player,
-        hand: InteractionHand?,
-        hit: BlockHitResult?
-    ): InteractionResult {
+    override fun onUse(state: BlockState?, world: Level?, pos: BlockPos?, player: Player, hand: InteractionHand?, hit: BlockHitResult?): InteractionResult {
         if (isRemote) return InteractionResult.PASS
         val `is` = player.getItemInHand(hand!!)
         if (`is`.isEmpty) return InteractionResult.PASS
@@ -114,8 +111,8 @@ class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(
             player.sendSystemMessage(
                 Component.translatable(
                     "gtmthings.machine.wireless_energy_hatch.tooltip.bind",
-                    TeamUtil.getName(player)
-                )
+                    TeamUtil.getName(player),
+                ),
             )
             updateEnergySubscription()
             return InteractionResult.SUCCESS
@@ -123,13 +120,7 @@ class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(
         return InteractionResult.PASS
     }
 
-    override fun onLeftClick(
-        player: Player,
-        world: Level?,
-        hand: InteractionHand?,
-        pos: BlockPos?,
-        direction: Direction?
-    ): Boolean {
+    override fun onLeftClick(player: Player, world: Level?, hand: InteractionHand?, pos: BlockPos?, direction: Direction?): Boolean {
         if (isRemote) return false
         val `is` = player.getItemInHand(hand!!)
         if (`is`.isEmpty) return false
@@ -150,21 +141,18 @@ class WirelessEnergyInterface(holder: IMachineBlockEntity): TieredIOPartMachine(
         }
     }
 
-    override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? {
-        return this.wirelessEnergyContainerCache
-    }
+    override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? = this.wirelessEnergyContainerCache
 
     override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer) {
         this.wirelessEnergyContainerCache = container
     }
 
-    override fun getUUID(): UUID? {
-        return this.ownerUUID
-    }
+    override fun getUUID(): UUID? = this.ownerUUID
 
-
-    /**/////////////////////////////////// */ // ********** Misc **********//
-    /**/////////////////////////////////// */
+    /**/
+    // //////////////////////////////// */ // ********** Misc **********//
+    /**/
+    // //////////////////////////////// */
     override fun tintColor(index: Int): Int {
         if (index == 2) {
             return GTValues.VC[getTier()]

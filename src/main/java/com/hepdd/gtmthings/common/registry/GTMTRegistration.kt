@@ -1,9 +1,10 @@
 package com.hepdd.gtmthings.common.registry
 
-import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate
-import com.hepdd.gtmthings.GTMThings
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.CreativeModeTab
+
+import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate
+import com.hepdd.gtmthings.GTMThings
 
 open class GTMTRegistration {
 
@@ -16,6 +17,7 @@ open class GTMTRegistration {
         }
     }
 
-    private fun GTMTRegistration() { /**/
+    private fun GTMTRegistration() {
+        /**/
     }
 }

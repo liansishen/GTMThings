@@ -1,5 +1,10 @@
 package com.hepdd.gtmthings.api.machine.trait
 
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.level.material.Fluid
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
+
 import appeng.api.stacks.AEFluidKey
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.machine.MetaMachine
@@ -8,14 +13,16 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipe
 import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank
 import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.level.material.Fluid
-import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
+
 import kotlin.math.min
 
-class InaccessibleInfiniteTank(holder: MetaMachine, internalBuffer: KeyStorage): NotifiableFluidTank(holder,
-    mutableListOf<CustomFluidTank?>(FluidStorageDelegate(internalBuffer)), IO.OUT, IO.NONE) {
+class InaccessibleInfiniteTank(holder: MetaMachine, internalBuffer: KeyStorage) :
+    NotifiableFluidTank(
+        holder,
+        mutableListOf<CustomFluidTank?>(FluidStorageDelegate(internalBuffer)),
+        IO.OUT,
+        IO.NONE,
+    ) {
     private var storage: FluidStorageDelegate? = null
 
     init {
@@ -33,12 +40,7 @@ class InaccessibleInfiniteTank(holder: MetaMachine, internalBuffer: KeyStorage):
         return null
     }
 
-    override fun handleRecipe(
-        io: IO?,
-        recipe: GTRecipe?,
-        left: MutableList<*>,
-        simulate: Boolean
-    ): MutableList<FluidIngredient?>? {
+    override fun handleRecipe(io: IO?, recipe: GTRecipe?, left: MutableList<*>, simulate: Boolean): MutableList<FluidIngredient?>? {
         if (!simulate && io == IO.OUT) {
             for (ingredient in left) {
                 if ((ingredient as FluidIngredient).isEmpty) continue
@@ -53,42 +55,23 @@ class InaccessibleInfiniteTank(holder: MetaMachine, internalBuffer: KeyStorage):
         return null
     }
 
-    override fun getTanks(): Int {
-        return 128
-    }
+    override fun getTanks(): Int = 128
 
-    override fun getContents(): MutableList<Any?> {
-        return mutableListOf()
-    }
+    override fun getContents(): MutableList<Any?> = mutableListOf()
 
-    override fun getTotalContentAmount(): Double {
-        return 0.0
-    }
+    override fun getTotalContentAmount(): Double = 0.0
 
-    override fun isEmpty(): Boolean {
-        return true
-    }
+    override fun isEmpty(): Boolean = true
 
-    override fun getFluidInTank(tank: Int): FluidStack {
-        return FluidStack.EMPTY
-    }
+    override fun getFluidInTank(tank: Int): FluidStack = FluidStack.EMPTY
 
     override fun setFluidInTank(tank: Int, fluidStack: FluidStack) {}
 
-    override fun getTankCapacity(tank: Int): Int {
-        return Int.Companion.MAX_VALUE
-    }
+    override fun getTankCapacity(tank: Int): Int = Int.Companion.MAX_VALUE
 
-    override fun isFluidValid(tank: Int, stack: FluidStack): Boolean {
-        return true
-    }
+    override fun isFluidValid(tank: Int, stack: FluidStack): Boolean = true
 
-    override fun handleRecipeInner(
-        io: IO?,
-        recipe: GTRecipe?,
-        left: MutableList<FluidIngredient>,
-        simulate: Boolean
-    ): MutableList<FluidIngredient>? {
+    override fun handleRecipeInner(io: IO?, recipe: GTRecipe?, left: MutableList<FluidIngredient>, simulate: Boolean): MutableList<FluidIngredient>? {
         if (io != IO.OUT) return left
         val action = if (simulate) FluidAction.SIMULATE else FluidAction.EXECUTE
         val it: MutableIterator<FluidIngredient?> = left.iterator()
@@ -122,9 +105,7 @@ class InaccessibleInfiniteTank(holder: MetaMachine, internalBuffer: KeyStorage):
             }
         }
 
-        override fun getCapacity(): Int {
-            return Int.Companion.MAX_VALUE
-        }
+        override fun getCapacity(): Int = Int.Companion.MAX_VALUE
 
         override fun setFluid(fluid: FluidStack?) {}
 
@@ -139,12 +120,8 @@ class InaccessibleInfiniteTank(holder: MetaMachine, internalBuffer: KeyStorage):
             return changeValue.toInt()
         }
 
-        override fun supportsFill(tank: Int): Boolean {
-            return false
-        }
+        override fun supportsFill(tank: Int): Boolean = false
 
-        override fun supportsDrain(tank: Int): Boolean {
-            return false
-        }
+        override fun supportsDrain(tank: Int): Boolean = false
     }
 }

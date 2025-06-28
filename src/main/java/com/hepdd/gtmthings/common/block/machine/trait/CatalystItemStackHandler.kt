@@ -1,5 +1,8 @@
 package com.hepdd.gtmthings.common.block.machine.trait
 
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Ingredient
+
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability
 import com.gregtechceu.gtceu.api.machine.MetaMachine
@@ -9,18 +12,14 @@ import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler
 import com.gregtechceu.gtceu.utils.ItemStackHashStrategy
 import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.crafting.Ingredient
+
 import java.util.function.IntFunction
 
-class CatalystItemStackHandler(machine: MetaMachine, slots: Int, handlerIO: IO, capabilityIO: IO):NotifiableItemStackHandler(machine, slots, handlerIO, capabilityIO, IntFunction { size: Int -> CustomItemStackHandler(size) }) {
+class CatalystItemStackHandler(machine: MetaMachine, slots: Int, handlerIO: IO, capabilityIO: IO) : NotifiableItemStackHandler(machine, slots, handlerIO, capabilityIO, IntFunction { size: Int -> CustomItemStackHandler(size) }) {
 
     constructor(machine: MetaMachine, slots: Int, handlerIO: IO) : this(machine, slots, handlerIO, handlerIO)
 
-    override fun handleRecipeInner(
-        io: IO?, recipe: GTRecipe, left: MutableList<Ingredient?>?,
-        simulate: Boolean
-    ): MutableList<Ingredient?>? {
+    override fun handleRecipeInner(io: IO?, recipe: GTRecipe, left: MutableList<Ingredient?>?, simulate: Boolean): MutableList<Ingredient?>? {
         val map: Object2IntMap<ItemStack?> =
             Object2IntOpenCustomHashMap<ItemStack?>(ItemStackHashStrategy.comparingAllButCount())
         for (i in 0..<storage.slots) {

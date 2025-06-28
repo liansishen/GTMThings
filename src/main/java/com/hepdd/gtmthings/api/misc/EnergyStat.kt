@@ -26,10 +26,14 @@ class EnergyStat(windowStart: Int) {
             }
         }
         averageEnergy =
-            if (lastChangedCache.compareTo(BigInteger.ZERO) == 0) BigDecimal.ZERO else BigDecimal(lastChangedCache).divide(
-                BigDecimal.valueOf(minute!!.slotResolution.toLong()),
-                RoundingMode.HALF_UP
-            )
+            if (lastChangedCache.compareTo(BigInteger.ZERO) == 0) {
+                BigDecimal.ZERO
+            } else {
+                BigDecimal(lastChangedCache).divide(
+                    BigDecimal.valueOf(minute!!.slotResolution.toLong()),
+                    RoundingMode.HALF_UP,
+                )
+            }
         lastChangedCache = BigInteger.ZERO
     }
 
@@ -40,19 +44,11 @@ class EnergyStat(windowStart: Int) {
         lastChangedCache = lastChangedCache.add(value)
     }
 
-    fun getMinuteAvg(): BigDecimal {
-        return minute!!.getAvgByTick()
-    }
+    fun getMinuteAvg(): BigDecimal = minute!!.getAvgByTick()
 
-    fun getHourAvg(): BigDecimal {
-        return hour!!.getAvgByTick()
-    }
+    fun getHourAvg(): BigDecimal = hour!!.getAvgByTick()
 
-    fun getDayAvg(): BigDecimal {
-        return day!!.getAvgByTick()
-    }
+    fun getDayAvg(): BigDecimal = day!!.getAvgByTick()
 
-    fun getAvgEnergy(): BigDecimal {
-        return averageEnergy
-    }
+    fun getAvgEnergy(): BigDecimal = averageEnergy
 }

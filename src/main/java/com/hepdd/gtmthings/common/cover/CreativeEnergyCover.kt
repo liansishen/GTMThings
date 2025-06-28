@@ -1,5 +1,10 @@
 package com.hepdd.gtmthings.common.cover
 
+import net.minecraft.MethodsReturnNonnullByDefault
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.ItemStack
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper
 import com.gregtechceu.gtceu.api.capability.ICoverable
@@ -11,17 +16,13 @@ import com.gregtechceu.gtceu.api.machine.TickableSubscription
 import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import net.minecraft.MethodsReturnNonnullByDefault
-import net.minecraft.core.Direction
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.item.ItemStack
+
 import javax.annotation.ParametersAreNonnullByDefault
 import kotlin.math.min
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-class CreativeEnergyCover(definition: CoverDefinition, coverHolder: ICoverable, attachedSide: Direction) :
-    CoverBehavior(definition, coverHolder, attachedSide) {
+class CreativeEnergyCover(definition: CoverDefinition, coverHolder: ICoverable, attachedSide: Direction) : CoverBehavior(definition, coverHolder, attachedSide) {
     private var subscription: TickableSubscription? = null
 
     @Persisted
@@ -36,9 +37,7 @@ class CreativeEnergyCover(definition: CoverDefinition, coverHolder: ICoverable, 
     @Persisted
     private var machineMaxEnergy: Long = 0
 
-    override fun getFieldHolder(): ManagedFieldHolder {
-        return MANAGED_FIELD_HOLDER
-    }
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
     init {
         this.tier = GTValues.LV
@@ -102,7 +101,7 @@ class CreativeEnergyCover(definition: CoverDefinition, coverHolder: ICoverable, 
     companion object {
         private val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
             CreativeEnergyCover::class.java,
-            CoverBehavior.MANAGED_FIELD_HOLDER
+            CoverBehavior.MANAGED_FIELD_HOLDER,
         )
     }
 }

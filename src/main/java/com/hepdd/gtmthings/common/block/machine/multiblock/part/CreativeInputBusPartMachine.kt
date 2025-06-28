@@ -1,5 +1,12 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part
 
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Ingredient
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.gui.GuiTextures
@@ -24,21 +31,18 @@ import com.lowdragmc.lowdraglib.misc.ItemStackTransfer
 import com.lowdragmc.lowdraglib.syncdata.ISubscription
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.world.inventory.ClickType
-import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.crafting.Ingredient
+
 import java.util.function.Function
 import java.util.function.IntFunction
 
-open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFactory: Function<Int?, ItemStackTransfer>):TieredIOPartMachine(holder, GTValues.MAX, IO.IN),IDistinctPart {
+open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFactory: Function<Int?, ItemStackTransfer>) :
+    TieredIOPartMachine(holder, GTValues.MAX, IO.IN),
+    IDistinctPart {
     companion object {
         @JvmStatic
         val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
             CreativeInputBusPartMachine::class.java,
-            TieredIOPartMachine.MANAGED_FIELD_HOLDER
+            TieredIOPartMachine.MANAGED_FIELD_HOLDER,
         )
 
         private const val ITEM_SIZE = 5
@@ -65,27 +69,19 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
 
     constructor(holder: IMachineBlockEntity) : this(holder, Function { size: Int? -> ItemStackTransfer(size!!) })
 
-    override fun getFieldHolder(): ManagedFieldHolder {
-        return MANAGED_FIELD_HOLDER
-    }
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
-    protected fun getInventorySize(): Int {
-        return ITEM_SIZE * ITEM_SIZE
-    }
+    protected fun getInventorySize(): Int = ITEM_SIZE * ITEM_SIZE
 
-    protected fun createInventory(): NotifiableItemStackHandler {
-        return InfinityItemStackHandler(
-            this,
-            getInventorySize(),
-            io,
-            io
-        ) { size: Int -> UnlimitedItemStackTransfer(size) }
-    }
+    protected fun createInventory(): NotifiableItemStackHandler = InfinityItemStackHandler(
+        this,
+        getInventorySize(),
+        io,
+        io,
+    ) { size: Int -> UnlimitedItemStackTransfer(size) }
 
-    protected fun createCircuitItemHandler(): NotifiableItemStackHandler {
-        return NotifiableItemStackHandler(this, 1, IO.IN, IO.NONE)
-            .setFilter { itemStack: ItemStack? -> IntCircuitBehaviour.isIntegratedCircuit(itemStack) }
-    }
+    protected fun createCircuitItemHandler(): NotifiableItemStackHandler = NotifiableItemStackHandler(this, 1, IO.IN, IO.NONE)
+        .setFilter { itemStack: ItemStack? -> IntCircuitBehaviour.isIntegratedCircuit(itemStack) }
 
     override fun onLoad() {
         super.onLoad()
@@ -106,9 +102,7 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
         }
     }
 
-    override fun isDistinct(): Boolean {
-        return inventory.isDistinct() && circuitInventory!!.isDistinct()
-    }
+    override fun isDistinct(): Boolean = inventory.isDistinct() && circuitInventory!!.isDistinct()
 
     override fun setDistinct(isDistinct: Boolean) {
         inventory.setDistinct(isDistinct)
@@ -164,19 +158,14 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
                 val finalIndex = index++
                 container.addWidget(
                     object : PhantomSlotWidget(this.creativeStorage, finalIndex, 4 + x * 18, 4 + y * 18) {
-                        override fun slotClickPhantom(
-                            slot: Slot,
-                            mouseButton: Int,
-                            clickTypeIn: ClickType,
-                            stackHeld: ItemStack
-                        ): ItemStack {
+                        override fun slotClickPhantom(slot: Slot, mouseButton: Int, clickTypeIn: ClickType, stackHeld: ItemStack): ItemStack {
                             var stack = ItemStack.EMPTY
                             val stackSlot = slot.item
                             if (!stackSlot.isEmpty) {
                                 stack = stackSlot.copy()
                             }
 
-                            if (stackHeld.isEmpty || mouseButton == 2 || mouseButton == 1) {   // held is
+                            if (stackHeld.isEmpty || mouseButton == 2 || mouseButton == 1) { // held is
                                 lstItem!!.remove(stackSlot.item)
                                 fillPhantomSlot(slot, ItemStack.EMPTY)
                                 inventory.setStackInSlot(finalIndex, ItemStack.EMPTY)
@@ -191,7 +180,7 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
                                     updateInventorySubscription()
                                 }
                             } else {
-                                if (!areItemsEqual(stackSlot, stackHeld)) {  // slot item is not equal to held item
+                                if (!areItemsEqual(stackSlot, stackHeld)) { // slot item is not equal to held item
                                     if (!lstItem!!.contains(stackHeld.item)) { // item not in another slot ->
                                         // change the slot
                                         lstItem!!.remove(stackSlot.item)
@@ -207,12 +196,7 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
                             return stack
                         }
 
-                        override fun drawInBackground(
-                            graphics: GuiGraphics,
-                            mouseX: Int,
-                            mouseY: Int,
-                            partialTicks: Float
-                        ) {
+                        override fun drawInBackground(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
                             super.drawInBackground(graphics, mouseX, mouseY, partialTicks)
                             val position = getPosition()
                             GuiTextures.SLOT.draw(
@@ -222,7 +206,7 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
                                 position.x.toFloat(),
                                 position.y.toFloat(),
                                 18,
-                                18
+                                18,
                             )
                             GuiTextures.CONFIG_ARROW_DARK.draw(
                                 graphics,
@@ -231,7 +215,7 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
                                 position.x.toFloat(),
                                 position.y.toFloat(),
                                 18,
-                                18
+                                18,
                             )
                             val stackX = position.x + 1
                             val stackY = position.y + 1
@@ -255,9 +239,7 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
                             }
                         }
 
-                        override fun areItemsEqual(itemStack1: ItemStack, itemStack2: ItemStack): Boolean {
-                            return ItemStack.matches(itemStack1, itemStack2)
-                        }
+                        override fun areItemsEqual(itemStack1: ItemStack, itemStack2: ItemStack): Boolean = ItemStack.matches(itemStack1, itemStack2)
 
                         fun mouseOverStock(mouseX: Double, mouseY: Double): Boolean {
                             val position = getPosition()
@@ -265,7 +247,7 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
                         }
                     }
                         .setClearSlotOnRightClick(false)
-                        .setChangeListener { this.markDirty() }
+                        .setChangeListener { this.markDirty() },
                 )
             }
         }
@@ -276,20 +258,7 @@ open class CreativeInputBusPartMachine(holder: IMachineBlockEntity, transferFact
         return group
     }
 
-    open class InfinityItemStackHandler(
-        machine: MetaMachine,
-        slots: Int,
-        handlerIO: IO,
-        capabilityIO: IO,
-        storageFactory: IntFunction<CustomItemStackHandler?>
-    ) : NotifiableItemStackHandler(machine, slots, handlerIO, capabilityIO, storageFactory) {
-        override fun handleRecipeInner(
-            io: IO,
-            recipe: GTRecipe,
-            left: MutableList<Ingredient?>,
-            simulate: Boolean
-        ): MutableList<Ingredient?>? {
-            return super.handleRecipeInner(io, recipe, left, true)
-        }
+    open class InfinityItemStackHandler(machine: MetaMachine, slots: Int, handlerIO: IO, capabilityIO: IO, storageFactory: IntFunction<CustomItemStackHandler?>) : NotifiableItemStackHandler(machine, slots, handlerIO, capabilityIO, storageFactory) {
+        override fun handleRecipeInner(io: IO, recipe: GTRecipe, left: MutableList<Ingredient?>, simulate: Boolean): MutableList<Ingredient?>? = super.handleRecipeInner(io, recipe, left, true)
     }
 }

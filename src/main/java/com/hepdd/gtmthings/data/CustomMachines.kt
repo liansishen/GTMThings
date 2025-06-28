@@ -1,5 +1,9 @@
 package com.hepdd.gtmthings.data
 
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
+
 import com.gregtechceu.gtceu.GTCEu
 import com.gregtechceu.gtceu.api.GTCEuAPI
 import com.gregtechceu.gtceu.api.GTValues
@@ -21,9 +25,7 @@ import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeDualHatchPar
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.ProgrammableHatchPartMachine
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng.MEOutputPartMachine
 import com.hepdd.gtmthings.common.registry.GTMTRegistration
-import net.minecraft.ChatFormatting
-import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
+
 import java.util.function.BiFunction
 import kotlin.math.pow
 
@@ -53,28 +55,30 @@ class CustomMachines {
                         tooltip!!.add(
                             Component.translatable("gtceu.universal.tooltip.uses_per_tick", energyPerTick)
                                 .append(Component.literal(", ").withStyle(ChatFormatting.GRAY))
-                                .append(Component.literal("§7每个方块需要§f" + (40 / 2.0.pow(tier.toDouble())).toInt() + "§7刻。"))
+                                .append(Component.literal("§7每个方块需要§f" + (40 / 2.0.pow(tier.toDouble())).toInt() + "§7刻。")),
                         )
                         tooltip.add(
                             Component.translatable(
                                 "gtceu.universal.tooltip.voltage_in",
                                 FormattingUtil.formatNumbers(GTValues.VEX[tier]),
-                                GTValues.VNF[tier]
-                            )
+                                GTValues.VNF[tier],
+                            ),
                         )
                         tooltip.add(
-                            Component.translatable("gtceu.universal.tooltip.working_area_max", maxArea, maxArea)
+                            Component.translatable("gtceu.universal.tooltip.working_area_max", maxArea, maxArea),
                         )
                     }
                     .recipeTypes(GTMTRecipeTypes.DIGITAL_MINER_RECIPE)
                     .register()
             },
-            GTValues.LV, GTValues.MV, GTValues.HV
+            GTValues.LV,
+            GTValues.MV,
+            GTValues.HV,
         )
 
         @JvmStatic
         val ME_EXPORT_BUFFER: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE.machine(
-            "me_export_buffer"
+            "me_export_buffer",
         ) { holder: IMachineBlockEntity -> MEOutputPartMachine(holder) }
             .rotationState(RotationState.ALL)
             .abilities(PartAbility.EXPORT_ITEMS, PartAbility.EXPORT_FLUIDS)
@@ -91,22 +95,26 @@ class CustomMachines {
                     .langValue(GTValues.VNF[tier!!] + " Input Bus")
                     .rotationState(RotationState.ALL)
                     .abilities(
-                        *if (tier == 0) arrayOf<PartAbility>(
-                            PartAbility.IMPORT_ITEMS,
-                            PartAbility.STEAM_IMPORT_ITEMS
-                        ) else arrayOf<PartAbility>(PartAbility.IMPORT_ITEMS)
+                        *if (tier == 0) {
+                            arrayOf<PartAbility>(
+                                PartAbility.IMPORT_ITEMS,
+                                PartAbility.STEAM_IMPORT_ITEMS,
+                            )
+                        } else {
+                            arrayOf<PartAbility>(PartAbility.IMPORT_ITEMS)
+                        },
                     )
                     .overlayTieredHullRenderer("item_bus.import")
                     .tooltips(
                         Component.translatable("gtmthings.machine.huge_item_bus.import.tooltip"),
                         Component.translatable(
                             "gtceu.universal.tooltip.item_storage_capacity",
-                            (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE
-                        )
+                            (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE,
+                        ),
                     )
                     .register()
             },
-            *ALL_TIERS
+            *ALL_TIERS,
         )
 
         @JvmStatic
@@ -118,22 +126,26 @@ class CustomMachines {
                     .langValue(GTValues.VNF[tier!!] + " Output Bus")
                     .rotationState(RotationState.ALL)
                     .abilities(
-                        *if (tier == 0) arrayOf<PartAbility>(
-                            PartAbility.EXPORT_ITEMS,
-                            PartAbility.STEAM_EXPORT_ITEMS
-                        ) else arrayOf<PartAbility>(PartAbility.EXPORT_ITEMS)
+                        *if (tier == 0) {
+                            arrayOf<PartAbility>(
+                                PartAbility.EXPORT_ITEMS,
+                                PartAbility.STEAM_EXPORT_ITEMS,
+                            )
+                        } else {
+                            arrayOf<PartAbility>(PartAbility.EXPORT_ITEMS)
+                        },
                     )
                     .overlayTieredHullRenderer("item_bus.export")
                     .tooltips(
                         Component.translatable("gtmthings.machine.huge_item_bus.export.tooltip"),
                         Component.translatable(
                             "gtceu.universal.tooltip.item_storage_capacity",
-                            (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE
-                        )
+                            (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE,
+                        ),
                     )
                     .register()
             },
-            *ALL_TIERS
+            *ALL_TIERS,
         )
 
         @JvmStatic
@@ -143,7 +155,7 @@ class CustomMachines {
                 HugeDualHatchPartMachine(
                     holder!!,
                     tier!!,
-                    IO.IN
+                    IO.IN,
                 )
             },
             { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
@@ -155,18 +167,19 @@ class CustomMachines {
                 builder.tooltips(
                     Component.translatable(
                         "gtceu.universal.tooltip.item_storage_capacity",
-                        (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE
-                    )
+                        (1 + tier) * HugeBusPartMachine.Companion.INV_MULTIPLE,
+                    ),
                 )
                     .tooltips(
                         Component.translatable(
                             "gtceu.universal.tooltip.fluid_storage_capacity_mult",
-                            tier, FormattingUtil.formatNumbers(Int.Companion.MAX_VALUE)
-                        )
+                            tier,
+                            FormattingUtil.formatNumbers(Int.Companion.MAX_VALUE),
+                        ),
                     )
                 builder.register()
             },
-            *ALL_TIERS
+            *ALL_TIERS,
         )
 
         @JvmStatic
@@ -176,7 +189,7 @@ class CustomMachines {
                 ProgrammableHatchPartMachine(
                     holder!!,
                     tier!!,
-                    IO.IN
+                    IO.IN,
                 )
             },
             { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
@@ -187,38 +200,33 @@ class CustomMachines {
                     .renderer {
                         OverlayTieredMachineRenderer(
                             tier,
-                            GTCEu.id("block/machine/part/dual_hatch.import")
+                            GTCEu.id("block/machine/part/dual_hatch.import"),
                         )
                     }
                     .tooltips(
                         Component.translatable("gtceu.machine.dual_hatch.import.tooltip"),
                         Component.translatable(
                             "gtceu.universal.tooltip.item_storage_capacity",
-                            (tier - 4).toDouble().pow(2.0).toInt()
+                            (tier - 4).toDouble().pow(2.0).toInt(),
                         ),
                         Component.translatable(
                             "gtceu.universal.tooltip.fluid_storage_capacity_mult",
                             (tier - 4),
-                            DualHatchPartMachine.getTankCapacity(DualHatchPartMachine.INITIAL_TANK_CAPACITY, tier)
+                            DualHatchPartMachine.getTankCapacity(DualHatchPartMachine.INITIAL_TANK_CAPACITY, tier),
                         ),
-                        Component.translatable("gtceu.universal.enabled")
+                        Component.translatable("gtceu.universal.enabled"),
                     )
                     .register()
             },
-            *GTMachineUtils.DUAL_HATCH_TIERS
+            *GTMachineUtils.DUAL_HATCH_TIERS,
         )
 
-        fun registerTieredMachines(
-            name: String?,
-            factory: BiFunction<IMachineBlockEntity?, Int?, MetaMachine?>,
-            builder: BiFunction<Int?, MachineBuilder<MachineDefinition?>?, MachineDefinition?>,
-            vararg tiers: Int
-        ): Array<MachineDefinition?> {
+        fun registerTieredMachines(name: String?, factory: BiFunction<IMachineBlockEntity?, Int?, MetaMachine?>, builder: BiFunction<Int?, MachineBuilder<MachineDefinition?>?, MachineDefinition?>, vararg tiers: Int): Array<MachineDefinition?> {
             val definitions = arrayOfNulls<MachineDefinition>(GTValues.TIER_COUNT)
             for (tier in tiers) {
                 val register = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
                     .machine(
-                        GTValues.VN[tier].lowercase() + "_" + name
+                        GTValues.VN[tier].lowercase() + "_" + name,
                     ) { holder: IMachineBlockEntity? -> factory.apply(holder, tier) }
                     .tier(tier)
                 definitions[tier] = builder.apply(tier, register)

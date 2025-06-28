@@ -1,10 +1,5 @@
 package com.hepdd.gtmthings.common.item.behaviour
 
-import com.gregtechceu.gtceu.api.cover.CoverDefinition
-import com.gregtechceu.gtceu.api.item.component.IInteractionItem
-import com.hepdd.gtmthings.data.CustomItems
-import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.world.InteractionHand
@@ -16,6 +11,12 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.Level
 
+import com.gregtechceu.gtceu.api.cover.CoverDefinition
+import com.gregtechceu.gtceu.api.item.component.IInteractionItem
+import com.hepdd.gtmthings.data.CustomItems
+import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper
+import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper
+
 @JvmRecord
 data class WirelessTransferCoverPlaceBehavior(val coverDefinition: CoverDefinition?) : IInteractionItem {
     override fun onItemUseFirst(itemStack: ItemStack, context: UseOnContext): InteractionResult {
@@ -25,9 +26,17 @@ data class WirelessTransferCoverPlaceBehavior(val coverDefinition: CoverDefiniti
             val blockPos = context.clickedPos
             val itemTransfer = ItemTransferHelper.getItemTransfer(level, blockPos, context.clickedFace)
             val fluidTransfer = FluidTransferHelper.getFluidTransfer(level, blockPos, context.clickedFace)
-            if (((itemStack.`is`(CustomItems.WIRELESS_ITEM_TRANSFER_COVER.asItem()) || itemStack.`is`(CustomItems.ADVANCED_WIRELESS_ITEM_TRANSFER_COVER.asItem())) && itemTransfer != null && itemTransfer.slots > 0) || ((itemStack.`is`(
-                    CustomItems.WIRELESS_FLUID_TRANSFER_COVER.asItem()
-                ) || itemStack.`is`(CustomItems.ADVANCED_WIRELESS_FLUID_TRANSFER_COVER.asItem())) && fluidTransfer != null && fluidTransfer.tanks > 0)
+            if (((itemStack.`is`(CustomItems.WIRELESS_ITEM_TRANSFER_COVER.asItem()) || itemStack.`is`(CustomItems.ADVANCED_WIRELESS_ITEM_TRANSFER_COVER.asItem())) && itemTransfer != null && itemTransfer.slots > 0) ||
+                (
+                    (
+                        itemStack.`is`(
+                            CustomItems.WIRELESS_FLUID_TRANSFER_COVER.asItem(),
+                        ) ||
+                            itemStack.`is`(CustomItems.ADVANCED_WIRELESS_FLUID_TRANSFER_COVER.asItem())
+                        ) &&
+                        fluidTransfer != null &&
+                        fluidTransfer.tanks > 0
+                    )
             ) {
                 val tag = CompoundTag()
                 tag.putString("dimensionid", level.dimension().location().toString())
@@ -38,25 +47,22 @@ data class WirelessTransferCoverPlaceBehavior(val coverDefinition: CoverDefiniti
                 tag.putInt("y", blockPos.y)
                 tag.putInt("z", blockPos.z)
                 itemStack.tag = tag
-                if (level.isClientSide()) player!!.sendSystemMessage(
-                    Component.translatable(
-                        "item.gtmthings.wireless_transfer.tooltip.bind.1",
-                        Component.translatable(level.getBlockState(blockPos).block.descriptionId),
-                        blockPos.toShortString()
+                if (level.isClientSide()) {
+                    player!!.sendSystemMessage(
+                        Component.translatable(
+                            "item.gtmthings.wireless_transfer.tooltip.bind.1",
+                            Component.translatable(level.getBlockState(blockPos).block.descriptionId),
+                            blockPos.toShortString(),
+                        ),
                     )
-                )
+                }
             }
             return InteractionResult.SUCCESS
         }
         return InteractionResult.PASS
     }
 
-    override fun use(
-        item: Item?,
-        level: Level,
-        player: Player,
-        usedHand: InteractionHand?
-    ): InteractionResultHolder<ItemStack?>? {
+    override fun use(item: Item?, level: Level, player: Player, usedHand: InteractionHand?): InteractionResultHolder<ItemStack?>? {
         if (player.isShiftKeyDown) {
             val `is` = player.getItemInHand(InteractionHand.MAIN_HAND)
             `is`.removeTagKey("dimensionid")

@@ -9,9 +9,10 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableComputationContainer
 import com.gregtechceu.gtceu.api.recipe.GTRecipe
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine
+
 import kotlin.math.min
 
-class WirelessNotifiableComputationContainer(machine: MetaMachine, handlerIO: IO?, transmitter: Boolean):NotifiableComputationContainer(machine, handlerIO, transmitter) {
+class WirelessNotifiableComputationContainer(machine: MetaMachine, handlerIO: IO?, transmitter: Boolean) : NotifiableComputationContainer(machine, handlerIO, transmitter) {
 
     private var currentOutputCwu = 0
     private var lastOutputCwu: Int = 0
@@ -97,7 +98,7 @@ class WirelessNotifiableComputationContainer(machine: MetaMachine, handlerIO: IO
                             }
                         }
                         GTCEu.LOGGER.error(
-                            "NotifiableComputationContainer could not get maximum CWU/t from its machine's controller!"
+                            "NotifiableComputationContainer could not get maximum CWU/t from its machine's controller!",
                         )
                         return 0
                     }
@@ -146,7 +147,7 @@ class WirelessNotifiableComputationContainer(machine: MetaMachine, handlerIO: IO
                             }
                         }
                         GTCEu.LOGGER.error(
-                            "NotifiableComputationContainer could not test bridge status of its machine's controller!"
+                            "NotifiableComputationContainer could not test bridge status of its machine's controller!",
                         )
                         return false
                     }
@@ -168,10 +169,7 @@ class WirelessNotifiableComputationContainer(machine: MetaMachine, handlerIO: IO
         }
     }
 
-    override fun handleRecipeInner(
-        io: IO?, recipe: GTRecipe, left: MutableList<Int?>,
-        simulate: Boolean
-    ): MutableList<Int?>? {
+    override fun handleRecipeInner(io: IO?, recipe: GTRecipe, left: MutableList<Int?>, simulate: Boolean): MutableList<Int?>? {
         val provider: IOpticalComputationProvider? = getOpticalNetProvider()
         if (provider == null) return left
 

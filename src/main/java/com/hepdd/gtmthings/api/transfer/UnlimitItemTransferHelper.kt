@@ -1,8 +1,5 @@
 package com.hepdd.gtmthings.api.transfer
 
-import com.lowdragmc.lowdraglib.side.item.forge.ItemTransferHelperImpl
-import it.unimi.dsi.fastutil.ints.IntArrayList
-import it.unimi.dsi.fastutil.ints.IntList
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.item.ItemStack
@@ -10,6 +7,11 @@ import net.minecraft.world.level.Level
 import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.items.ItemHandlerHelper
+
+import com.lowdragmc.lowdraglib.side.item.forge.ItemTransferHelperImpl
+import it.unimi.dsi.fastutil.ints.IntArrayList
+import it.unimi.dsi.fastutil.ints.IntList
+
 import java.util.function.Predicate
 import kotlin.math.min
 
@@ -17,14 +19,7 @@ open class UnlimitItemTransferHelper {
     companion object {
 
         @JvmStatic
-        fun exportToTarget(
-            source: IItemHandler,
-            maxAmount: Int,
-            predicate: Predicate<ItemStack?>,
-            level: Level,
-            pos: BlockPos,
-            direction: Direction?
-        ) {
+        fun exportToTarget(source: IItemHandler, maxAmount: Int, predicate: Predicate<ItemStack?>, level: Level, pos: BlockPos, direction: Direction?) {
             var maxAmount = maxAmount
             if (level.getBlockState(pos).hasBlockEntity()) {
                 val blockEntity = level.getBlockEntity(pos)

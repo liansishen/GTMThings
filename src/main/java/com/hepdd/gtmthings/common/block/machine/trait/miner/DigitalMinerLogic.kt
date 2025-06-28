@@ -1,5 +1,22 @@
 package com.hepdd.gtmthings.common.block.machine.trait.miner
 
+import net.minecraft.commands.arguments.blocks.BlockStateParser
+import net.minecraft.core.BlockPos
+import net.minecraft.core.NonNullList
+import net.minecraft.core.registries.Registries
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.enchantment.Enchantments
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.storage.loot.LootParams
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams
+import net.minecraft.world.phys.Vec3
+import net.minecraftforge.common.Tags
+import net.minecraftforge.items.IItemHandlerModifiable
+
 import com.gregtechceu.gtceu.GTCEu
 import com.gregtechceu.gtceu.api.capability.recipe.*
 import com.gregtechceu.gtceu.api.cover.filter.ItemFilter
@@ -21,39 +38,30 @@ import com.hepdd.gtmthings.api.capability.IDigitalMiner
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
 import com.mojang.brigadier.exceptions.CommandSyntaxException
-import net.minecraft.commands.arguments.blocks.BlockStateParser
-import net.minecraft.core.BlockPos
-import net.minecraft.core.NonNullList
-import net.minecraft.core.registries.Registries
-import net.minecraft.network.chat.Component
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.enchantment.Enchantments
-import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.storage.loot.LootParams
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams
-import net.minecraft.world.phys.Vec3
-import net.minecraftforge.common.Tags
-import net.minecraftforge.items.IItemHandlerModifiable
+
 import java.util.*
 import kotlin.math.pow
 
-class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHeight:Int, maxHeight:Int, silk:Int, itemFilter: ItemFilter?, speed:Int): RecipeLogic(machine), IRecipeCapabilityHolder {
+class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHeight: Int, maxHeight: Int, silk: Int, itemFilter: ItemFilter?, speed: Int) :
+    RecipeLogic(machine),
+    IRecipeCapabilityHolder {
 
     companion object {
         @JvmStatic
         val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
             DigitalMinerLogic::class.java,
-            RecipeLogic.MANAGED_FIELD_HOLDER
+            RecipeLogic.MANAGED_FIELD_HOLDER,
         )
+
         @JvmStatic
         val MAX_SPEED: Short = Short.MAX_VALUE
+
         @JvmStatic
         val POWER: Byte = 5
+
         @JvmStatic
         val TICK_TOLERANCE: Byte = 20
+
         @JvmStatic
         val DIVIDEND: Double = MAX_SPEED * TICK_TOLERANCE.toDouble().pow(POWER.toDouble())
     }
@@ -132,19 +140,19 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
         this.minHeight = minHeight
         this.maxHeight = maxHeight
         this.pickaxeTool = GTMaterialItems.TOOL_ITEMS[GTMaterials.Neutronium, GTToolType.PICKAXE]!!.get().get()
-        (this.pickaxeTool as ItemStack).enchant(Enchantments.BLOCK_FORTUNE,1)
+        (this.pickaxeTool as ItemStack).enchant(Enchantments.BLOCK_FORTUNE, 1)
         this.itemFilter = itemFilter
         this.capabilitiesProxy = EnumMap(IO::class.java)
         this.capabilitiesFlat = EnumMap(
-            IO::class.java
+            IO::class.java,
         )
         this.inputItemHandler = ItemRecipeHandler(
             IO.IN,
-            machine.getRecipeType().getMaxInputs(ItemRecipeCapability.CAP)
+            machine.getRecipeType().getMaxInputs(ItemRecipeCapability.CAP),
         )
         this.outputItemHandler = ItemRecipeHandler(
             IO.OUT,
-            machine.getRecipeType().getMaxOutputs(ItemRecipeCapability.CAP)
+            machine.getRecipeType().getMaxOutputs(ItemRecipeCapability.CAP),
         )
         this.inputEnergyHandler = IgnoreEnergyRecipeHandler()
         addHandlerList(RecipeHandlerList.of(IO.IN, inputItemHandler, inputEnergyHandler))
@@ -170,9 +178,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
         this.resetRecipeLogic()
     }
 
-    override fun getFieldHolder(): ManagedFieldHolder {
-        return MANAGED_FIELD_HOLDER
-    }
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
     override fun inValid() {
         super.inValid()
@@ -183,12 +189,13 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
         try {
             return BlockStateParser.parseForBlock(
                 level.holderLookup(Registries.BLOCK),
-                ConfigHolder.INSTANCE.machines.replaceMinedBlocksWith, false
+                ConfigHolder.INSTANCE.machines.replaceMinedBlocksWith,
+                false,
             ).blockState()
         } catch (ignored: CommandSyntaxException) {
             GTCEu.LOGGER.error(
                 "failed to parse replaceMinedBlocksWith, invalid BlockState: {}",
-                ConfigHolder.INSTANCE.machines.replaceMinedBlocksWith
+                ConfigHolder.INSTANCE.machines.replaceMinedBlocksWith,
             )
             return Blocks.COBBLESTONE.defaultBlockState()
         }
@@ -213,7 +220,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
                 if (this.isWorking) {
                     setWaiting(
                         Component.translatable("gtceu.recipe_logic.insufficient_out").append(": ")
-                            .append(ItemRecipeCapability.CAP.getName())
+                            .append(ItemRecipeCapability.CAP.getName()),
                     )
                 }
             }
@@ -300,13 +307,9 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
     /**
      * Should we apply additional processing according to the recipe type?
      */
-    private fun hasPostProcessing(): Boolean {
-        return false
-    }
+    private fun hasPostProcessing(): Boolean = false
 
-    private fun isSilkTouchMode(): Boolean {
-        return silk == 1
-    }
+    private fun isSilkTouchMode(): Boolean = silk == 1
 
     /**
      * called to handle mining regular ores and blocks
@@ -314,20 +317,13 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
      * @param blockDrops the List of items to fill after the operation
      * @param blockState the [BlockState] of the block being mined
      */
-    private fun getRegularBlockDrops(
-        blockDrops: NonNullList<ItemStack>, blockState: BlockState,
-        builder: LootParams.Builder
-    ) {
+    private fun getRegularBlockDrops(blockDrops: NonNullList<ItemStack>, blockState: BlockState, builder: LootParams.Builder) {
         blockDrops.addAll(blockState.getDrops(builder))
     }
 
-    private fun getVoltageTier(): Int {
-        return 0
-    }
+    private fun getVoltageTier(): Int = 0
 
-    private fun doPostProcessing(
-        blockDrops: NonNullList<ItemStack>
-    ): Boolean {
+    private fun doPostProcessing(blockDrops: NonNullList<ItemStack>): Boolean {
         val oreDrop = blockDrops[0]
 
         // create dummy recipe handler
@@ -339,7 +335,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
         outputItemHandler!!.storage.onContentsChanged(0)
 
         val matches = machine.recipeType.searchRecipe(
-            this
+            this,
         ) { r: GTRecipe? -> RecipeHelper.matchContents(this, r).isSuccess }
 
         while (matches.hasNext()) {
@@ -363,9 +359,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
         return false
     }
 
-    private fun dropPostProcessing(
-        blockDrops: NonNullList<ItemStack>, outputs: List<ItemStack>
-    ) {
+    private fun dropPostProcessing(blockDrops: NonNullList<ItemStack>, outputs: List<ItemStack>) {
         blockDrops.addAll(outputs)
     }
 
@@ -375,9 +369,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
      * @param blockDrops the List of items to fill after the operation
      * @param blockState the [BlockState] of the block being mined
      */
-    private fun getSilkTouchDrops(
-        blockDrops: NonNullList<ItemStack>, blockState: BlockState
-    ) {
+    private fun getSilkTouchDrops(blockDrops: NonNullList<ItemStack>, blockState: BlockState) {
         blockDrops.add(ItemStack(blockState.block))
     }
 
@@ -385,7 +377,8 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
         if (cachedItemTransfer == null) {
             cachedItemTransfer = NotifiableAccountedInvWrapper(
                 *machine.getCapabilitiesFlat(IO.OUT, ItemRecipeCapability.CAP)
-                    .map { it as IItemHandlerModifiable }.toTypedArray())
+                    .map { it as IItemHandlerModifiable }.toTypedArray(),
+            )
         }
         return cachedItemTransfer as NotifiableAccountedInvWrapper
     }
@@ -442,9 +435,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
      *
      * @return `true` if the coordinates are invalid, else false
      */
-    private fun checkCoordinatesInvalid(): Boolean {
-        return x == Int.MAX_VALUE && y == Int.MAX_VALUE && z == Int.MAX_VALUE
-    }
+    private fun checkCoordinatesInvalid(): Boolean = x == Int.MAX_VALUE && y == Int.MAX_VALUE && z == Int.MAX_VALUE
 
     /**
      * Checks whether there are any more blocks to mine, if there are currently none queued
@@ -480,8 +471,10 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
         val calcAmount = Short.MAX_VALUE.toInt()
         var calculated = 0
 
-        if (this.minBuildHeight == Int.MAX_VALUE) this.minBuildHeight =
-            getMachine().level!!.minBuildHeight
+        if (this.minBuildHeight == Int.MAX_VALUE) {
+            this.minBuildHeight =
+                getMachine().level!!.minBuildHeight
+        }
 
         // keep getting blocks until the target amount is reached
         while (calculated < calcAmount) {
@@ -493,7 +486,8 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
                     if (x <= startX + currentRadius * 2) {
                         val blockPos = BlockPos(x, y, z)
                         val state = getMachine().level!!.getBlockState(blockPos)
-                        if (state.block.defaultDestroyTime() >= 0 && getMachine().level!!.getBlockEntity(blockPos) == null &&
+                        if (state.block.defaultDestroyTime() >= 0 &&
+                            getMachine().level!!.getBlockEntity(blockPos) == null &&
                             state.`is`(Tags.Blocks.ORES)
                         ) {
                             if (itemFilter == null) {
@@ -514,7 +508,9 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
                     z = startZ
                     --y
                 }
-            } else return blocks
+            } else {
+                return blocks
+            }
 
             // only count iterations where blocks were found
             if (!blocks.isEmpty()) calculated = blocks.size
@@ -538,9 +534,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
      * @param world the [Level] to get the average tick time of
      * @return the mean tick time
      */
-    private fun getMeanTickTime(world: Level?): Double {
-        return mean(world!!.server!!.tickTimes) * 1.0E-6
-    }
+    private fun getMeanTickTime(world: Level?): Double = mean(world!!.server!!.tickTimes) * 1.0E-6
 
     /**
      * gets the quotient for determining the amount of blocks to mine
@@ -548,16 +542,12 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius:Int, minHei
      * @param base is a value used for calculation, intended to be the mean tick time of the world the miner is in
      * @return the quotient
      */
-    private fun getQuotient(base: Double): Double {
-        return DIVIDEND / base.pow(POWER.toDouble())
-    }
+    private fun getQuotient(base: Double): Double = DIVIDEND / base.pow(POWER.toDouble())
 
     /**
      * @return the position to start mining from
      */
-    private fun getMiningPos(): BlockPos {
-        return getMachine().pos
-    }
+    private fun getMiningPos(): BlockPos = getMachine().pos
 
     override fun getCapabilitiesProxy(): MutableMap<IO, MutableList<RecipeHandlerList>> {
         TODO("Not yet implemented")

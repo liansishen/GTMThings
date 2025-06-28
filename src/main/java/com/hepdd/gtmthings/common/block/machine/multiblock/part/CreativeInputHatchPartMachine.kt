@@ -1,5 +1,7 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part
 
+import net.minecraftforge.fluids.FluidStack
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.gui.GuiTextures
@@ -17,16 +19,18 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import net.minecraftforge.fluids.FluidStack
+
 import java.util.function.Consumer
 import kotlin.math.sqrt
 
-open class CreativeInputHatchPartMachine(holder: IMachineBlockEntity):TieredIOPartMachine(holder, GTValues.MAX, IO.IN),IDistinctPart {
+open class CreativeInputHatchPartMachine(holder: IMachineBlockEntity) :
+    TieredIOPartMachine(holder, GTValues.MAX, IO.IN),
+    IDistinctPart {
     companion object {
         @JvmStatic
         val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
             CreativeInputHatchPartMachine::class.java,
-            TieredIOPartMachine.MANAGED_FIELD_HOLDER
+            TieredIOPartMachine.MANAGED_FIELD_HOLDER,
         )
 
         private const val SLOT_COUNT = 9
@@ -51,14 +55,9 @@ open class CreativeInputHatchPartMachine(holder: IMachineBlockEntity):TieredIOPa
         }
     }
 
-    override fun getFieldHolder():ManagedFieldHolder
-    {
-        return MANAGED_FIELD_HOLDER
-    }
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
-    protected fun createTank(): NotifiableFluidTank {
-        return InfinityFluidTank(this, SLOT_COUNT, Int.Companion.MAX_VALUE, IO.IN)
-    }
+    protected fun createTank(): NotifiableFluidTank = InfinityFluidTank(this, SLOT_COUNT, Int.Companion.MAX_VALUE, IO.IN)
 
     override fun onLoad() {
         super.onLoad()
@@ -113,9 +112,10 @@ open class CreativeInputHatchPartMachine(holder: IMachineBlockEntity):TieredIOPa
         super.setWorkingEnabled(workingEnabled)
     }
 
-
-    /**/////////////////////////////////// */ // ********** GUI ***********//
-    /**/////////////////////////////////// */
+    /**/
+    // //////////////////////////////// */ // ********** GUI ***********//
+    /**/
+    // //////////////////////////////// */
     override fun createUIWidget(): Widget {
         var rowSize = sqrt(slots.toDouble()).toInt()
         var colSize = rowSize
@@ -133,33 +133,41 @@ open class CreativeInputHatchPartMachine(holder: IMachineBlockEntity):TieredIOPa
                 val finalIndex = index++
                 container.addWidget(
                     PhantomFluidWidget(
-                        this.creativeTanks[finalIndex], finalIndex,
-                        4 + x * 18, 4 + y * 18, 18, 18,
+                        this.creativeTanks[finalIndex],
+                        finalIndex,
+                        4 + x * 18,
+                        4 + y * 18,
+                        18,
+                        18,
                         { this.creativeTanks[finalIndex]!!.getFluid() },
-                        (Consumer { fluid: FluidStack? ->
-                            if (fluid!!.isEmpty) {
-                                this.creativeTanks[finalIndex]!!.setFluid(fluid)
-                                if (!fluidMap!!.isEmpty() && fluidMap!!.containsKey(finalIndex)) fluidMap!!.remove(
-                                    finalIndex
-                                )
-                                updateTankSubscription()
-                                return@Consumer
-                            }
-                            for (entry in fluidMap!!.entries) {
-                                val i = entry.key as Int
-                                val f = entry.value as FluidStack
-                                if (i != finalIndex && f.fluid === fluid.fluid) {
-                                    return@Consumer
-                                } else if (i == finalIndex && f.fluid !== fluid.fluid) {
-                                    setFluid(finalIndex, fluid)
+                        (
+                            Consumer { fluid: FluidStack? ->
+                                if (fluid!!.isEmpty) {
+                                    this.creativeTanks[finalIndex]!!.setFluid(fluid)
+                                    if (!fluidMap!!.isEmpty() && fluidMap!!.containsKey(finalIndex)) {
+                                        fluidMap!!.remove(
+                                            finalIndex,
+                                        )
+                                    }
                                     updateTankSubscription()
                                     return@Consumer
                                 }
+                                for (entry in fluidMap!!.entries) {
+                                    val i = entry.key as Int
+                                    val f = entry.value as FluidStack
+                                    if (i != finalIndex && f.fluid === fluid.fluid) {
+                                        return@Consumer
+                                    } else if (i == finalIndex && f.fluid !== fluid.fluid) {
+                                        setFluid(finalIndex, fluid)
+                                        updateTankSubscription()
+                                        return@Consumer
+                                    }
+                                }
+                                setFluid(finalIndex, fluid)
+                                updateTankSubscription()
                             }
-                            setFluid(finalIndex, fluid)
-                            updateTankSubscription()
-                        })
-                    ).setShowAmount(false).setBackground(GuiTextures.FLUID_SLOT)
+                            ),
+                    ).setShowAmount(false).setBackground(GuiTextures.FLUID_SLOT),
                 )
             }
         }
@@ -181,23 +189,13 @@ open class CreativeInputHatchPartMachine(holder: IMachineBlockEntity):TieredIOPa
         }
     }
 
-    override fun isDistinct(): Boolean {
-        return this.tank!!.isDistinct()
-    }
+    override fun isDistinct(): Boolean = this.tank!!.isDistinct()
 
     override fun setDistinct(isDistinct: Boolean) {
         this.tank!!.setDistinct(isDistinct)
     }
 
-    open class InfinityFluidTank(machine: MetaMachine, slots: Int, capacity: Int, io: IO) :
-        NotifiableFluidTank(machine, slots, capacity, io) {
-        override fun handleRecipeInner(
-            io: IO,
-            recipe: GTRecipe,
-            left: MutableList<FluidIngredient?>,
-            simulate: Boolean
-        ): MutableList<FluidIngredient?>? {
-            return super.handleRecipeInner(io, recipe, left, true)
-        }
+    open class InfinityFluidTank(machine: MetaMachine, slots: Int, capacity: Int, io: IO) : NotifiableFluidTank(machine, slots, capacity, io) {
+        override fun handleRecipeInner(io: IO, recipe: GTRecipe, left: MutableList<FluidIngredient?>, simulate: Boolean): MutableList<FluidIngredient?>? = super.handleRecipeInner(io, recipe, left, true)
     }
 }

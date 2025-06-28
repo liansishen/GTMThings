@@ -1,14 +1,5 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part.computation
 
-import com.gregtechceu.gtceu.api.capability.recipe.IO
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
-import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine
-import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine
-import com.gregtechceu.gtceu.common.data.GTItems
-import com.hepdd.gtmthings.api.capability.IGTMTJadeIF
-import com.hepdd.gtmthings.common.block.machine.trait.WirelessNotifiableComputationContainer
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
@@ -19,23 +10,32 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 
-open class WirelessOpticalComputationHatchMachine(holder: IMachineBlockEntity, transmitter: Boolean):MultiblockPartMachine(holder),IInteractedMachine, IGTMTJadeIF {
+import com.gregtechceu.gtceu.api.capability.recipe.IO
+import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
+import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine
+import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine
+import com.gregtechceu.gtceu.common.data.GTItems
+import com.hepdd.gtmthings.api.capability.IGTMTJadeIF
+import com.hepdd.gtmthings.common.block.machine.trait.WirelessNotifiableComputationContainer
+import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
+import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
+
+open class WirelessOpticalComputationHatchMachine(holder: IMachineBlockEntity, transmitter: Boolean) :
+    MultiblockPartMachine(holder),
+    IInteractedMachine,
+    IGTMTJadeIF {
 
     companion object {
         @JvmStatic
         val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
-            WirelessOpticalComputationHatchMachine::class.java, MultiblockPartMachine.MANAGED_FIELD_HOLDER
+            WirelessOpticalComputationHatchMachine::class.java,
+            MultiblockPartMachine.MANAGED_FIELD_HOLDER,
         )
     }
 
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
-    override fun getFieldHolder(): ManagedFieldHolder {
-        return MANAGED_FIELD_HOLDER
-    }
-
-    override fun isRemote(): Boolean {
-        return level?.isClientSide ?: true
-    }
+    override fun isRemote(): Boolean = level?.isClientSide ?: true
 
     private var transmitter = false
 
@@ -51,7 +51,6 @@ open class WirelessOpticalComputationHatchMachine(holder: IMachineBlockEntity, t
         this.computationContainer = createComputationContainer(transmitter)
     }
 
-
     protected fun createComputationContainer(vararg args: Any?): WirelessNotifiableComputationContainer {
         var io = IO.IN
         if (args.size > 1 && args[args.size - 2] is IO) {
@@ -63,22 +62,11 @@ open class WirelessOpticalComputationHatchMachine(holder: IMachineBlockEntity, t
         throw IllegalArgumentException()
     }
 
-    override fun shouldOpenUI(player: Player, hand: InteractionHand, hit: BlockHitResult): Boolean {
-        return false
-    }
+    override fun shouldOpenUI(player: Player, hand: InteractionHand, hit: BlockHitResult): Boolean = false
 
-    override fun canShared(): Boolean {
-        return false
-    }
+    override fun canShared(): Boolean = false
 
-    override fun onUse(
-        state: BlockState,
-        world: Level,
-        pos: BlockPos,
-        player: Player,
-        hand: InteractionHand,
-        hit: BlockHitResult
-    ): InteractionResult {
+    override fun onUse(state: BlockState, world: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult {
         val `is` = player.getItemInHand(hand)
         if (`is`.isEmpty) return InteractionResult.PASS
         if (`is`.`is`(GTItems.TOOL_DATA_STICK.asItem())) {
@@ -94,7 +82,7 @@ open class WirelessOpticalComputationHatchMachine(holder: IMachineBlockEntity, t
                     val bindPos = tag.get("receiverPos") as CompoundTag?
                     if (bindPos != null) {
                         val recPos = BlockPos(bindPos.getInt("x"), bindPos.getInt("y"), bindPos.getInt("z"))
-                        (getMachine(level!!,recPos) as? WirelessOpticalComputationHatchMachine)?.let { woc ->
+                        (getMachine(level!!, recPos) as? WirelessOpticalComputationHatchMachine)?.let { woc ->
                             if (!woc.transmitter) {
                                 woc.transmitterPos = this.transmitterPos
                                 this.receiverPos = recPos
@@ -136,7 +124,7 @@ open class WirelessOpticalComputationHatchMachine(holder: IMachineBlockEntity, t
                     val bindPos = tag.get("transmitterPos") as CompoundTag?
                     if (bindPos != null) {
                         val tranPos = BlockPos(bindPos.getInt("x"), bindPos.getInt("y"), bindPos.getInt("z"))
-                        (getMachine(level!!,tranPos) as? WirelessOpticalComputationHatchMachine)?.let { woc ->
+                        (getMachine(level!!, tranPos) as? WirelessOpticalComputationHatchMachine)?.let { woc ->
                             if (!woc.transmitter) {
                                 woc.receiverPos = this.receiverPos
                                 this.transmitterPos = tranPos
@@ -171,13 +159,9 @@ open class WirelessOpticalComputationHatchMachine(holder: IMachineBlockEntity, t
         return InteractionResult.PASS
     }
 
-    override fun isTransmitter(): Boolean {
-        return transmitter
-    }
+    override fun isTransmitter(): Boolean = transmitter
 
-    override fun isbinded(): Boolean {
-        return (this.transmitterPos != null || this.receiverPos != null)
-    }
+    override fun isbinded(): Boolean = (this.transmitterPos != null || this.receiverPos != null)
 
     override fun getBindPos(): String {
         if (this.isTransmitter() && this.receiverPos != null) {

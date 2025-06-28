@@ -1,5 +1,8 @@
 package com.hepdd.gtmthings.data
 
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.item.crafting.RecipeType
+
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.gui.GuiTextures
 import com.gregtechceu.gtceu.api.recipe.GTRecipeSerializer
@@ -7,9 +10,6 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeType
 import com.gregtechceu.gtceu.api.registry.GTRegistries
 import com.hepdd.gtmthings.GTMThings.Companion.id
 import com.lowdragmc.lowdraglib.gui.texture.ProgressTexture.FillDirection
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.item.crafting.RecipeSerializer
-import net.minecraft.world.item.crafting.RecipeType
 
 object GTMTRecipeTypes {
     const val ELECTRIC: String = "electric"
@@ -24,12 +24,12 @@ object GTMTRecipeTypes {
         GTRegistries.register(
             BuiltInRegistries.RECIPE_TYPE,
             recipeType.registryName,
-            recipeType
+            recipeType,
         )
         GTRegistries.register(
             BuiltInRegistries.RECIPE_SERIALIZER,
             recipeType.registryName,
-            GTRecipeSerializer()
+            GTRecipeSerializer(),
         )
         GTRegistries.RECIPE_TYPES.register(recipeType.registryName, recipeType)
         return recipeType

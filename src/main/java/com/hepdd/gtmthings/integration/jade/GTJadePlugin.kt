@@ -10,13 +10,13 @@ import snownee.jade.api.IWailaPlugin
 import snownee.jade.api.WailaPlugin
 
 @WailaPlugin
-class GTJadePlugin:IWailaPlugin {
+class GTJadePlugin : IWailaPlugin {
 
     override fun register(registration: IWailaCommonRegistration) {
         registration.registerBlockDataProvider(WirelessEnergyHatchProvider(), MetaMachineBlockEntity::class.java)
         registration.registerBlockDataProvider(
             WirelessOpticalComputationHatchProvider(),
-            MetaMachineBlockEntity::class.java
+            MetaMachineBlockEntity::class.java,
         )
     }
 

@@ -1,7 +1,5 @@
 package com.hepdd.gtmthings.client
 
-import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider
-import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.MultiBufferSource
@@ -13,14 +11,15 @@ import net.minecraft.world.item.ItemStack
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
+import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider
+import com.mojang.blaze3d.vertex.PoseStack
+
 @OnlyIn(Dist.CLIENT)
 class ClientUtil {
     companion object {
 
         @JvmStatic
-        fun getItemRenderer(): ItemRenderer {
-            return Minecraft.getInstance().itemRenderer
-        }
+        fun getItemRenderer(): ItemRenderer = Minecraft.getInstance().itemRenderer
 
         @JvmStatic
         fun getVanillaModel(stack: ItemStack, level: ClientLevel?, entity: LivingEntity?): BakedModel {
@@ -34,16 +33,7 @@ class ClientUtil {
         }
 
         @JvmStatic
-        fun vanillaRender(
-            stack: ItemStack,
-            transformType: ItemDisplayContext,
-            leftHand: Boolean,
-            poseStack: PoseStack,
-            buffer: MultiBufferSource,
-            combinedLight: Int,
-            combinedOverlay: Int,
-            model: BakedModel
-        ) {
+        fun vanillaRender(stack: ItemStack, transformType: ItemDisplayContext, leftHand: Boolean, poseStack: PoseStack, buffer: MultiBufferSource, combinedLight: Int, combinedOverlay: Int, model: BakedModel) {
             IItemRendererProvider.disabled.set(true)
             getItemRenderer().render(
                 stack,
@@ -53,7 +43,7 @@ class ClientUtil {
                 buffer,
                 combinedLight,
                 combinedOverlay,
-                model
+                model,
             )
             IItemRendererProvider.disabled.set(false)
         }

@@ -1,6 +1,9 @@
 package com.hepdd.gtmthings.common.item
 
-import com.gregtechceu.gtceu.GTCEu
+import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+
 import com.gregtechceu.gtceu.api.gui.GuiTextures
 import com.gregtechceu.gtceu.api.item.component.IItemUIFactory
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
@@ -9,20 +12,16 @@ import com.lowdragmc.lowdraglib.gui.editor.ColorPattern
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory.HeldItemHolder
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI
 import com.lowdragmc.lowdraglib.gui.widget.*
-import net.minecraft.network.chat.Component
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.level.Level
+
 import java.util.*
 
-class WirelessEnergyTerminalBehavior: IItemUIFactory {
-    override fun createUI(holder: HeldItemHolder, entityPlayer: Player): ModularUI {
-        return ModularUI(
-            WirelessEnergyMonitor.DISPLAY_TEXT_WIDTH + 8 + 8,
-            117 + 8 + 8 + 8 + 17,
-            holder,
-            entityPlayer
-        ).widget(createWidget(holder.getHeld().descriptionId, WirelessMonitor(entityPlayer.uuid, entityPlayer.level())))
-    }
+class WirelessEnergyTerminalBehavior : IItemUIFactory {
+    override fun createUI(holder: HeldItemHolder, entityPlayer: Player): ModularUI = ModularUI(
+        WirelessEnergyMonitor.DISPLAY_TEXT_WIDTH + 8 + 8,
+        117 + 8 + 8 + 8 + 17,
+        holder,
+        entityPlayer,
+    ).widget(createWidget(holder.getHeld().descriptionId, WirelessMonitor(entityPlayer.uuid, entityPlayer.level())))
 
     private fun createWidget(descriptionId: String, monitor: WirelessMonitor): Widget {
         val group = WidgetGroup(0, 0, WirelessEnergyMonitor.DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8 + 8 + 8 + 17)
@@ -36,11 +35,12 @@ class WirelessEnergyTerminalBehavior: IItemUIFactory {
                 .addWidget(label)
                 .addWidget(
                     ComponentPanelWidget(
-                        8, 17
+                        8,
+                        17,
                     ) { text: MutableList<Component> -> addDisplayText(text, monitor) }.setMaxWidthLimit(
-                        WirelessEnergyMonitor.DISPLAY_TEXT_WIDTH
-                    )
-                )
+                        WirelessEnergyMonitor.DISPLAY_TEXT_WIDTH,
+                    ),
+                ),
         )
 
         group.setBackground(GuiTextures.BACKGROUND_INVERSE)
@@ -55,7 +55,7 @@ class WirelessEnergyTerminalBehavior: IItemUIFactory {
         textList.addAll(monitor.displayTextCache!!)
     }
 
-    class WirelessMonitor(val uuid: UUID, val level: Level): IWirelessMonitor {
+    class WirelessMonitor(val uuid: UUID, val level: Level) : IWirelessMonitor {
 
         val isRemote: Boolean
             get() = level.isClientSide
@@ -64,25 +64,16 @@ class WirelessEnergyTerminalBehavior: IItemUIFactory {
 
         private var WirelessEnergyContainerCache: WirelessEnergyContainer? = null
 
-        override fun getUUID(): UUID? {
-            return uuid
-        }
+        override fun getUUID(): UUID? = uuid
 
-        override fun display(): Boolean {
-            return false
-        }
+        override fun display(): Boolean = false
 
-        override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? {
-            return WirelessEnergyContainerCache
-        }
+        override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? = WirelessEnergyContainerCache
 
         override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer) {
             WirelessEnergyContainerCache = container
         }
 
-        override fun getMonitorLevel(): Level {
-            return this.level
-        }
-
+        override fun getMonitorLevel(): Level = this.level
     }
 }

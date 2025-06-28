@@ -1,6 +1,5 @@
 package com.hepdd.gtmthings.data
 
-import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.GlobalPos
 import net.minecraft.core.registries.Registries
@@ -11,6 +10,9 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.saveddata.SavedData
+
+import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
+
 import java.math.BigInteger
 import java.util.*
 
@@ -70,14 +72,12 @@ class WirelessEnergySavedData : SavedData {
         @JvmField
         var INSTANCE: WirelessEnergySavedData? = null
 
-        fun getOrCreate(serverLevel: ServerLevel): WirelessEnergySavedData {
-            return serverLevel.dataStorage
-                .computeIfAbsent({ tag: CompoundTag? ->
-                    WirelessEnergySavedData(
-                        tag!!
-                    )
-                }, { WirelessEnergySavedData() }, "gtceu_wireless_energy")
-        }
+        fun getOrCreate(serverLevel: ServerLevel): WirelessEnergySavedData = serverLevel.dataStorage
+            .computeIfAbsent({ tag: CompoundTag? ->
+                WirelessEnergySavedData(
+                    tag!!,
+                )
+            }, { WirelessEnergySavedData() }, "gtceu_wireless_energy")
 
         private fun readGlobalPos(dimension: String, pos: Long): GlobalPos? {
             if (dimension.isEmpty()) return null

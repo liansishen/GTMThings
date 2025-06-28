@@ -1,14 +1,16 @@
 package com.hepdd.gtmthings.api.misc
 
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.Style
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.machine.MetaMachine
 import com.gregtechceu.gtceu.utils.GTUtil
 import com.hepdd.gtmthings.utils.FormatUtil
 import com.hepdd.gtmthings.utils.TeamUtil
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.HoverEvent
-import net.minecraft.network.chat.Style
+
 import java.math.BigDecimal
 import java.util.*
 import kotlin.math.abs
@@ -31,15 +33,15 @@ interface ITransferData {
                         HoverEvent.Action.SHOW_TEXT,
                         Component.translatable(
                             "recipe.condition.dimension.tooltip",
-                            machine.level!!.dimension().location()
+                            machine.level!!.dimension().location(),
                         ).append(" [").append(pos!!).append("] ").append(
                             Component.translatable(
                                 "gtmthings.machine.wireless_energy_monitor.tooltip.0",
-                                TeamUtil.getName(machine.level!!, UUID()!!)
-                            )
-                        )
-                    )
-                )
+                                TeamUtil.getName(machine.level!!, UUID()!!),
+                            ),
+                        ),
+                    ),
+                ),
             )
             .append((if (eut > 0) " +" else " ") + FormatUtil.formatBigDecimalNumberOrSic(BigDecimal.valueOf(eut)))
             .append(" EU/t (").append(GTValues.VNF[GTUtil.getFloorTierByVoltage(abs(eut)).toInt()]).append(")")

@@ -5,11 +5,7 @@ import java.util.*
 interface IBindable {
     fun getUUID(): UUID?
 
-    fun cover(): Boolean {
-        return false
-    }
+    fun cover(): Boolean = false
 
-    fun display(): Boolean {
-        return true
-    }
+    fun display(): Boolean = true
 }

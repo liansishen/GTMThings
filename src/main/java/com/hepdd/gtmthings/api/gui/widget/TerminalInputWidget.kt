@@ -1,14 +1,15 @@
 package com.hepdd.gtmthings.api.gui.widget
 
-import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget
-import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.util.Mth
+
+import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget
+import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
+
 import java.util.function.Consumer
 import java.util.function.Supplier
 
-open class TerminalInputWidget(x: Int, y: Int, width: Int, height: Int, valueSupplier: Supplier<Int?>,
-                          onChanged: Consumer<Int?>): WidgetGroup(x, y, width, height) {
+open class TerminalInputWidget(x: Int, y: Int, width: Int, height: Int, valueSupplier: Supplier<Int?>, onChanged: Consumer<Int?>) : WidgetGroup(x, y, width, height) {
     private var valueSupplier: Supplier<Int?>? = null
 
     private var min: Int = defaultMin()
@@ -25,25 +26,15 @@ open class TerminalInputWidget(x: Int, y: Int, width: Int, height: Int, valueSup
         buildUI()
     }
 
-    private fun toText(value: Int?): String? {
-        return value.toString()
-    }
+    private fun toText(value: Int?): String? = value.toString()
 
-    private fun fromText(value: String): Int {
-        return value.toInt()
-    }
+    private fun fromText(value: String): Int = value.toInt()
 
-    private fun clamp(value: Int, min: Int, max: Int): Int {
-        return Mth.clamp(value, min, max)
-    }
+    private fun clamp(value: Int, min: Int, max: Int): Int = Mth.clamp(value, min, max)
 
-    private fun defaultMin(): Int {
-        return 0
-    }
+    private fun defaultMin(): Int = 0
 
-    private fun defaultMax(): Int {
-        return Int.Companion.MAX_VALUE
-    }
+    private fun defaultMax(): Int = Int.Companion.MAX_VALUE
 
     private fun setTextFieldRange(textField: TextFieldWidget, min: Int, max: Int) {
         textField.setNumbersOnly(min, max)
@@ -66,9 +57,13 @@ open class TerminalInputWidget(x: Int, y: Int, width: Int, height: Int, valueSup
 
     private fun buildUI() {
         this.textField = object : TextFieldWidget(
-            0, 0, sizeWidth, 12,
+            0,
+            0,
+            sizeWidth,
+            12,
             Supplier { toText(valueSupplier!!.get()) },
-            Consumer { stringValue: String? -> this.setValue(clamp(fromText(stringValue!!), min, max)) }) {
+            Consumer { stringValue: String? -> this.setValue(clamp(fromText(stringValue!!), min, max)) },
+        ) {
             override fun mouseWheelMove(mouseX: Double, mouseY: Double, wheelDelta: Double): Boolean {
                 if (wheelDur > 0 && numberInstance != null && isMouseOverElement(mouseX, mouseY) && isFocus) {
                     try {

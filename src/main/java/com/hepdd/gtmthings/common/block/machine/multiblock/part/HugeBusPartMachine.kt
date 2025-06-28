@@ -1,5 +1,15 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part
 
+import net.minecraft.ChatFormatting
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
+import net.minecraft.server.TickTask
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.gui.GuiTextures
@@ -29,24 +39,19 @@ import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper
 import com.lowdragmc.lowdraglib.syncdata.ISubscription
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import net.minecraft.ChatFormatting
-import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.Style
-import net.minecraft.server.TickTask
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.block.Block
+
 import java.util.function.IntFunction
 
-open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, shareSize: Int):TieredIOPartMachine(holder, tier, io),IDistinctPart, IMachineLife {
+open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, shareSize: Int) :
+    TieredIOPartMachine(holder, tier, io),
+    IDistinctPart,
+    IMachineLife {
 
     companion object {
         @JvmStatic
         val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
             HugeBusPartMachine::class.java,
-            TieredIOPartMachine.MANAGED_FIELD_HOLDER
+            TieredIOPartMachine.MANAGED_FIELD_HOLDER,
         )
 
         const val INV_MULTIPLE: Int = 2
@@ -69,38 +74,31 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
         this.shareInventory = CatalystItemStackHandler(this, shareSize, IO.IN, IO.NONE)
     }
 
-    constructor(holder: IMachineBlockEntity, tier: Int, io: IO):this(holder, tier, io, 4)
+    constructor(holder: IMachineBlockEntity, tier: Int, io: IO) : this(holder, tier, io, 4)
 
-    override fun getFieldHolder():ManagedFieldHolder
-    {
-        return MANAGED_FIELD_HOLDER
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
+
+    protected fun getInventorySize(): Int = if (getTier() < GTValues.EV) {
+        1 + getTier()
+    } else {
+        (1 + getTier()) * INV_MULTIPLE
     }
 
-    protected fun getInventorySize(): Int {
-        return if (getTier() < GTValues.EV) 1 + getTier()
-        else (1 + getTier()) * INV_MULTIPLE
+    protected fun createInventory(): NotifiableItemStackHandler = object : NotifiableItemStackHandler(
+        this,
+        getInventorySize(),
+        io,
+        io,
+        IntFunction { size: Int -> UnlimitedItemStackTransfer(size) },
+    ) {
+        override fun canCapOutput(): Boolean = true
     }
 
-    protected fun createInventory(): NotifiableItemStackHandler {
-        return object : NotifiableItemStackHandler(
-            this,
-            getInventorySize(),
-            io,
-            io,
-            IntFunction { size: Int -> UnlimitedItemStackTransfer(size) }) {
-            override fun canCapOutput(): Boolean {
-                return true
-            }
-        }
-    }
-
-    protected fun createCircuitItemHandler(vararg args: Any?): NotifiableItemStackHandler {
-        return if (args.isNotEmpty() && args[0] is IO && io == IO.IN) {
-            NotifiableItemStackHandler(this, 1, IO.IN, IO.NONE)
-                .setFilter { itemStack: ItemStack? -> IntCircuitBehaviour.isIntegratedCircuit(itemStack) }
-        } else {
-            NotifiableItemStackHandler(this, 0, IO.NONE)
-        }
+    protected fun createCircuitItemHandler(vararg args: Any?): NotifiableItemStackHandler = if (args.isNotEmpty() && args[0] is IO && io == IO.IN) {
+        NotifiableItemStackHandler(this, 1, IO.IN, IO.NONE)
+            .setFilter { itemStack: ItemStack? -> IntCircuitBehaviour.isIntegratedCircuit(itemStack) }
+    } else {
+        NotifiableItemStackHandler(this, 0, IO.NONE)
     }
 
     override fun onLoad() {
@@ -120,9 +118,7 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
         }
     }
 
-    override fun isDistinct(): Boolean {
-        return inventory.isDistinct() && circuitInventory!!.isDistinct() && shareInventory!!.isDistinct()
-    }
+    override fun isDistinct(): Boolean = inventory.isDistinct() && circuitInventory!!.isDistinct() && shareInventory!!.isDistinct()
 
     override fun setDistinct(isDistinct: Boolean) {
         inventory.setDistinct(isDistinct)
@@ -132,8 +128,9 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
 
     protected open fun refundAll(clickData: ClickData) {
         if (ItemTransferHelper.getItemTransfer(
-                level, pos.relative(getFrontFacing()),
-                getFrontFacing().opposite
+                level,
+                pos.relative(getFrontFacing()),
+                getFrontFacing().opposite,
             ) != null
         ) {
             setWorkingEnabled(false)
@@ -141,9 +138,10 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
         }
     }
 
-
-    /**/////////////////////////////////// */ // ******** Auto IO *********//
-    /**/////////////////////////////////// */
+    /**/
+    // //////////////////////////////// */ // ******** Auto IO *********//
+    /**/
+    // //////////////////////////////// */
     override fun onNeighborChanged(block: Block, fromPos: BlockPos, isMoving: Boolean) {
         super.onNeighborChanged(block, fromPos, isMoving)
         updateInventorySubscription()
@@ -160,8 +158,9 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
 
     protected open fun updateInventorySubscription() {
         if (isWorkingEnabled && ((io == IO.OUT && !inventory.isEmpty()) || io == IO.IN) && ItemTransferHelper.getItemTransfer(
-                level, pos.relative(getFrontFacing()),
-                getFrontFacing().opposite
+                level,
+                pos.relative(getFrontFacing()),
+                getFrontFacing().opposite,
             ) != null
         ) {
             autoIOSubs = subscribeServerTick(autoIOSubs) { this.autoIO() }
@@ -190,8 +189,12 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
         val pos = getPos()
         for (facing in facings) {
             UnlimitItemTransferHelper.exportToTarget(
-                handler, Int.Companion.MAX_VALUE, { f: ItemStack? -> true }, level!!, pos.relative(facing),
-                facing.opposite
+                handler,
+                Int.Companion.MAX_VALUE,
+                { f: ItemStack? -> true },
+                level!!,
+                pos.relative(facing),
+                facing.opposite,
             )
         }
     }
@@ -201,32 +204,35 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
         updateInventorySubscription()
     }
 
-
-    /**/////////////////////////////////// */ // ********** GUI ***********//
-    /**/////////////////////////////////// */
+    /**/
+    // //////////////////////////////// */ // ********** GUI ***********//
+    /**/
+    // //////////////////////////////// */
     override fun attachConfigurators(configuratorPanel: ConfiguratorPanel) {
         super<TieredIOPartMachine>.attachConfigurators(configuratorPanel)
         if (this.io == IO.IN) {
             configuratorPanel.attachConfigurators(CircuitFancyConfigurator(circuitInventory!!.storage))
             configuratorPanel.attachConfigurators(
                 ButtonConfigurator(
-                    GuiTextureGroup(GuiTextures.BUTTON, TextTexture("🔙")), { clickData: ClickData? ->
+                    GuiTextureGroup(GuiTextures.BUTTON, TextTexture("🔙")),
+                    { clickData: ClickData? ->
                         this.refundAll(
-                            clickData!!
+                            clickData!!,
                         )
                     },
-                    mutableListOf(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.1"))
-                )
+                    mutableListOf(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.1")),
+                ),
             )
             configuratorPanel.attachConfigurators(
                 InventoryFancyConfigurator(
-                    shareInventory!!.storage, Component.translatable("gui.gtmthings.share_inventory.title"),
+                    shareInventory!!.storage,
+                    Component.translatable("gui.gtmthings.share_inventory.title"),
                     mutableListOf(
                         Component.translatable("gui.gtmthings.share_inventory.desc.0"),
                         Component.translatable("gui.gtmthings.share_inventory.desc.1"),
-                        Component.translatable("gui.gtmthings.share_inventory.desc.2")
-                    )
-                )
+                        Component.translatable("gui.gtmthings.share_inventory.desc.2"),
+                    ),
+                ),
             )
         }
     }
@@ -238,7 +244,7 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
 
         val componentPanel = ComponentPanelWidget(8, 5) { textList: MutableList<Component?>? ->
             this.addDisplayText(
-                textList!!
+                textList!!,
             )
         }.setMaxWidthLimit(width - 16)
         val screen = DraggableScrollableWidgetGroup(4, 4, width, height)
@@ -259,8 +265,8 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
                         .setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW))
                         .append(
                             Component.literal(FormatUtil.formatNumber(`is`.count.toLong()))
-                                .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))
-                        )
+                                .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)),
+                        ),
                 )
                 itemCount++
             }
@@ -269,9 +275,9 @@ open class HugeBusPartMachine(holder: IMachineBlockEntity, tier: Int, io: IO, sh
             textList.add(Component.translatable("gtmthings.machine.huge_item_bus.tooltip.3"))
         }
         textList.add(
-            0, Component.translatable("gtmthings.machine.huge_item_bus.tooltip.2", itemCount, getInventorySize())
-                .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
+            0,
+            Component.translatable("gtmthings.machine.huge_item_bus.tooltip.2", itemCount, getInventorySize())
+                .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)),
         )
     }
-
 }

@@ -1,5 +1,7 @@
 package com.hepdd.gtmthings.common.block.machine.trait
 
+import net.minecraftforge.fluids.FluidStack
+
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.machine.MetaMachine
@@ -9,16 +11,10 @@ import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient
 import com.gregtechceu.gtceu.utils.FluidStackHashStrategy
 import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap
-import net.minecraftforge.fluids.FluidStack
 
-class CatalystFluidStackHandler(machine: MetaMachine, slots: Int, capacity: Int, io: IO?, capabilityIO: IO?):NotifiableFluidTank(machine, slots, capacity, io, capabilityIO) {
+class CatalystFluidStackHandler(machine: MetaMachine, slots: Int, capacity: Int, io: IO?, capabilityIO: IO?) : NotifiableFluidTank(machine, slots, capacity, io, capabilityIO) {
 
-    override fun handleRecipeInner(
-        io: IO?,
-        recipe: GTRecipe,
-        left: MutableList<FluidIngredient?>?,
-        simulate: Boolean
-    ): MutableList<FluidIngredient?>? {
+    override fun handleRecipeInner(io: IO?, recipe: GTRecipe, left: MutableList<FluidIngredient?>?, simulate: Boolean): MutableList<FluidIngredient?>? {
         val map: Object2IntMap<FluidStack?> =
             Object2IntOpenCustomHashMap<FluidStack?>(FluidStackHashStrategy.comparingAllButAmount())
         val storages = getStorages()

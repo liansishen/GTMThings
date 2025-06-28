@@ -1,22 +1,21 @@
 package com.hepdd.gtmthings.api.misc
 
+import net.minecraft.core.GlobalPos
+import net.minecraft.server.MinecraftServer
+
 import com.gregtechceu.gtceu.api.machine.MetaMachine
 import com.hepdd.gtmthings.config.ConfigHolder
 import com.hepdd.gtmthings.data.WirelessEnergySavedData
 import com.hepdd.gtmthings.utils.BigIntegerUtils
 import com.hepdd.gtmthings.utils.TeamUtil
 import lombok.Getter
-import net.minecraft.core.GlobalPos
-import net.minecraft.server.MinecraftServer
+
 import java.math.BigInteger
 import java.util.*
 import kotlin.math.min
 
 @Getter
-class WirelessEnergyContainer(var uuid: UUID,
-                                   var storage: BigInteger? = BigInteger.ZERO,
-                                   var rate: Long = 0,
-                                   var bindPos: GlobalPos? = null) {
+class WirelessEnergyContainer(var uuid: UUID, var storage: BigInteger? = BigInteger.ZERO, var rate: Long = 0, var bindPos: GlobalPos? = null) {
     var energyStat: EnergyStat
 
     init {
@@ -26,16 +25,16 @@ class WirelessEnergyContainer(var uuid: UUID,
 
     companion object {
         @JvmField var observed: Boolean = false
+
         @JvmField val TRANSFER_DATA: WeakHashMap<MetaMachine, ITransferData> = WeakHashMap()
+
         @JvmField var server: MinecraftServer? = null
 
         @JvmStatic
-        fun getOrCreateContainer(uuid: UUID?): WirelessEnergyContainer? {
-            return WirelessEnergySavedData.INSTANCE?.containerMap?.computeIfAbsent(TeamUtil.getTeamUUID(uuid)) { _uuid: UUID? ->
-                WirelessEnergyContainer(
-                    _uuid!!
-                )
-            }
+        fun getOrCreateContainer(uuid: UUID?): WirelessEnergyContainer? = WirelessEnergySavedData.INSTANCE?.containerMap?.computeIfAbsent(TeamUtil.getTeamUUID(uuid)) { _uuid: UUID? ->
+            WirelessEnergyContainer(
+                _uuid!!,
+            )
         }
     }
 
@@ -57,8 +56,10 @@ class WirelessEnergyContainer(var uuid: UUID,
     fun removeEnergy(energy: Long, machine: MetaMachine?): Long {
         var change = min(BigIntegerUtils.getLongValue(storage!!).toDouble(), energy.toDouble()).toLong()
         ConfigHolder.INSTANCE?.let {
-            if (it.isWirelessRateEnable) change =
-                min(BigIntegerUtils.getLongValue(storage!!).toDouble(), min(rate.toDouble(), energy.toDouble())).toLong()
+            if (it.isWirelessRateEnable) {
+                change =
+                    min(BigIntegerUtils.getLongValue(storage!!).toDouble(), min(rate.toDouble(), energy.toDouble())).toLong()
+            }
         }
         if (change <= 0) return 0
         storage = storage?.subtract(BigInteger.valueOf(change))
@@ -72,7 +73,5 @@ class WirelessEnergyContainer(var uuid: UUID,
         return change
     }
 
-    fun getCapacity(): BigInteger? {
-        return null
-    }
+    fun getCapacity(): BigInteger? = null
 }

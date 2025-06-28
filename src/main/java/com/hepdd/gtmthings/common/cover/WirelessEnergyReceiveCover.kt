@@ -1,5 +1,9 @@
 package com.hepdd.gtmthings.common.cover
 
+import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.ItemStack
+
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper
 import com.gregtechceu.gtceu.api.capability.ICoverable
@@ -14,14 +18,13 @@ import com.gregtechceu.gtceu.common.machine.electric.HullMachine
 import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder
 import com.hepdd.gtmthings.api.machine.WirelessEnergyReceiveCoverHolder
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer
-import net.minecraft.core.Direction
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.item.ItemStack
+
 import java.util.*
 import kotlin.math.min
 
-open class WirelessEnergyReceiveCover(definition: CoverDefinition, coverHolder: ICoverable, attachedSide: Direction, tier: Int, amperage: Int):CoverBehavior(definition, coverHolder, attachedSide),IWirelessEnergyContainerHolder {
-
+open class WirelessEnergyReceiveCover(definition: CoverDefinition, coverHolder: ICoverable, attachedSide: Direction, tier: Int, amperage: Int) :
+    CoverBehavior(definition, coverHolder, attachedSide),
+    IWirelessEnergyContainerHolder {
 
     private var subscription: TickableSubscription? = null
 
@@ -100,11 +103,13 @@ open class WirelessEnergyReceiveCover(definition: CoverDefinition, coverHolder: 
                 val container = getWirelessEnergyContainer()
                 if (container == null) return
                 val changeenergy = container.removeEnergy(changeStored, machine)
-                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(
-                    null,
-                    changeenergy / this.amperage,
-                    this.amperage.toLong()
-                )
+                if (changeenergy > 0) {
+                    energyContainer.acceptEnergyFromNetwork(
+                        null,
+                        changeenergy / this.amperage,
+                        this.amperage.toLong(),
+                    )
+                }
             } else {
                 val changeStored = min(this.machineMaxEnergy - energyContainer.energyStored, this.energyPerTick)
                 if (changeStored <= 0) return
@@ -123,9 +128,7 @@ open class WirelessEnergyReceiveCover(definition: CoverDefinition, coverHolder: 
         return null
     }
 
-    override fun cover(): Boolean {
-        return true
-    }
+    override fun cover(): Boolean = true
 
     private fun getMachine(): MetaMachine? {
         if (machine == null) machine = MetaMachine.getMachine(coverHolder.level, coverHolder.pos)
@@ -135,9 +138,7 @@ open class WirelessEnergyReceiveCover(definition: CoverDefinition, coverHolder: 
         return machine
     }
 
-    override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? {
-        return this.wirelessEnergyContainerCache
-    }
+    override fun getWirelessEnergyContainerCache(): WirelessEnergyContainer? = this.wirelessEnergyContainerCache
 
     override fun setWirelessEnergyContainerCache(container: WirelessEnergyContainer) {
         this.wirelessEnergyContainerCache = container

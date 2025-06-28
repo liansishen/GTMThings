@@ -1,15 +1,16 @@
 package com.hepdd.gtmthings.api.machine.fancyconfigurator
 
+import net.minecraft.network.chat.Component
+
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfiguratorButton
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture
 import com.lowdragmc.lowdraglib.gui.util.ClickData
 import lombok.experimental.Accessors
-import net.minecraft.network.chat.Component
+
 import java.util.function.Consumer
 
 @Accessors(chain = true)
-open class ButtonConfigurator(texture: IGuiTexture?, onClick: Consumer<ClickData?>,var tooltips1: MutableList<Component?>):IFancyConfiguratorButton {
-
+open class ButtonConfigurator(texture: IGuiTexture?, onClick: Consumer<ClickData?>, var tooltips1: MutableList<Component?>) : IFancyConfiguratorButton {
 
     private var buttonIcon: IGuiTexture? = null
     private var onClick: Consumer<ClickData?>? = null
@@ -23,11 +24,7 @@ open class ButtonConfigurator(texture: IGuiTexture?, onClick: Consumer<ClickData
         onClick!!.accept(clickData)
     }
 
-    override fun getIcon(): IGuiTexture? {
-        return this.buttonIcon
-    }
+    override fun getIcon(): IGuiTexture? = this.buttonIcon
 
-    override fun getTooltips(): MutableList<Component?> {
-        return tooltips1;
-    }
+    override fun getTooltips(): MutableList<Component?> = tooltips1
 }

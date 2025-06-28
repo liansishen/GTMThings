@@ -1,5 +1,13 @@
 package com.hepdd.gtmthings.common.item
 
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.block.Blocks
+
 import com.gregtechceu.gtceu.api.GTCEuAPI
 import com.gregtechceu.gtceu.api.block.ICoilType
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock
@@ -20,19 +28,13 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget
 import com.lowdragmc.lowdraglib.gui.widget.Widget
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
 import com.lowdragmc.lowdraglib.utils.BlockInfo
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.context.UseOnContext
-import net.minecraft.world.level.block.Blocks
+
 import java.util.*
 import java.util.function.Supplier
 import java.util.function.ToIntFunction
 import kotlin.math.min
 
-class AdvancedTerminalBehavior:IItemUIFactory {
+class AdvancedTerminalBehavior : IItemUIFactory {
 
     override fun useOn(context: UseOnContext): InteractionResult {
         if (context.player != null && context.player!!.isShiftKeyDown) {
@@ -48,18 +50,18 @@ class AdvancedTerminalBehavior:IItemUIFactory {
                     getAdvancedBlockPattern(controller.pattern)!!.autoBuild(
                         context.player!!,
                         controller.multiblockState,
-                        autoBuildSetting
+                        autoBuildSetting,
                     )
                 } else if (MetaMachine.getMachine(
                         level,
-                        blockPos
+                        blockPos,
                     ) is WorkableMultiblockMachine && autoBuildSetting.isReplaceCoilMode()
                 ) {
-                    val workableMultiblockMachine = MetaMachine.getMachine(level,blockPos) as WorkableMultiblockMachine
+                    val workableMultiblockMachine = MetaMachine.getMachine(level, blockPos) as WorkableMultiblockMachine
                     getAdvancedBlockPattern(controller.pattern)!!.autoBuild(
                         context.player!!,
                         controller.multiblockState,
-                        autoBuildSetting
+                        autoBuildSetting,
                     )
                     workableMultiblockMachine.onPartUnload()
                 }
@@ -88,9 +90,7 @@ class AdvancedTerminalBehavior:IItemUIFactory {
         return autoBuildSetting
     }
 
-    override fun createUI(holder: HeldItemHolder?, entityPlayer: Player): ModularUI {
-        return ModularUI(176, 166, holder, entityPlayer).widget(createWidget(entityPlayer))
-    }
+    override fun createUI(holder: HeldItemHolder?, entityPlayer: Player): ModularUI = ModularUI(176, 166, holder, entityPlayer).widget(createWidget(entityPlayer))
 
     private fun createWidget(entityPlayer: Player): Widget {
         val handItem = entityPlayer.mainHandItem
@@ -103,8 +103,8 @@ class AdvancedTerminalBehavior:IItemUIFactory {
             .forEach { coil: MutableMap.MutableEntry<ICoilType?, Supplier<CoilBlock?>?>? ->
                 lines.add(
                     Component.literal((coil!!.key!!.tier + 1).toString()).append(":").append(
-                        coil.value!!.get()!!.name
-                    )
+                        coil.value!!.get()!!.name,
+                    ),
                 )
             }
 
@@ -116,51 +116,76 @@ class AdvancedTerminalBehavior:IItemUIFactory {
                 .addWidget(LabelWidget(40, 5, "item.gtmthings.advanced_terminal.setting.title"))
                 .addWidget(
                     LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.1")
-                        .setHoverTooltips(lines)
+                        .setHoverTooltips(lines),
                 )
                 .addWidget(
                     TerminalInputWidget(
-                        140, 5 + 16 * rowIndex++, 20, 16, { getCoilTier(handItem) },
-                        { v: Int? -> setCoilTier(v!!, handItem) })
-                        .setMin(0).setMax(GTCEuAPI.HEATING_COILS.size)
+                        140,
+                        5 + 16 * rowIndex++,
+                        20,
+                        16,
+                        { getCoilTier(handItem) },
+                        { v: Int? -> setCoilTier(v!!, handItem) },
+                    )
+                        .setMin(0).setMax(GTCEuAPI.HEATING_COILS.size),
                 )
                 .addWidget(
                     LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.2")
-                        .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.2.tooltip"))
+                        .setHoverTooltips(Component.translatable("item.gtmthings.advanced_terminal.setting.2.tooltip")),
                 )
                 .addWidget(
                     TerminalInputWidget(
-                        140, 5 + 16 * rowIndex++, 20, 16, { getRepeatCount(handItem) },
-                        { v: Int? -> setRepeatCount(v!!, handItem) })
-                        .setMin(0).setMax(99)
+                        140,
+                        5 + 16 * rowIndex++,
+                        20,
+                        16,
+                        { getRepeatCount(handItem) },
+                        { v: Int? -> setRepeatCount(v!!, handItem) },
+                    )
+                        .setMin(0).setMax(99),
                 )
                 .addWidget(
                     LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.3")
-                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.3.tooltip")
+                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.3.tooltip"),
                 )
                 .addWidget(
                     TerminalInputWidget(
-                        140, 5 + 16 * rowIndex++, 20, 16, { getIsBuildHatches(handItem) },
-                        { v: Int? -> setIsBuildHatches(v!!, handItem) }).setMin(0).setMax(1)
+                        140,
+                        5 + 16 * rowIndex++,
+                        20,
+                        16,
+                        { getIsBuildHatches(handItem) },
+                        { v: Int? -> setIsBuildHatches(v!!, handItem) },
+                    ).setMin(0).setMax(1),
                 )
                 .addWidget(
                     LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.4")
-                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.4.tooltip")
+                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.4.tooltip"),
                 )
                 .addWidget(
                     TerminalInputWidget(
-                        140, 5 + 16 * rowIndex++, 20, 16, { getReplaceCoilMode(handItem) },
-                        { v: Int? -> setReplaceCoilMode(v!!, handItem) }).setMin(0).setMax(1)
+                        140,
+                        5 + 16 * rowIndex++,
+                        20,
+                        16,
+                        { getReplaceCoilMode(handItem) },
+                        { v: Int? -> setReplaceCoilMode(v!!, handItem) },
+                    ).setMin(0).setMax(1),
                 )
                 .addWidget(
                     LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.5")
-                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.5.tooltip")
+                        .setHoverTooltips("item.gtmthings.advanced_terminal.setting.5.tooltip"),
                 )
                 .addWidget(
                     TerminalInputWidget(
-                        140, 5 + 16 * rowIndex++, 20, 16, { getIsUseAE(handItem) },
-                        { v: Int? -> setIsUseAE(v!!, handItem) }).setMin(0).setMax(1)
-                )
+                        140,
+                        5 + 16 * rowIndex++,
+                        20,
+                        16,
+                        { getIsUseAE(handItem) },
+                        { v: Int? -> setIsUseAE(v!!, handItem) },
+                    ).setMin(0).setMax(1),
+                ),
         )
 
         group.setBackground(GuiTextures.BACKGROUND_INVERSE)
@@ -286,8 +311,6 @@ class AdvancedTerminalBehavior:IItemUIFactory {
             return true
         }
 
-        fun isReplaceCoilMode(): Boolean {
-            return replaceCoilMode == 1
-        }
+        fun isReplaceCoilMode(): Boolean = replaceCoilMode == 1
     }
 }

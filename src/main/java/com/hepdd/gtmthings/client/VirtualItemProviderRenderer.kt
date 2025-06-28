@@ -1,14 +1,5 @@
 package com.hepdd.gtmthings.client
 
-import com.hepdd.gtmthings.GTMThings.Companion.id
-import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior
-import com.lowdragmc.lowdraglib.client.model.ModelFactory
-import com.lowdragmc.lowdraglib.client.renderer.IRenderer
-import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.DefaultVertexFormat
-import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.blaze3d.vertex.Tesselator
-import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.client.renderer.MultiBufferSource
@@ -19,7 +10,17 @@ import net.minecraft.world.item.ItemStack
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
-open class VirtualItemProviderRenderer:IRenderer {
+import com.hepdd.gtmthings.GTMThings.Companion.id
+import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior
+import com.lowdragmc.lowdraglib.client.model.ModelFactory
+import com.lowdragmc.lowdraglib.client.renderer.IRenderer
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.Tesselator
+import com.mojang.blaze3d.vertex.VertexFormat
+
+open class VirtualItemProviderRenderer : IRenderer {
 
     companion object {
         @JvmStatic
@@ -27,16 +28,7 @@ open class VirtualItemProviderRenderer:IRenderer {
     }
 
     @OnlyIn(Dist.CLIENT)
-    override fun renderItem(
-        stack: ItemStack,
-        transformType: ItemDisplayContext,
-        leftHand: Boolean,
-        poseStack: PoseStack,
-        buffer: MultiBufferSource,
-        combinedLight: Int,
-        combinedOverlay: Int,
-        model: BakedModel?
-    ) {
+    override fun renderItem(stack: ItemStack, transformType: ItemDisplayContext, leftHand: Boolean, poseStack: PoseStack, buffer: MultiBufferSource, combinedLight: Int, combinedOverlay: Int, model: BakedModel?) {
         val item = VirtualItemProviderBehavior.getVirtualItem(stack)
         poseStack.pushPose()
         if (!item.isEmpty) {

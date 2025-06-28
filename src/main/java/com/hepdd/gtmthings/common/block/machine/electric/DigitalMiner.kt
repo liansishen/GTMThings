@@ -1,5 +1,19 @@
 package com.hepdd.gtmthings.common.block.machine.electric
 
+import net.minecraft.ChatFormatting
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
+import net.minecraft.server.TickTask
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.phys.BlockHitResult
+
 import com.gregtechceu.gtceu.GTCEu
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.cover.filter.ItemFilter
@@ -24,32 +38,22 @@ import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper
 import com.lowdragmc.lowdraglib.syncdata.ISubscription
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import lombok.Getter
-import lombok.Setter
-import net.minecraft.ChatFormatting
-import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.Style
-import net.minecraft.server.TickTask
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.block.Block
-import net.minecraft.world.phys.BlockHitResult
+
 import java.util.function.Predicate
 import kotlin.math.max
 import kotlin.math.pow
 
-open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any): WorkableTieredMachine(holder,tier,GTMachineUtils.defaultTankSizeFunction, args), IDigitalMiner, IFancyUIMachine, IDataInfoProvider {
+open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any) :
+    WorkableTieredMachine(holder, tier, GTMachineUtils.defaultTankSizeFunction, args),
+    IDigitalMiner,
+    IFancyUIMachine,
+    IDataInfoProvider {
 
     companion object {
         @JvmStatic
         val MANAGED_FIELD_HOLDER: ManagedFieldHolder = ManagedFieldHolder(
             DigitalMiner::class.java,
-            WorkableTieredMachine.MANAGED_FIELD_HOLDER
+            WorkableTieredMachine.MANAGED_FIELD_HOLDER,
         )
 
         const val BORDER_WIDTH: Int = 3
@@ -70,13 +74,15 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
     private var filterSlot: SlotWidget? = null
     private var resetButton: ButtonWidget? = null
     private var silkButton: ButtonWidget? = null
-    //protected var fortuneButton: ButtonWidget? = null
-    //protected var overClockButton: ButtonWidget? = null
+    // protected var fortuneButton: ButtonWidget? = null
+    // protected var overClockButton: ButtonWidget? = null
 
     @Persisted
     private var minerRadius = 0
+
     @Persisted
     private var minHeight = 0
+
     @Persisted
     private var maxHeight = 0
     private var silkLevel = 0
@@ -91,15 +97,9 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
         this.minerRadius = 32
     }
 
+    override fun getFieldHolder(): ManagedFieldHolder = MANAGED_FIELD_HOLDER
 
-    override fun getFieldHolder():ManagedFieldHolder
-    {
-        return MANAGED_FIELD_HOLDER
-    }
-
-    override fun isRemote(): Boolean {
-        return level?.isClientSide ?: GTCEu.isClientThread()
-    }
+    override fun isRemote(): Boolean = level?.isClientSide ?: GTCEu.isClientThread()
 
     protected fun createFilterItemHandler(): CustomItemStackHandler {
         val transfer = CustomItemStackHandler()
@@ -108,32 +108,27 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
         return transfer
     }
 
-    override fun createRecipeLogic(vararg args: Any?): RecipeLogic {
-        return DigitalMinerLogic(
-            this,
-            minerRadius,
-            minHeight,
-            maxHeight,
-            silkLevel,
-            itemFilter,
-            (40 / 2.0.pow(getTier().toDouble())).toInt()
-        )
-    }
+    override fun createRecipeLogic(vararg args: Any?): RecipeLogic = DigitalMinerLogic(
+        this,
+        minerRadius,
+        minHeight,
+        maxHeight,
+        silkLevel,
+        itemFilter,
+        (40 / 2.0.pow(getTier().toDouble())).toInt(),
+    )
 
     override fun onMachineRemoved() {
         clearInventory(exportItems.storage)
         filterInventory?.let { clearInventory(it) }
     }
 
-    override fun getRecipeLogic(): DigitalMinerLogic {
-        return super.getRecipeLogic() as DigitalMinerLogic
-    }
+    override fun getRecipeLogic(): DigitalMinerLogic = super.getRecipeLogic() as DigitalMinerLogic
 
     override fun onNeighborChanged(block: Block, fromPos: BlockPos, isMoving: Boolean) {
         super.onNeighborChanged(block, fromPos, isMoving)
         updateAutoOutputSubscription()
     }
-
 
     override fun onLoad() {
         super.onLoad()
@@ -157,14 +152,17 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
         }
     }
 
-
-    /**/////////////////////////////////// */ // ********** LOGIC **********//
-    /**/////////////////////////////////// */
+    /**/
+    // //////////////////////////////// */ // ********** LOGIC **********//
+    /**/
+    // //////////////////////////////// */
     protected fun updateAutoOutputSubscription() {
         val outputFacingItems = frontFacing
-        if (!exportItems.isEmpty && ItemTransferHelper.getItemTransfer(
+        if (!exportItems.isEmpty &&
+            ItemTransferHelper.getItemTransfer(
                 level,
-                pos.relative(outputFacingItems), outputFacingItems.opposite
+                pos.relative(outputFacingItems),
+                outputFacingItems.opposite,
             ) != null
         ) {
             autoOutputSubs = subscribeServerTick(autoOutputSubs) { this.autoOutput() }
@@ -201,20 +199,23 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
 
         // infomation screen
         val componentPanel = ComponentPanelWidget(
-            4, 5
+            4,
+            5,
         ) { textList: MutableList<Component>? ->
             this.addDisplayText(
-                textList
+                textList,
             )
         }.setMaxWidthLimit(110)
         val container = WidgetGroup(8, 0, 87, 76)
         container.addWidget(
             DraggableScrollableWidgetGroup(
-                4, 4, container.size.width - 8,
-                container.size.height - 8
+                4,
+                4,
+                container.size.width - 8,
+                container.size.height - 8,
             )
                 .setBackground(GuiTextures.DISPLAY)
-                .addWidget(componentPanel)
+                .addWidget(componentPanel),
         )
         container.setBackground(GuiTextures.BACKGROUND_INVERSE)
         group.addWidget(container)
@@ -240,46 +241,64 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
         group.addWidget(LabelWidget(99, 26, "水平范围:"))
         group.addWidget(
             SimpleNumberInputWidget(
-                140, 24, 24, 12,
+                140,
+                24,
+                24,
+                12,
                 { this.minerRadius },
-                { radius: Int? -> this.minerRadius = radius!! })
-                .setMin(1).setMax((8 * 2.0.pow(getTier().toDouble())).toInt())
+                { radius: Int? -> this.minerRadius = radius!! },
+            )
+                .setMin(1).setMax((8 * 2.0.pow(getTier().toDouble())).toInt()),
         )
 
         // Min height
         group.addWidget(LabelWidget(99, 44, "最小高度:"))
         group.addWidget(
             SimpleNumberInputWidget(
-                140, 42, 24, 12,
+                140,
+                42,
+                24,
+                12,
                 { this.minHeight },
-                { mheight: Int? -> this.minHeight = mheight!! })
-                .setMin(level!!.minBuildHeight).setMax(level!!.maxBuildHeight)
+                { mheight: Int? -> this.minHeight = mheight!! },
+            )
+                .setMin(level!!.minBuildHeight).setMax(level!!.maxBuildHeight),
         )
 
         // Max height
         group.addWidget(LabelWidget(99, 62, "最大高度:"))
         group.addWidget(
             SimpleNumberInputWidget(
-                140, 60, 24, 12,
+                140,
+                60,
+                24,
+                12,
                 { this.maxHeight },
-                { maxHeight: Int? -> this.maxHeight = maxHeight!! })
-                .setMin(level!!.minBuildHeight).setMax(level!!.maxBuildHeight)
+                { maxHeight: Int? -> this.maxHeight = maxHeight!! },
+            )
+                .setMin(level!!.minBuildHeight).setMax(level!!.maxBuildHeight),
         )
 
         // reset button
         this.resetButton = ButtonWidget(
-            16, 46 + BORDER_WIDTH, 18, 16 - BORDER_WIDTH,
-            TextTexture("重置").setDropShadow(false).setColor(ChatFormatting.GRAY.color!!)
+            16,
+            46 + BORDER_WIDTH,
+            18,
+            16 - BORDER_WIDTH,
+            TextTexture("重置").setDropShadow(false).setColor(ChatFormatting.GRAY.color!!),
         ) { this.reset() }
         resetButton!!.setHoverTooltips(Component.literal("修改配置后必须重置才能生效。"))
         group.addWidget(this.resetButton)
 
         // silk button
         this.silkButton = ButtonWidget(
-            36, 46 + BORDER_WIDTH, 18, 16 - BORDER_WIDTH,
+            36,
+            46 + BORDER_WIDTH,
+            18,
+            16 - BORDER_WIDTH,
             TextTexture("精准")
                 .setDropShadow(false)
-                .setColor((if (silkLevel == 0) ChatFormatting.GRAY.color else ChatFormatting.GREEN.color)!!)
+                .setColor((if (silkLevel == 0) ChatFormatting.GRAY.color else ChatFormatting.GREEN.color)!!),
         ) { this.setSilk() }
         silkButton!!.setHoverTooltips(Component.literal("开启精准采集模式，4倍耗电。"))
         group.addWidget(this.silkButton)
@@ -294,9 +313,11 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
 
     private fun filterChange() {
         this.itemFilter = null
-        if (!filterInventory!!.getStackInSlot(0).isEmpty) this.itemFilter = ItemFilter.loadFilter(
-            filterInventory!!.getStackInSlot(0)
-        )
+        if (!filterInventory!!.getStackInSlot(0).isEmpty) {
+            this.itemFilter = ItemFilter.loadFilter(
+                filterInventory!!.getStackInSlot(0),
+            )
+        }
         resetRecipe()
     }
 
@@ -308,13 +329,13 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
         if (silkLevel == 0) {
             silkLevel = 1
             silkButton!!.setButtonTexture(
-                TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GREEN.color!!)
+                TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GREEN.color!!),
             )
             energyPerTick = GTValues.VEX[getTier() - 1] * 4
         } else {
             silkLevel = 0
             silkButton!!.setButtonTexture(
-                TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GRAY.color!!)
+                TextTexture("精准").setDropShadow(false).setColor(ChatFormatting.GRAY.color!!),
             )
             energyPerTick = GTValues.VEX[getTier() - 1]
         }
@@ -323,48 +344,56 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
 
     private fun addDisplayText(textList: MutableList<Component>?) {
         textList!!.add(Component.literal("挖掘: ").append(getRecipeLogic().oreAmount.toString()))
-        if (getRecipeLogic().isDone) textList.add(
-            Component.translatable("gtceu.multiblock.large_miner.done")
-                .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
-        )
-        else if (getRecipeLogic().isWorking) textList.add(
-            Component.translatable("gtceu.multiblock.large_miner.working")
-                .setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD))
-        )
-        else if (!this.isWorkingEnabled) textList.add(Component.translatable("gtceu.multiblock.work_paused"))
-        if (getRecipeLogic().isInventoryFull) textList.add(
-            Component.translatable("gtceu.multiblock.large_miner.invfull")
-                .setStyle(Style.EMPTY.withColor(ChatFormatting.RED))
-        )
-        if (!drainInput(true)) textList.add(
-            Component.translatable("gtceu.multiblock.large_miner.needspower")
-                .setStyle(Style.EMPTY.withColor(ChatFormatting.RED))
-        )
+        if (getRecipeLogic().isDone) {
+            textList.add(
+                Component.translatable("gtceu.multiblock.large_miner.done")
+                    .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)),
+            )
+        } else if (getRecipeLogic().isWorking) {
+            textList.add(
+                Component.translatable("gtceu.multiblock.large_miner.working")
+                    .setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)),
+            )
+        } else if (!this.isWorkingEnabled) {
+            textList.add(Component.translatable("gtceu.multiblock.work_paused"))
+        }
+        if (getRecipeLogic().isInventoryFull) {
+            textList.add(
+                Component.translatable("gtceu.multiblock.large_miner.invfull")
+                    .setStyle(Style.EMPTY.withColor(ChatFormatting.RED)),
+            )
+        }
+        if (!drainInput(true)) {
+            textList.add(
+                Component.translatable("gtceu.multiblock.large_miner.needspower")
+                    .setStyle(Style.EMPTY.withColor(ChatFormatting.RED)),
+            )
+        }
     }
 
-
-    /**/////////////////////////////////// */ // ******* Interaction *******//
-    /**/////////////////////////////////// */
-    override fun onScrewdriverClick(
-        playerIn: Player,
-        hand: InteractionHand,
-        gridSide: Direction,
-        hitResult: BlockHitResult
-    ): InteractionResult {
+    /**/
+    // //////////////////////////////// */ // ******* Interaction *******//
+    /**/
+    // //////////////////////////////// */
+    override fun onScrewdriverClick(playerIn: Player, hand: InteractionHand, gridSide: Direction, hitResult: BlockHitResult): InteractionResult {
         if (isRemote) return InteractionResult.SUCCESS
 
         if (!this.isActive) {
             val currentRadius = getRecipeLogic().currentRadius
-            if (currentRadius == 1) getRecipeLogic().currentRadius = getRecipeLogic().maximumRadius
-            else if (playerIn.isShiftKeyDown) getRecipeLogic().currentRadius =
-                max(1.0, Math.round(currentRadius / 2.0f).toDouble()).toInt()
-            else getRecipeLogic().currentRadius = max(1.0, (currentRadius - 1).toDouble()).toInt()
+            if (currentRadius == 1) {
+                getRecipeLogic().currentRadius = getRecipeLogic().maximumRadius
+            } else if (playerIn.isShiftKeyDown) {
+                getRecipeLogic().currentRadius =
+                    max(1.0, Math.round(currentRadius / 2.0f).toDouble()).toInt()
+            } else {
+                getRecipeLogic().currentRadius = max(1.0, (currentRadius - 1).toDouble()).toInt()
+            }
 
             getRecipeLogic().resetArea(true)
 
             val workingArea: Int = IDigitalMiner.getWorkingArea(getRecipeLogic().currentRadius)
             playerIn.sendSystemMessage(
-                Component.translatable("gtceu.universal.tooltip.working_area", workingArea, workingArea)
+                Component.translatable("gtceu.universal.tooltip.working_area", workingArea, workingArea),
             )
         } else {
             playerIn.sendSystemMessage(Component.translatable("gtceu.multiblock.large_miner.errorradius"))
@@ -378,7 +407,7 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
         ) {
             val workingArea: Int = IDigitalMiner.getWorkingArea(getRecipeLogic().currentRadius)
             return listOf<Component>(
-                Component.translatable("gtceu.universal.tooltip.working_area", workingArea, workingArea)
+                Component.translatable("gtceu.universal.tooltip.working_area", workingArea, workingArea),
             )
         }
         return ArrayList()

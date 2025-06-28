@@ -1,5 +1,7 @@
 package com.hepdd.gtmthings.data
 
+import net.minecraft.network.chat.Component
+
 import com.gregtechceu.gtceu.api.GTCEuAPI
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.capability.recipe.IO
@@ -16,7 +18,7 @@ import com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.WirelessEnergyHatchPartMachine
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine
 import com.hepdd.gtmthings.common.registry.GTMTRegistration
-import net.minecraft.network.chat.Component
+
 import java.util.function.BiFunction
 
 class WirelessMachines {
@@ -25,6 +27,7 @@ class WirelessMachines {
         @JvmStatic
         val ALL_TIERS: IntArray =
             GTValues.tiersBetween(GTValues.LV, if (GTCEuAPI.isHighTier()) GTValues.MAX else GTValues.UHV)
+
         @JvmStatic
         val WIRELL_ENERGY_HIGH_TIERS: IntArray =
             GTValues.tiersBetween(GTValues.EV, if (GTCEuAPI.isHighTier()) GTValues.MAX else GTValues.UHV)
@@ -36,7 +39,7 @@ class WirelessMachines {
         @JvmStatic
         val WIRELESS_ENERGY_MONITOR: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
             .machine(
-                "wireless_energy_monitor"
+                "wireless_energy_monitor",
             ) { holder: IMachineBlockEntity? -> WirelessEnergyMonitor(holder!!) }
             .rotationState(RotationState.NON_Y_AXIS)
             .workableTieredHullRenderer(id("block/machines/wireless_energy_monitor"))
@@ -46,7 +49,7 @@ class WirelessMachines {
         @JvmStatic
         val WIRELESS_ENERGY_INTERFACE: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
             .machine(
-                "wireless_energy_interface"
+                "wireless_energy_interface",
             ) { holder: IMachineBlockEntity? -> WirelessEnergyInterface(holder!!) }
             .rotationState(RotationState.ALL)
             .overlayTieredHullRenderer("energy_hatch.input")
@@ -56,14 +59,14 @@ class WirelessMachines {
         @JvmStatic
         val WIRELESS_COMPUTATION_HATCH_TRANSMITTER: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
             .machine(
-                "wireless_computation_transmitter_hatch"
+                "wireless_computation_transmitter_hatch",
             ) { holder: IMachineBlockEntity? -> WirelessOpticalComputationHatchMachine(holder!!, true) }
             .rotationState(RotationState.ALL)
             .abilities(PartAbility.COMPUTATION_DATA_TRANSMISSION)
             .overlayTieredHullRenderer("computation_data_hatch")
             .tooltips(
                 Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.1"),
-                Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.2")
+                Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.2"),
             )
             .tier(GTValues.UV)
             .register()
@@ -71,14 +74,14 @@ class WirelessMachines {
         @JvmStatic
         val WIRELESS_COMPUTATION_HATCH_RECEIVER: MachineDefinition = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
             .machine(
-                "wireless_computation_receiver_hatch"
+                "wireless_computation_receiver_hatch",
             ) { holder: IMachineBlockEntity? -> WirelessOpticalComputationHatchMachine(holder!!, false) }
             .rotationState(RotationState.ALL)
             .abilities(PartAbility.COMPUTATION_DATA_RECEPTION)
             .overlayTieredHullRenderer("computation_data_hatch")
             .tooltips(
                 Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tooltip.1"),
-                Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tooltip.2")
+                Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tooltip.2"),
             )
             .tier(GTValues.UV)
             .register()
@@ -86,26 +89,33 @@ class WirelessMachines {
         @JvmStatic
         val WIRELESS_ENERGY_INPUT_HATCH: Array<MachineDefinition?> =
             registerWirelessEnergyHatch(IO.IN, 2, PartAbility.INPUT_ENERGY, ALL_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_INPUT_HATCH_4A: Array<MachineDefinition?> =
             registerWirelessEnergyHatch(IO.IN, 4, PartAbility.INPUT_ENERGY, ALL_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_INPUT_HATCH_16A: Array<MachineDefinition?> =
             registerWirelessEnergyHatch(IO.IN, 16, PartAbility.INPUT_ENERGY, ALL_TIERS)
+
         // public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_64A =
         // registerWirelessEnergyHatch(IO.IN,64,PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
         @JvmStatic
         val WIRELESS_ENERGY_INPUT_HATCH_256A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.IN, 256, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_INPUT_HATCH_1024A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.IN, 1024, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_INPUT_HATCH_4096A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.IN, 4096, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_INPUT_HATCH_16384A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.IN, 16384, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_INPUT_HATCH_65536A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.IN, 65536, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
@@ -113,41 +123,43 @@ class WirelessMachines {
         @JvmStatic
         val WIRELESS_ENERGY_OUTPUT_HATCH: Array<MachineDefinition?> =
             registerWirelessEnergyHatch(IO.OUT, 2, PartAbility.OUTPUT_ENERGY, ALL_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_OUTPUT_HATCH_4A: Array<MachineDefinition?> =
             registerWirelessEnergyHatch(IO.OUT, 4, PartAbility.OUTPUT_ENERGY, ALL_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_OUTPUT_HATCH_16A: Array<MachineDefinition?> =
             registerWirelessEnergyHatch(IO.OUT, 16, PartAbility.OUTPUT_ENERGY, ALL_TIERS)
+
         // public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_64A =
         // registerWirelessEnergyHatch(IO.OUT,64,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
         @JvmStatic
         val WIRELESS_ENERGY_OUTPUT_HATCH_256A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.OUT, 256, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_OUTPUT_HATCH_1024A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.OUT, 1024, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_OUTPUT_HATCH_4096A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.OUT, 4096, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_OUTPUT_HATCH_16384A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.OUT, 16384, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
+
         @JvmStatic
         val WIRELESS_ENERGY_OUTPUT_HATCH_65536A: Array<MachineDefinition?> =
             registerWirelessLaserHatch(IO.OUT, 65536, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS)
 
-        fun registerTieredMachines(
-            name: String?,
-            factory: BiFunction<IMachineBlockEntity?, Int?, MetaMachine?>,
-            builder: BiFunction<Int?, MachineBuilder<MachineDefinition?>?, MachineDefinition?>,
-            vararg tiers: Int
-        ): Array<MachineDefinition?> {
+        fun registerTieredMachines(name: String?, factory: BiFunction<IMachineBlockEntity?, Int?, MetaMachine?>, builder: BiFunction<Int?, MachineBuilder<MachineDefinition?>?, MachineDefinition?>, vararg tiers: Int): Array<MachineDefinition?> {
             val definitions = arrayOfNulls<MachineDefinition>(GTValues.TIER_COUNT)
             for (tier in tiers) {
                 val register = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
                     .machine(
-                        GTValues.VN[tier].lowercase() + "_" + name
+                        GTValues.VN[tier].lowercase() + "_" + name,
                     ) { holder: IMachineBlockEntity? -> factory.apply(holder, tier) }
                     .tier(tier)
                 definitions[tier] = builder.apply(tier, register)
@@ -155,12 +167,7 @@ class WirelessMachines {
             return definitions
         }
 
-        fun registerWirelessEnergyHatch(
-            io: IO,
-            amperage: Int,
-            ability: PartAbility,
-            tiers: IntArray
-        ): Array<MachineDefinition?> {
+        fun registerWirelessEnergyHatch(io: IO, amperage: Int, ability: PartAbility, tiers: IntArray): Array<MachineDefinition?> {
             val name = if (io == IO.IN) "input" else "output"
             val finalRender = getRender(amperage)
             return registerTieredMachines(
@@ -170,7 +177,7 @@ class WirelessMachines {
                         holder!!,
                         tier!!,
                         io,
-                        amperage
+                        amperage,
                     )
                 },
                 { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
@@ -180,21 +187,16 @@ class WirelessMachines {
                         .abilities(ability)
                         .tooltips(
                             Component.translatable("gtmthings.machine.energy_hatch.$name.tooltip"),
-                            (Component.translatable("gtmthings.machine.wireless_energy_hatch.$name.tooltip"))
+                            (Component.translatable("gtmthings.machine.wireless_energy_hatch.$name.tooltip")),
                         )
                         .overlayTieredHullRenderer(finalRender)
                         .register()
                 },
-                *tiers
+                *tiers,
             )
         }
 
-        fun registerWirelessLaserHatch(
-            io: IO,
-            amperage: Int,
-            ability: PartAbility,
-            tiers: IntArray
-        ): Array<MachineDefinition?> {
+        fun registerWirelessLaserHatch(io: IO, amperage: Int, ability: PartAbility, tiers: IntArray): Array<MachineDefinition?> {
             val name = if (io == IO.IN) "target" else "source"
             val finalRender = getRender(amperage)
             return registerTieredMachines(
@@ -204,25 +206,25 @@ class WirelessMachines {
                         holder!!,
                         tier!!,
                         io,
-                        amperage
+                        amperage,
                     )
                 },
                 { tier: Int?, builder: MachineBuilder<MachineDefinition?>? ->
                     builder!!
                         .langValue(
                             GTValues.VNF[tier!!] + " " + FormattingUtil.formatNumbers(amperage) + "A Laser " +
-                                    FormattingUtil.toEnglishName(name) + " Hatch"
+                                FormattingUtil.toEnglishName(name) + " Hatch",
                         )
                         .rotationState(RotationState.ALL)
                         .abilities(ability)
                         .tooltips(
                             Component.translatable("gtmthings.machine.energy_hatch.$name.tooltip"),
-                            (Component.translatable("gtmthings.machine.wireless_energy_hatch.$name.tooltip"))
+                            (Component.translatable("gtmthings.machine.wireless_energy_hatch.$name.tooltip")),
                         )
                         .overlayTieredHullRenderer(finalRender)
                         .register()
                 },
-                *tiers
+                *tiers,
             )
         }
 
