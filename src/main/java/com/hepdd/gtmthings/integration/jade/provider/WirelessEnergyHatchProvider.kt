@@ -46,11 +46,9 @@ class WirelessEnergyHatchProvider :
     }
 
     override fun write(data: CompoundTag, capability: IBindable) {
-        if (capability.getUUID() != null) {
-            data.putBoolean("isBindable", true)
-            data.putUUID("uuid", capability.getUUID())
-            data.putBoolean("cover", capability.cover())
-        }
+        data.putBoolean("isBindable", true)
+        data.putUUID("uuid", capability.getUUID()!!)
+        data.putBoolean("cover", capability.cover())
     }
 
     override fun addTooltip(capData: CompoundTag, tooltip: ITooltip, player: Player?, block: BlockAccessor, blockEntity: BlockEntity?, config: IPluginConfig?) {

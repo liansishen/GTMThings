@@ -69,10 +69,6 @@ open class CreativeInputHatchPartMachine(holder: IMachineBlockEntity) :
         updateTankSubscription()
     }
 
-    override fun onUnload() {
-        super.onUnload()
-    }
-
     protected fun updateTankSubscription() {
         if (!fluidMap!!.isEmpty()) {
             autoIOSubs = subscribeServerTick(autoIOSubs) { this.autoKeep() }

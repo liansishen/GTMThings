@@ -148,11 +148,11 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
         )
         this.inputItemHandler = ItemRecipeHandler(
             IO.IN,
-            machine.getRecipeType().getMaxInputs(ItemRecipeCapability.CAP),
+            machine.recipeType.getMaxInputs(ItemRecipeCapability.CAP),
         )
         this.outputItemHandler = ItemRecipeHandler(
             IO.OUT,
-            machine.getRecipeType().getMaxOutputs(ItemRecipeCapability.CAP),
+            machine.recipeType.getMaxOutputs(ItemRecipeCapability.CAP),
         )
         this.inputEnergyHandler = IgnoreEnergyRecipeHandler()
         addHandlerList(RecipeHandlerList.of(IO.IN, inputItemHandler, inputEnergyHandler))
@@ -192,7 +192,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
                 ConfigHolder.INSTANCE.machines.replaceMinedBlocksWith,
                 false,
             ).blockState()
-        } catch (ignored: CommandSyntaxException) {
+        } catch (_: CommandSyntaxException) {
             GTCEu.LOGGER.error(
                 "failed to parse replaceMinedBlocksWith, invalid BlockState: {}",
                 ConfigHolder.INSTANCE.machines.replaceMinedBlocksWith,
@@ -202,21 +202,21 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
     }
 
     /**
-     * Performs the actual mining in world
+     * Performs the actual mining in the world
      * Call this method every tick in update
      */
     override fun serverTick() {
         if (!isSuspend && getMachine().level is ServerLevel && checkCanMine()) {
             val serverLevel: ServerLevel = getMachine().level as ServerLevel
-            // if the inventory is not full, drain energy etc. from the miner
+            // if the inventory is not full, drain energy etc. from the miner,
             // the storages have already been checked earlier
             if (!isInventoryFull) {
                 // always drain storages when working, even if blocksToMine ends up being empty
                 miner!!.drainInput(false)
-                // since energy is being consumed the miner is now active
+                // since energy is being consumed, the miner is now active
                 status = Status.WORKING
             } else {
-                // the miner cannot drain, therefore it is inactive
+                // the miner cannot drain; therefore, it is inactive
                 if (this.isWorking) {
                     setWaiting(
                         Component.translatable("gtceu.recipe_logic.insufficient_out").append(": ")
@@ -253,7 +253,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
                     } else {
                         getRegularBlockDrops(blockDrops, blockState, builder)
                     }
-                    // handle recipe type
+                    // handle a recipe type
                     if (hasPostProcessing()) {
                         doPostProcessing(blockDrops)
                     }
@@ -278,7 +278,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
                 this.oreAmount = blocksToMine.size
             }
         } else {
-            // machine isn't working enabled
+            // the machine isn't working enabled
             this.status = Status.IDLE
             if (subscription != null) {
                 subscription.unsubscribe()
@@ -326,7 +326,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
     private fun doPostProcessing(blockDrops: NonNullList<ItemStack>): Boolean {
         val oreDrop = blockDrops[0]
 
-        // create dummy recipe handler
+        // create a fake recipe handler
         inputItemHandler!!.storage.setStackInSlot(0, oreDrop)
         inputItemHandler!!.storage.onContentsChanged(0)
         for (i in 0..<outputItemHandler!!.storage.slots) {
@@ -384,15 +384,15 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
     }
 
     /**
-     * called in order to insert the mined items into the inventory and actually remove the block in world
+     * called to insert the mined items into the inventory and actually remove the block in a world
      * marks the inventory as full if the items cannot fit, and not full if it previously was full and items could fit
      *
      * @param blockDrops the List of items to insert
      * @param world      the [ServerLevel] the miner is in
      */
     private fun mineAndInsertItems(blockDrops: NonNullList<ItemStack>, world: ServerLevel) {
-        // If the block's drops can fit in the inventory, move the previously mined position to the block
-        // replace the ore block with cobblestone instead of breaking it to prevent mob spawning
+        // If the block's drops can fit in the inventory, move the previously mined position to the block,
+        // replace the ore block with cobblestone instead of breaking it to prevent mob spawning,
         // remove the ore block's position from the mining queue
         val transfer = getCachedItemTransfer()
         if (GTTransferUtils.addItemsToItemHandler(transfer, true, blockDrops)) {
@@ -445,7 +445,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
     }
 
     /**
-     * Recalculates the mining area, refills the block list and restarts the miner, if it was done
+     * Recalculates the mining area, refills the blocklist and restarts the miner if it was done
      */
     fun resetArea(checkToMine: Boolean) {
         initPos(getMiningPos(), currentRadius)
@@ -537,7 +537,7 @@ class DigitalMinerLogic(machine: IRecipeLogicMachine?, maximumRadius: Int, minHe
     private fun getMeanTickTime(world: Level?): Double = mean(world!!.server!!.tickTimes) * 1.0E-6
 
     /**
-     * gets the quotient for determining the amount of blocks to mine
+     * gets the quotient for determining the number of blocks to mine
      *
      * @param base is a value used for calculation, intended to be the mean tick time of the world the miner is in
      * @return the quotient

@@ -53,17 +53,18 @@ class FormatUtil {
             for (c in appends) {
                 a[++i] = c
             }
-            val tmp = Component.translatable(labelKey, *a as Array<Any?>)
+            val tmp = Component.translatable(labelKey, *a as Array<*>)
             val baseLength = getComponentLength(tmp)
             val spaceLength = width - baseLength
             if (spaceLength <= 0) return tmp
             // var spacerCount = (spaceLength / 2) - 4;
             val spacerCount = 0 // 暂时移除对齐功能
-            val spacer = if (spacerCount > 0) (".".repeat((spaceLength / 2) - 4) + " ") else ""
+            // val spacer = if (spacerCount > 0) (".".repeat((spaceLength / 2) - 4) + " ") else ""
+            val spacer = ""
             val spacerComponent = Component.literal(spacer)
             // return tmp;
             a[0] = spacerComponent.append(body)
-            return Component.translatable(labelKey, *a as Array<Any?>)
+            return Component.translatable(labelKey, *a as Array<*>)
         }
 
         @JvmStatic

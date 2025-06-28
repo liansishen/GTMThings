@@ -224,7 +224,7 @@ open class CreativeEnergyHatchPartMachine(holder: IMachineBlockEntity) :
                 }
                 sum = sum - canOutput
             } else if (io == IO.OUT) {
-                val canInput = capability.getEnergyCapacity() - capability.getEnergyStored()
+                val canInput = capability.energyCapacity - capability.energyStored
                 if (!simulate) {
                     capability.addEnergy(min(canInput, sum))
                 }

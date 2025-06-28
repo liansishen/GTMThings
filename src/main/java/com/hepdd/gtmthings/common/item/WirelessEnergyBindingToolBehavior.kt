@@ -21,18 +21,18 @@ import java.math.BigInteger
 
 class WirelessEnergyBindingToolBehavior : IInteractionItem {
     override fun onItemUseFirst(stack: ItemStack?, context: UseOnContext): InteractionResult {
-        if (context.getLevel().isClientSide()) return InteractionResult.PASS
+        if (context.level.isClientSide()) return InteractionResult.PASS
         if (ConfigHolder.INSTANCE!!.isWirelessRateEnable) {
-            val pos = context.getClickedPos()
-            val rate: Long = getRate(context.getLevel(), pos)
+            val pos = context.clickedPos
+            val rate: Long = getRate(context.level, pos)
             if (rate > 0) {
-                val container = getOrCreateContainer(context.getPlayer()!!.getUUID())
+                val container = getOrCreateContainer(context.player!!.getUUID())
                 container!!.rate = rate
-                container.bindPos = GlobalPos.of(context.getLevel().dimension(), pos)
-                context.getPlayer()!!.sendSystemMessage(
+                container.bindPos = GlobalPos.of(context.level.dimension(), pos)
+                context.player!!.sendSystemMessage(
                     Component.translatable(
                         "item.gtmthings.wireless_transfer.tooltip.bind.1",
-                        Component.translatable(context.getLevel().getBlockState(pos).getBlock().getDescriptionId()),
+                        Component.translatable(context.level.getBlockState(pos).block.descriptionId),
                         pos.toShortString(),
                     ),
                 )
@@ -49,14 +49,14 @@ class WirelessEnergyBindingToolBehavior : IInteractionItem {
                 val machine = MetaMachine.getMachine(level, pos)
                 if (machine is BatteryBufferMachine) {
                     val inv = machine.getBatteryInventory()
-                    for (i in 0..<inv.getSlots()) {
+                    for (i in 0..<inv.slots) {
                         val electricItem = GTCapabilityHelper.getElectricItem(inv.getStackInSlot(i))
                         if (electricItem != null) {
-                            rate += GTValues.VEX[electricItem.getTier()]
+                            rate += GTValues.VEX[electricItem.tier]
                         }
                     }
                 } else if (machine is PowerSubstationMachine && machine.isFormed()) {
-                    rate = machine.getEnergyInfo().capacity().divide(BigInteger.valueOf(4096)).toLong()
+                    rate = machine.energyInfo.capacity().divide(BigInteger.valueOf(4096)).toLong()
                 }
             }
             return rate

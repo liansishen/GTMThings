@@ -89,7 +89,7 @@ class CreativeMachines {
         var CREATIVE_ENERGY_COVER: ItemEntry<ComponentItem?> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
             .item<ComponentItem?>(
                 "creative_energy_cover",
-            ) { properties: Item.Properties? -> ComponentItem.create(properties) }
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
             .onRegister(
                 GTItems.attach<ComponentItem?>(
                     CoverPlaceBehavior(GTMTCovers.CREATIVE_ENERGY),
@@ -102,7 +102,7 @@ class CreativeMachines {
         var CREATIVE_FLUID_CELL: ItemEntry<ComponentItem?> = GTMTRegistration.Companion.GTMTHINGS_REGISTRATE
             .item<ComponentItem?>(
                 "creative_fluid_cell",
-            ) { properties: Item.Properties? -> ComponentItem.create(properties) }
+            ) { properties: Item.Properties -> ComponentItem.create(properties) }
             .color { Supplier { GTItems.cellColor() } }
             .setData<RegistrateItemModelProvider?>(
                 ProviderType.ITEM_MODEL,

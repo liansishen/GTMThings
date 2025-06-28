@@ -5,5 +5,5 @@ interface IGTMTJadeIF {
 
     fun isbinded(): Boolean
 
-    fun getBindPos(): String?
+    fun getBindPos(): String
 }

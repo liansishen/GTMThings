@@ -16,8 +16,4 @@ open class GTMTRegistration {
             GTMTHINGS_REGISTRATE.defaultCreativeTab(null as ResourceKey<CreativeModeTab?>?)
         }
     }
-
-    private fun GTMTRegistration() {
-        /**/
-    }
 }

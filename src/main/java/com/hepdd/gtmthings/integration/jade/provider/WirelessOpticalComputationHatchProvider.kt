@@ -33,8 +33,7 @@ class WirelessOpticalComputationHatchProvider :
         return null
     }
 
-    override fun write(data: CompoundTag, capability: IGTMTJadeIF?) {
-        if (capability == null) return
+    override fun write(data: CompoundTag, capability: IGTMTJadeIF) {
         data.putBoolean("isGTMTJadeIF", true)
         data.putBoolean("isTransmitter", capability.isTransmitter())
         data.putBoolean("isBinded", capability.isbinded())

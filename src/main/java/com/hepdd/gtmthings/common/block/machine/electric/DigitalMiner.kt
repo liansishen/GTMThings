@@ -42,6 +42,7 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
 import java.util.function.Predicate
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.math.roundToLong
 
 open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any) :
     WorkableTieredMachine(holder, tier, GTMachineUtils.defaultTankSizeFunction, args),
@@ -384,7 +385,7 @@ open class DigitalMiner(holder: IMachineBlockEntity, tier: Int, vararg args: Any
                 getRecipeLogic().currentRadius = getRecipeLogic().maximumRadius
             } else if (playerIn.isShiftKeyDown) {
                 getRecipeLogic().currentRadius =
-                    max(1.0, Math.round(currentRadius / 2.0f).toDouble()).toInt()
+                    max(1.0, (currentRadius / 2.0f).roundToLong().toDouble()).toInt()
             } else {
                 getRecipeLogic().currentRadius = max(1.0, (currentRadius - 1).toDouble()).toInt()
             }

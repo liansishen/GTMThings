@@ -199,7 +199,7 @@ interface IWirelessMonitor : IWirelessEnergyContainerHolder {
 
     fun getTimeToFillDrainText(timeToFillSeconds: BigInteger): Component {
         var t = timeToFillSeconds
-        if (t.compareTo(BigIntegerUtils.BIG_INTEGER_MAX_LONG) > 0) {
+        if (t > BigIntegerUtils.BIG_INTEGER_MAX_LONG) {
             t = BigIntegerUtils.BIG_INTEGER_MAX_LONG
         }
 

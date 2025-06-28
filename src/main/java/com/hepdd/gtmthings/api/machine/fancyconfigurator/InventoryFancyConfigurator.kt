@@ -31,9 +31,9 @@ open class InventoryFancyConfigurator(inventory: CustomItemStackHandler, title: 
     override fun getIcon(): IGuiTexture = ResourceTexture("%s:textures/overlay/inventory_configurator.png".format(GTMThings.MOD_ID))
 
     override fun createConfigurator(): Widget {
-        var rowSize = sqrt(inventory!!.getSlots().toDouble()).toInt()
+        var rowSize = sqrt(inventory!!.slots.toDouble()).toInt()
         var colSize = rowSize
-        if (inventory!!.getSlots() == 8) {
+        if (inventory!!.slots == 8) {
             rowSize = 4
             colSize = 2
         }
