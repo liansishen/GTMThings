@@ -3,8 +3,7 @@ dependencies {
 
     implementation("thedarkcolour:kotlinforforge:4.11.0")
 
-    //modImplementation("com.gregtechceu.gtceu:gtceu-${project.minecraft_version}:${project.gtceu_version}")
-    modImplementation("dev:gtceu-1.20.1-1.7.0-SNAPSHOT+20250627-132522-82f725e")
+    modImplementation("com.gregtechceu.gtceu:gtceu-${project.minecraft_version}:${project.gtceu_version}")
     modImplementation("com.lowdragmc.ldlib:ldlib-forge-$project.minecraft_version:$project.ldlib_version") { transitive = false }
     modImplementation("com.tterrag.registrate:Registrate:$project.registrate_version")
     modImplementation("dev.toma.configuration:configuration-forge-$project.minecraft_version:$project.configuration_version")
