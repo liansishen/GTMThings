@@ -14,10 +14,30 @@ import com.hepdd.gtmthings.common.item.VirtualItemProviderBehavior;
 import com.hepdd.gtmthings.data.CustomItems;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.List;
+
 public class ProgrammableCircuitHandler extends NotifiableItemStackHandler {
 
     public ProgrammableCircuitHandler(Object machine) {
         super((MetaMachine) machine, 1, IO.IN, IO.IN, size -> new ItemStackHandler(size, machine));
+    }
+
+    @Override
+    @NotNull
+    public List<Object> getContents() {
+        return Collections.singletonList(storage.getStackInSlot(0));
+    }
+
+    @Override
+    public double getTotalContentAmount() {
+        return storage.getStackInSlot(0).getCount();
+    }
+
+    @NotNull
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        return ItemStack.EMPTY;
     }
 
     private static class ItemStackHandler extends CustomItemStackHandler {
