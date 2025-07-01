@@ -314,22 +314,15 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     protected boolean doPostProcessing(NonNullList<ItemStack> blockDrops, BlockState blockState,
                                        LootParams.Builder builder) {
         ItemStack oreDrop = blockDrops.get(0);
-
+        if (oreDrop.isEmpty()) return false;
         // create dummy recipe handler
         inputItemHandler.storage.setStackInSlot(0, oreDrop);
-        inputItemHandler.storage.onContentsChanged(0);
-        for (int i = 0; i < outputItemHandler.storage.getSlots(); ++i) {
-            outputItemHandler.storage.setStackInSlot(i, ItemStack.EMPTY);
-        }
-        outputItemHandler.storage.onContentsChanged(0);
-
+        outputItemHandler.storage.clear();
         var matches = machine.getRecipeType().searchRecipe(this, r -> RecipeHelper.matchContents(this, r).isSuccess());
-
-        while (matches != null && matches.hasNext()) {
+        while (matches.hasNext()) {
             GTRecipe match = matches.next();
             if (match == null) continue;
-
-            var eut = RecipeHelper.getInputEUt(match);
+            long eut = match.getInputEUt();
             if (GTUtil.getTierByVoltage(eut) <= getVoltageTier()) {
                 if (RecipeHelper.handleRecipeIO(this, match, IO.OUT, this.chanceCaches).isSuccess()) {
                     blockDrops.clear();
