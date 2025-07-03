@@ -38,9 +38,8 @@ lombok {
     version = "1.18.36"
 }
 
-jar {
-    exclude "**/.cache"
-    exclude "**/SimplifiedToTraditional.properties"
+java {
+    withSourcesJar()
 }
 
 idea {
