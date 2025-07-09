@@ -329,7 +329,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
             GTRecipe match = matches.next();
             if (match == null) continue;
 
-            var eut = match.getInputEUt();
+            var eut = match.getInputEUt().getTotalEU();
             if (GTUtil.getTierByVoltage(eut) <= getVoltageTier()) {
                 if (RecipeHelper.handleRecipeIO(this, match, IO.OUT, this.chanceCaches).isSuccess()) {
                     blockDrops.clear();
