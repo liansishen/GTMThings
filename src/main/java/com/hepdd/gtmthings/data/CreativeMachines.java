@@ -1,6 +1,5 @@
 package com.hepdd.gtmthings.data;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.RotationState;
 import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.item.component.ICustomDescriptionId;
@@ -12,7 +11,6 @@ import com.gregtechceu.gtceu.common.item.ItemFluidContainer;
 import com.gregtechceu.gtceu.common.item.TooltipBehavior;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -41,7 +39,7 @@ public class CreativeMachines {
     public static final MachineDefinition CREATIVE_FLUID_INPUT_HATCH = GTMTHINGS_REGISTRATE.machine(
             "creative_fluid_input_hatch", CreativeInputHatchPartMachine::new)
             .rotationState(RotationState.ALL)
-            .colorOverlayTieredHullModel("overlay_pipe_in_9x",OVERLAY_FLUID_HATCH_HALF_PX_TEX)
+            .colorOverlayTieredHullModel("overlay_pipe_in_9x", OVERLAY_FLUID_HATCH_HALF_PX_TEX)
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
             .abilities(PartAbility.IMPORT_FLUIDS, PartAbility.IMPORT_FLUIDS_9X)
             .tier(MAX)

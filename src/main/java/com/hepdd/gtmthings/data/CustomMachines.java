@@ -13,16 +13,15 @@ import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.DualHatchPartMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
-import com.hepdd.gtmthings.GTMThings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
+import com.hepdd.gtmthings.GTMThings;
 import com.hepdd.gtmthings.common.block.machine.electric.DigitalMiner;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeBusPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.HugeDualHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.ProgrammableHatchPartMachine;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.appeng.MEOutputPartMachine;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Locale;
 import java.util.function.BiFunction;
@@ -80,7 +79,7 @@ public class CustomMachines {
                     .abilities(
                             tier == 0 ? new PartAbility[] { PartAbility.IMPORT_ITEMS, PartAbility.STEAM_IMPORT_ITEMS } :
                                     new PartAbility[] { PartAbility.IMPORT_ITEMS })
-                    .colorOverlayTieredHullModel("overlay_pipe_in",OVERLAY_ITEM_HATCH)
+                    .colorOverlayTieredHullModel("overlay_pipe_in", OVERLAY_ITEM_HATCH)
                     .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.import.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
                                     (1 + tier) * INV_MULTIPLE))
@@ -95,7 +94,7 @@ public class CustomMachines {
                     .abilities(
                             tier == 0 ? new PartAbility[] { PartAbility.EXPORT_ITEMS, PartAbility.STEAM_EXPORT_ITEMS } :
                                     new PartAbility[] { PartAbility.EXPORT_ITEMS })
-                    .colorOverlayTieredHullModel("overlay_pipe_out",OVERLAY_ITEM_HATCH)
+                    .colorOverlayTieredHullModel("overlay_pipe_out", OVERLAY_ITEM_HATCH)
                     .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.export.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
                                     (1 + tier) * INV_MULTIPLE))
