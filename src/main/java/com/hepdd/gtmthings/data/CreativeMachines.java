@@ -31,7 +31,6 @@ import static com.gregtechceu.gtceu.common.data.GTItems.attach;
 import static com.gregtechceu.gtceu.common.data.models.GTMachineModels.OVERLAY_FLUID_HATCH_HALF_PX_TEX;
 import static com.gregtechceu.gtceu.common.data.models.GTMachineModels.OVERLAY_ITEM_HATCH;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
-import static com.hepdd.gtmthings.data.CustomMachines.OVER_LAY_PIPE_IN;
 
 public class CreativeMachines {
 

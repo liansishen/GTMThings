@@ -38,8 +38,6 @@ import static com.hepdd.gtmthings.data.GTMTRecipeTypes.DIGITAL_MINER_RECIPE;
 public class CustomMachines {
 
     public static final int[] ALL_TIERS = GTValues.tiersBetween(ULV, GTCEuAPI.isHighTier() ? MAX : UV);
-    public static ResourceLocation OVER_LAY_PIPE_IN = GTCEu.id("block/overlay/machine/overlay_pipe_in");
-    public static ResourceLocation OVER_LAY_PIPE_OUT = GTCEu.id("block/overlay/machine/overlay_pipe_out");
 
     static {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.MORE_MACHINES);
