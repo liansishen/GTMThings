@@ -47,7 +47,7 @@ public class CustomMachines {
             (tier, builder) -> builder
                     .langValue("%s Digital Miner %s".formatted(VLVH[tier], VLVT[tier]))
                     .rotationState(RotationState.NON_Y_AXIS).tier(tier)
-                    .workableTieredHullModel(GTCEu.id("block/machines/miner"))
+                    .workableTieredHullModel(GTMThings.id("block/machines/miner"))
                     .tooltipBuilder((stack, tooltip) -> {
                         int maxArea = (int) (8 * Math.pow(2, tier));
                         long energyPerTick = GTValues.VEX[tier - 1];
