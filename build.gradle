@@ -30,7 +30,11 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << "-Xlint:-deprecation" << "-Xlint:-removal" // 忽略删除和过时，真删了报错再说吧
 }
 
-tasks.withType(Copy).all {
+tasks.withType(Copy).configureEach {
+    duplicatesStrategy = 'exclude'
+}
+
+tasks.withType(Jar).configureEach {
     duplicatesStrategy = 'exclude'
 }
 
