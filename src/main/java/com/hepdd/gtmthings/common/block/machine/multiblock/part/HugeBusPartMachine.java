@@ -1,6 +1,7 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.blockentity.IPaintable;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
@@ -53,7 +54,7 @@ import static com.hepdd.gtmthings.utils.FormatUtil.formatNumber;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinctPart, IMachineLife {
+public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinctPart, IMachineLife, IPaintable {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(HugeBusPartMachine.class,
             TieredIOPartMachine.MANAGED_FIELD_HOLDER);
@@ -122,6 +123,7 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
         if (getLevel() instanceof ServerLevel serverLevel) {
             serverLevel.getServer().tell(new TickTask(0, this::updateInventorySubscription));
         }
+        getHandlerList().setColor(getPaintingColor());
         inventorySubs = getInventory().addChangedListener(this::updateInventorySubscription);
     }
 
@@ -132,6 +134,17 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
             inventorySubs.unsubscribe();
             inventorySubs = null;
         }
+    }
+
+    @Override
+    public void onPaintingColorChanged(int color) {
+        getHandlerList().setColor(color, true);
+    }
+
+    @Override
+    public int tintColor(int index) {
+        if (index == 9) return getRealColor();
+        return -1;
     }
 
     @Override

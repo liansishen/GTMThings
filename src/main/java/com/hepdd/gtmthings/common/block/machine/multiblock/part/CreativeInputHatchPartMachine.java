@@ -1,6 +1,7 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.blockentity.IPaintable;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.PhantomFluidWidget;
@@ -31,7 +32,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CreativeInputHatchPartMachine extends TieredIOPartMachine implements IDistinctPart {
+public class CreativeInputHatchPartMachine extends TieredIOPartMachine implements IDistinctPart, IPaintable {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeInputHatchPartMachine.class,
             TieredIOPartMachine.MANAGED_FIELD_HOLDER);
@@ -80,12 +81,24 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
                 fluidMap.put(i, this.creativeTanks[i].getFluid());
             }
         }
+        getHandlerList().setColor(getPaintingColor());
         updateTankSubscription();
     }
 
     @Override
     public void onUnload() {
         super.onUnload();
+    }
+
+    @Override
+    public void onPaintingColorChanged(int color) {
+        getHandlerList().setColor(color, true);
+    }
+
+    @Override
+    public int tintColor(int index) {
+        if (index == 9) return getRealColor();
+        return -1;
     }
 
     protected void updateTankSubscription() {

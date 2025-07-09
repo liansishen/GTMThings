@@ -536,6 +536,7 @@ public class GTMTRecipe {
                     .EUt(GTValues.VA[tier])
                     .save(provider);
         }
+
         ASSEMBLER_RECIPES.recipeBuilder(GTMThings.id("lv_digital_miner"))
                 .inputItems(GTMachines.MINER[GTValues.LV].asStack())
                 .inputItems(GTItems.CONVEYOR_MODULE_LV.asStack(2))

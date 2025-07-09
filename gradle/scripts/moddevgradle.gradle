@@ -15,8 +15,8 @@ legacyForge {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-            programArguments.addAll('--width', '3200')
-            programArguments.addAll('--height', '1800')
+//            programArguments.addAll('--width', '3200')
+//            programArguments.addAll('--height', '1800')
         }
 
         server {

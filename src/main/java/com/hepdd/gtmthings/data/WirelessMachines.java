@@ -38,14 +38,14 @@ public class WirelessMachines {
     public static final MachineDefinition WIRELESS_ENERGY_MONITOR = GTMTHINGS_REGISTRATE
             .machine("wireless_energy_monitor", WirelessEnergyMonitor::new)
             .rotationState(RotationState.NON_Y_AXIS)
-            .workableTieredHullRenderer(GTMThings.id("block/machines/wireless_energy_monitor"))
+            .workableTieredHullModel(GTMThings.id("block/machines/wireless_energy_monitor"))
             .tier(IV)
             .register();
 
     public static final MachineDefinition WIRELESS_ENERGY_INTERFACE = GTMTHINGS_REGISTRATE
             .machine("wireless_energy_interface", WirelessEnergyInterface::new)
             .rotationState(RotationState.ALL)
-            .overlayTieredHullRenderer("energy_hatch.input")
+            .overlayTieredHullModel("energy_input_hatch")
             .tier(IV)
             .register();
 
@@ -53,7 +53,7 @@ public class WirelessMachines {
             .machine("wireless_computation_transmitter_hatch", (holder) -> new WirelessOpticalComputationHatchMachine(holder, true))
             .rotationState(RotationState.ALL)
             .abilities(PartAbility.COMPUTATION_DATA_TRANSMISSION)
-            .overlayTieredHullRenderer("computation_data_hatch")
+            .overlayTieredHullModel("computation_data_hatch")
             .tooltips(Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.1"),
                     Component.translatable("gtmthings.machine.wireless_computation_transmitter_hatch.tooltip.2"))
             .tier(UV)
@@ -63,7 +63,7 @@ public class WirelessMachines {
             .machine("wireless_computation_receiver_hatch", (holder) -> new WirelessOpticalComputationHatchMachine(holder, false))
             .rotationState(RotationState.ALL)
             .abilities(PartAbility.COMPUTATION_DATA_RECEPTION)
-            .overlayTieredHullRenderer("computation_data_hatch")
+            .overlayTieredHullModel("computation_data_hatch")
             .tooltips(Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tooltip.1"),
                     Component.translatable("gtmthings.machine.wireless_computation_receiver_hatch.tooltip.2"))
             .tier(UV)
@@ -72,8 +72,6 @@ public class WirelessMachines {
     public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH = registerWirelessEnergyHatch(IO.IN, 2, PartAbility.INPUT_ENERGY, ALL_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_4A = registerWirelessEnergyHatch(IO.IN, 4, PartAbility.INPUT_ENERGY, ALL_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_16A = registerWirelessEnergyHatch(IO.IN, 16, PartAbility.INPUT_ENERGY, ALL_TIERS);
-    // public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_64A =
-    // registerWirelessEnergyHatch(IO.IN,64,PartAbility.INPUT_LASER,WIRELL_ENERGY_HIGH_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_256A = registerWirelessLaserHatch(IO.IN, 256, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_1024A = registerWirelessLaserHatch(IO.IN, 1024, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_INPUT_HATCH_4096A = registerWirelessLaserHatch(IO.IN, 4096, PartAbility.INPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
@@ -83,8 +81,6 @@ public class WirelessMachines {
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH = registerWirelessEnergyHatch(IO.OUT, 2, PartAbility.OUTPUT_ENERGY, ALL_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_4A = registerWirelessEnergyHatch(IO.OUT, 4, PartAbility.OUTPUT_ENERGY, ALL_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_16A = registerWirelessEnergyHatch(IO.OUT, 16, PartAbility.OUTPUT_ENERGY, ALL_TIERS);
-    // public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_64A =
-    // registerWirelessEnergyHatch(IO.OUT,64,PartAbility.OUTPUT_ENERGY, ALL_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_256A = registerWirelessLaserHatch(IO.OUT, 256, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_1024A = registerWirelessLaserHatch(IO.OUT, 1024, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
     public static final MachineDefinition[] WIRELESS_ENERGY_OUTPUT_HATCH_4096A = registerWirelessLaserHatch(IO.OUT, 4096, PartAbility.OUTPUT_LASER, WIRELL_ENERGY_HIGH_TIERS);
@@ -116,7 +112,7 @@ public class WirelessMachines {
                         .rotationState(RotationState.ALL)
                         .abilities(ability)
                         .tooltips(Component.translatable("gtmthings.machine.energy_hatch." + name + ".tooltip"), (Component.translatable("gtmthings.machine.wireless_energy_hatch." + name + ".tooltip")))
-                        .overlayTieredHullRenderer(finalRender)
+                        .overlayTieredHullModel(finalRender)
                         .register(),
                 tiers);
     }
@@ -132,7 +128,7 @@ public class WirelessMachines {
                         .rotationState(RotationState.ALL)
                         .abilities(ability)
                         .tooltips(Component.translatable("gtmthings.machine.energy_hatch." + name + ".tooltip"), (Component.translatable("gtmthings.machine.wireless_energy_hatch." + name + ".tooltip")))
-                        .overlayTieredHullRenderer(finalRender)
+                        .overlayTieredHullModel(finalRender)
                         .register(),
                 tiers);
     }
@@ -144,7 +140,7 @@ public class WirelessMachines {
             case 4 -> render + "_4a";
             case 16 -> render + "_16a";
             case 64 -> render + "_64a";
-            default -> "wireless_laser_hatch.target";
+            default -> "wireless_laser_hatch";
         };
         return render;
     }
