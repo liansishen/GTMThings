@@ -19,6 +19,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
+import com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget;
 import com.hepdd.gtmthings.api.gui.widget.TerminalInputWidget;
 import com.hepdd.gtmthings.api.misc.Hatch;
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
@@ -34,6 +35,7 @@ import lombok.Setter;
 
 import java.util.*;
 
+import static com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget.ALIGN_CENTER;
 import static com.hepdd.gtmthings.api.pattern.AdvancedBlockPattern.getAdvancedBlockPattern;
 
 public class AdvancedTerminalBehavior implements IItemUIFactory {
@@ -101,7 +103,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
                         .setBackground(GuiTextures.DISPLAY)
                         .setYScrollBarWidth(2)
                         .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
-                        .addWidget(new LabelWidget(40, 5, "item.gtmthings.advanced_terminal.setting.title"))
+                        .addWidget(new AlignLabelWidget(89, 5, "item.gtmthings.advanced_terminal.setting.title").setTextAlign(ALIGN_CENTER))
                         .addWidget(new LabelWidget(4, 5 + 16 * rowIndex, "item.gtmthings.advanced_terminal.setting.1")
                                 .setHoverTooltips(lines))
                         .addWidget(new TerminalInputWidget(140, 5 + 16 * rowIndex++, 20, 16, () -> getCoilTier(handItem),
