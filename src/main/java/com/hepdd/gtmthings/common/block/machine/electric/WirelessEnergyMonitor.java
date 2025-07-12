@@ -9,6 +9,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
+import com.hepdd.gtmthings.api.gui.widget.AlignComponentPanelWidget;
+import com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import com.hepdd.gtmthings.common.item.IWirelessMonitor;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
@@ -23,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import static com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget.ALIGN_CENTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -74,10 +78,11 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
         var group = new WidgetGroup(0, 0, DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8);
 
         group.addWidget(new DraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117).setBackground(GuiTextures.DISPLAY)
-                .addWidget(new LabelWidget(4, 5, self().getBlockState().getBlock().getDescriptionId()))
-                .addWidget(new ComponentPanelWidget(4, 17, this::addDisplayText)
+                .addWidget(new AlignLabelWidget(DISPLAY_TEXT_WIDTH / 2 + 4, 5, self().getBlockState().getBlock().getDescriptionId()).setTextAlign(ALIGN_CENTER))
+                .addWidget(new AlignComponentPanelWidget(4, 17, this::addDisplayText)
                         .setMaxWidthLimit(DISPLAY_TEXT_WIDTH)
-                        .clickHandler(this::handleDisplayClick)));
+                        .clickHandler(this::handleDisplayClick)
+                        .setSplitChar(".")));
         group.setBackground(GuiTextures.BACKGROUND_INVERSE);
         return group;
     }

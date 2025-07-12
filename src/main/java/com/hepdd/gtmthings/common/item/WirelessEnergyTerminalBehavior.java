@@ -8,6 +8,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
+import com.hepdd.gtmthings.api.gui.widget.AlignComponentPanelWidget;
+import com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget.ALIGN_CENTER;
 import static com.hepdd.gtmthings.common.block.machine.electric.WirelessEnergyMonitor.DISPLAY_TEXT_WIDTH;
 
 public class WirelessEnergyTerminalBehavior implements IItemUIFactory {
@@ -30,15 +33,16 @@ public class WirelessEnergyTerminalBehavior implements IItemUIFactory {
 
     private static Widget createWidget(String descriptionId, WirelessMonitor monitor) {
         var group = new WidgetGroup(0, 0, DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8 + 8 + 8 + 17);
-        Widget label = new LabelWidget(4, 5, descriptionId);
-        label.setSelfPositionX(group.getSizeWidth() / 2 - label.getSizeWidth() / 2);
+        Widget label = new AlignLabelWidget(DISPLAY_TEXT_WIDTH / 2 + 4, 5, descriptionId).setTextAlign(ALIGN_CENTER);
         group.addWidget(
                 new DraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117 + 8 + 8 + 17)
                         .setBackground(GuiTextures.DISPLAY)
                         .setYScrollBarWidth(2)
                         .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
                         .addWidget(label)
-                        .addWidget(new ComponentPanelWidget(8, 17, text -> addDisplayText(text, monitor)).setMaxWidthLimit(DISPLAY_TEXT_WIDTH)));
+                        .addWidget(new AlignComponentPanelWidget(4, 17, text -> addDisplayText(text, monitor))
+                                .setMaxWidthLimit(DISPLAY_TEXT_WIDTH)
+                                .setSplitChar(".")));
 
         group.setBackground(GuiTextures.BACKGROUND_INVERSE);
         return group;
