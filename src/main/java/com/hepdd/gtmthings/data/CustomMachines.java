@@ -79,7 +79,7 @@ public class CustomMachines {
                     .abilities(
                             tier == 0 ? new PartAbility[] { PartAbility.IMPORT_ITEMS, PartAbility.STEAM_IMPORT_ITEMS } :
                                     new PartAbility[] { PartAbility.IMPORT_ITEMS })
-                    .colorOverlayTieredHullModel("overlay_pipe_in", OVERLAY_ITEM_HATCH)
+                    .colorOverlayTieredHullModel("overlay_pipe_in_emissive", null, OVERLAY_ITEM_HATCH)
                     .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.import.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
                                     (1 + tier) * INV_MULTIPLE))
@@ -94,7 +94,7 @@ public class CustomMachines {
                     .abilities(
                             tier == 0 ? new PartAbility[] { PartAbility.EXPORT_ITEMS, PartAbility.STEAM_EXPORT_ITEMS } :
                                     new PartAbility[] { PartAbility.EXPORT_ITEMS })
-                    .colorOverlayTieredHullModel("overlay_pipe_out", OVERLAY_ITEM_HATCH)
+                    .colorOverlayTieredHullModel("overlay_pipe_out_emissive", null, OVERLAY_ITEM_HATCH)
                     .tooltips(Component.translatable("gtmthings.machine.huge_item_bus.export.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity",
                                     (1 + tier) * INV_MULTIPLE))
@@ -106,7 +106,7 @@ public class CustomMachines {
             (tier, builder) -> {
                 builder.langValue(GTValues.VNF[tier] + " Huge Input Dual Hatch")
                         .rotationState(RotationState.ALL)
-                        .colorOverlayTieredHullModel("overlay_pipe_in", "overlay_huge_dual_hatch")
+                        .colorOverlayTieredHullModel("overlay_pipe_in_emissive", null, "overlay_huge_dual_hatch")
                         .abilities(PartAbility.IMPORT_ITEMS)
                         .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"));
                 builder.tooltips(Component.translatable("gtceu.universal.tooltip.item_storage_capacity",

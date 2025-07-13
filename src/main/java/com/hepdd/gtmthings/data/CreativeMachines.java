@@ -39,7 +39,7 @@ public class CreativeMachines {
     public static final MachineDefinition CREATIVE_FLUID_INPUT_HATCH = GTMTHINGS_REGISTRATE.machine(
             "creative_fluid_input_hatch", CreativeInputHatchPartMachine::new)
             .rotationState(RotationState.ALL)
-            .colorOverlayTieredHullModel("overlay_pipe_in_9x", OVERLAY_FLUID_HATCH_HALF_PX_TEX)
+            .colorOverlayTieredHullModel("overlay_pipe_in_emissive", "overlay_pipe_9x", OVERLAY_FLUID_HATCH_HALF_PX_TEX)
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
             .abilities(PartAbility.IMPORT_FLUIDS, PartAbility.IMPORT_FLUIDS_9X)
             .tier(MAX)
@@ -48,7 +48,7 @@ public class CreativeMachines {
     public static final MachineDefinition CREATIVE_ITEM_INPUT_BUS = GTMTHINGS_REGISTRATE.machine(
             "creative_item_input_bus", CreativeInputBusPartMachine::new)
             .rotationState(RotationState.ALL)
-            .colorOverlayTieredHullModel("overlay_pipe_in", OVERLAY_ITEM_HATCH)
+            .colorOverlayTieredHullModel("overlay_pipe_in_emissive", null, OVERLAY_ITEM_HATCH)
             .tooltips(Component.translatable("gtmthings.creative_tooltip"))
             .abilities(PartAbility.IMPORT_ITEMS)
             .tier(MAX)
