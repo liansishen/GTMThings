@@ -2,6 +2,11 @@
   <a href="https://www.curseforge.com/minecraft/mc-mods/gtmthings"><img src="https://cf.way2muchnoise.eu/1104310.svg?badge_style=for_the_badge" alt="CurseForge"></a>
 </h1>
 
+| Mod Version | GTM Version |
+|-------------|------------|
+| <=1.4.6       | 1.6.4      |
+| 1.4.7-1.5.2 | 7.0 Snapshot|
+| >=1.5.3       | 7.0.0-7.0.1|
 
 # About This Mod
 Add some practical machines to GregTech-Modern.
