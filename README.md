@@ -5,7 +5,7 @@
 | Mod Version             | GTM Version      |    |
 |-------------------------|------------------|----|
 | ≤ 1.4.6                 | 1.6.4            ||
-| 1.4.7 ~ 1.5.2           | 7.0 Snapshot     |not recomand|
+| 1.4.7 ~ 1.5.2           | 7.0 Snapshot     |NOT RECOMMENDED|
 | ≥ 1.5.3                 | 7.0.0 ~ 7.0.1    ||
 
 # 关于本mod / About This Mod
