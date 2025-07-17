@@ -50,6 +50,12 @@ jobs:
           MESSAGE=$(ls build/libs/* | grep sources.jar -v | grep shadow.jar -v | grep slim.jar -v | awk -F '${{ steps.properties.outputs.mod_id }}-|.jar' '{print $2}')
           echo version=$MESSAGE >> $GITHUB_OUTPUT
 
+      - name: Get GTM Version
+        id: get_gtm_version
+        run: |
+          gtceu_version=$(grep '^gtceu_version=' gradle.properties | cut -d'=' -f2)
+          echo "gtceu_version=$gtceu_version" >> $GITHUB_OUTPUT
+          
       - name: Release
         id: release
         uses: Kir-Antipov/mc-publish@v3.3.0
@@ -63,7 +69,7 @@ jobs:
           curseforge-changelog: ${{ github.event.head_commit.message }}
           curseforge-game-versions: "1.20.1"
           curseforge-release-type: release
-          name: 'GTMThings-${{ github.ref_name }}.jar'
+          name: '[GTM${{ steps.get_gtm_version.outputs.gtceu_version }}]GTMThings-${{ github.ref_name }}.jar'
           version: ${{ github.ref_name }}
           loaders: |
             forge
