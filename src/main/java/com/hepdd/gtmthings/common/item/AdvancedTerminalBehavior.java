@@ -68,11 +68,11 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
         AutoBuildSetting autoBuildSetting = new AutoBuildSetting();
         var tag = itemStack.getTag();
         if (tag != null && !tag.isEmpty()) {
-            autoBuildSetting.setCoilTier(tag.getInt("CoilTier"));
-            autoBuildSetting.setRepeatCount(tag.getInt("RepeatCount"));
-            autoBuildSetting.setNoHatchMode(tag.getInt("NoHatchMode"));
-            autoBuildSetting.setReplaceCoilMode(tag.getInt("ReplaceCoilMode"));
-            autoBuildSetting.setIsUseAE(tag.getInt("IsUseAE"));
+            autoBuildSetting.setCoilTier(tag.contains("CoilTier") ? tag.getInt("CoilTier") : 0);
+            autoBuildSetting.setRepeatCount(tag.contains("CoilTier") ? tag.getInt("RepeatCount") : 0);
+            autoBuildSetting.setNoHatchMode(tag.contains("CoilTier") ? tag.getInt("NoHatchMode") : 1);
+            autoBuildSetting.setReplaceCoilMode(tag.contains("CoilTier") ? tag.getInt("ReplaceCoilMode") : 0);
+            autoBuildSetting.setIsUseAE(tag.contains("CoilTier") ? tag.getInt("IsUseAE") : 0);
         } else {
             autoBuildSetting.setCoilTier(0);
             autoBuildSetting.setRepeatCount(0);
@@ -133,7 +133,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
 
     private int getCoilTier(ItemStack itemStack) {
         var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if (tag != null && !tag.isEmpty() && tag.contains("CoilTier")) {
             return tag.getInt("CoilTier");
         } else {
             return 0;
@@ -149,7 +149,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
 
     private int getRepeatCount(ItemStack itemStack) {
         var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if (tag != null && !tag.isEmpty() && tag.contains("RepeatCount")) {
             return tag.getInt("RepeatCount");
         } else {
             return 0;
@@ -165,7 +165,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
 
     private int getIsBuildHatches(ItemStack itemStack) {
         var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if (tag != null && !tag.isEmpty() && tag.contains("NoHatchMode")) {
             return tag.getInt("NoHatchMode");
         } else {
             return 1;
@@ -181,7 +181,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
 
     private int getReplaceCoilMode(ItemStack itemStack) {
         var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if (tag != null && !tag.isEmpty() && tag.contains("ReplaceCoilMode")) {
             return tag.getInt("ReplaceCoilMode");
         } else {
             return 0;
@@ -197,7 +197,7 @@ public class AdvancedTerminalBehavior implements IItemUIFactory {
 
     private int getIsUseAE(ItemStack itemStack) {
         var tag = itemStack.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if (tag != null && !tag.isEmpty() && tag.contains("IsUseAE")) {
             return tag.getInt("IsUseAE");
         } else {
             return 0;
