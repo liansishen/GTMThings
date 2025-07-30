@@ -47,4 +47,5 @@ public class ForgeCommonEventListener {
             WirelessEnergyContainer.server = event.getLevel().getServer();
         }
     }
+
 }

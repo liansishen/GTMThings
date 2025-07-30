@@ -405,5 +405,27 @@
   "block.gtmthings.ulv_huge_dual_hatch":"§8ULV§rHuge Input Dual Hatch",
   "block.gtmthings.uv_huge_dual_hatch":"§3UV§rHuge Input Dual Hatch",
   "block.gtmthings.uxv_huge_dual_hatch":"§eUXV§rHuge Input Dual Hatch",
-  "config.gtmthings.option.isWirelessRateEnable": "Is enable wireless rate limit."
+  "config.gtmthings.option.isWirelessRateEnable": "Is enable wireless rate limit.",
+  
+  "command.gtmthings.demo_ui.success": "Opening UI Demo Screen",
+  
+  "screen.gtmthings.demo_widget.title": "UI Widget Demo",
+  "screen.gtmthings.demo_widget.basic_widgets": "Basic Widgets",
+  "screen.gtmthings.demo_widget.advanced_widgets": "Advanced Widgets",
+  "screen.gtmthings.demo_widget.button": "Button",
+  "screen.gtmthings.demo_widget.label": "Label",
+  "screen.gtmthings.demo_widget.textfield": "Text Field",
+  "screen.gtmthings.demo_widget.checkbox": "Checkbox",
+  "screen.gtmthings.demo_widget.slider": "Slider",
+  "screen.gtmthings.demo_widget.image": "Image",
+  "screen.gtmthings.demo_widget.progress_bar": "Progress Bar",
+  "screen.gtmthings.demo_widget.progress_bar.hover": "75% Complete",
+  "screen.gtmthings.demo_widget.vertical_progress_bar.hover": "50% Complete",
+  "screen.gtmthings.demo_widget.list": "List",
+  "screen.gtmthings.demo_widget.tab1": "Tab 1",
+  "screen.gtmthings.demo_widget.tab2": "Tab 2",
+  "screen.gtmthings.demo_widget.tab3": "Tab 3",
+  "screen.gtmthings.demo_widget.tab1_content": "This is Tab 1 content",
+  "screen.gtmthings.demo_widget.tab2_content": "This is Tab 2 content",
+  "screen.gtmthings.demo_widget.tab3_content": "This is Tab 3 content"
 }

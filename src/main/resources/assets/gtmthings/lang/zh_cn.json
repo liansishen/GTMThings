@@ -405,5 +405,27 @@
   "block.gtmthings.ulv_huge_dual_hatch":"§8ULV§r巨型输入总成",
   "block.gtmthings.uv_huge_dual_hatch":"§3UV§r巨型输入总成",
   "block.gtmthings.uxv_huge_dual_hatch":"§eUXV§r巨型输入总成",
-  "config.gtmthings.option.isWirelessRateEnable": "是否启用无线能源传输限制。"
+  "config.gtmthings.option.isWirelessRateEnable": "是否启用无线能源传输限制。",
+  
+  "command.gtmthings.demo_ui.success": "正在打开UI演示界面",
+  
+  "screen.gtmthings.demo_widget.title": "UI组件演示",
+  "screen.gtmthings.demo_widget.basic_widgets": "基础组件",
+  "screen.gtmthings.demo_widget.advanced_widgets": "高级组件",
+  "screen.gtmthings.demo_widget.button": "按钮",
+  "screen.gtmthings.demo_widget.label": "标签",
+  "screen.gtmthings.demo_widget.textfield": "文本框",
+  "screen.gtmthings.demo_widget.checkbox": "复选框",
+  "screen.gtmthings.demo_widget.slider": "滑块",
+  "screen.gtmthings.demo_widget.image": "图像",
+  "screen.gtmthings.demo_widget.progress_bar": "进度条",
+  "screen.gtmthings.demo_widget.progress_bar.hover": "完成度：75%",
+  "screen.gtmthings.demo_widget.vertical_progress_bar.hover": "完成度：50%",
+  "screen.gtmthings.demo_widget.list": "列表",
+  "screen.gtmthings.demo_widget.tab1": "标签页1",
+  "screen.gtmthings.demo_widget.tab2": "标签页2",
+  "screen.gtmthings.demo_widget.tab3": "标签页3",
+  "screen.gtmthings.demo_widget.tab1_content": "这是标签页1的内容",
+  "screen.gtmthings.demo_widget.tab2_content": "这是标签页2的内容",
+  "screen.gtmthings.demo_widget.tab3_content": "这是标签页3的内容"
 }
