@@ -1,15 +1,20 @@
 package com.hepdd.gtmthings.client.widget;
 
+import com.hepdd.gtmthings.client.menu.ExampleMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
 /**
  * 一个基础的屏幕类，用于使用widget系统创建GUI屏幕
  */
-public class WidgetScreen extends Screen {
-
+public class WidgetScreen extends AbstractContainerScreen<ExampleMenu> {
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.parse("textures/gui/container/example.png");
     // 根widget容器
     protected final WidgetContainer rootContainer;
 
@@ -23,10 +28,15 @@ public class WidgetScreen extends Screen {
      *
      * @param title 屏幕标题
      */
-    public WidgetScreen(Component title, int width, int height) {
-        super(title);
-        screenWidth = width;
-        screenHeight = height;
+    public WidgetScreen(ExampleMenu menu, Inventory playerInventory, Component title) {
+        super(menu,playerInventory,title);
+        screenWidth = 500;
+        screenHeight = 500;
+//        int gameWidth = Minecraft.getInstance().getWindow().getWidth();
+//        int gameHeight = Minecraft.getInstance().getWindow().getHeight();
+//        int x = (gameWidth - screenWidth) / 2;
+//        int y = Math.max((gameHeight - screenHeight) / 2, 0);
+//        this.rootContainer = new WidgetContainer(x, y, screenWidth, screenHeight);
         this.rootContainer = new WidgetContainer(0, 0, screenWidth, screenHeight);
     }
 
@@ -66,6 +76,11 @@ public class WidgetScreen extends Screen {
 
         // 渲染其他元素
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
+        guiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
     }
 
     @Override

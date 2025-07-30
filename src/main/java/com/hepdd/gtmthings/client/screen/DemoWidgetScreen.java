@@ -1,9 +1,18 @@
 package com.hepdd.gtmthings.client.screen;
 
+import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
+import com.hepdd.gtmthings.client.menu.ExampleMenu;
 import com.hepdd.gtmthings.client.widget.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+
+import javax.swing.plaf.basic.BasicComboBoxUI;
 
 /**
  * 一个演示屏幕，展示如何使用widget系统
@@ -16,9 +25,8 @@ public class DemoWidgetScreen extends WidgetScreen {
     /**
      * 创建一个新的DemoWidgetScreen
      */
-    public DemoWidgetScreen(Minecraft mc,int width,int height) {
-        super(Component.translatable("screen.gtmthings.demo_widget"),width,height);
-        super.init(mc,width,height);
+    public DemoWidgetScreen(ExampleMenu menu, Inventory playerInventory, int width, int height) {
+        super(menu,playerInventory,Component.translatable("screen.gtmthings.demo_widget"));
         // 设置背景颜色
         setBackgroundColor(0xFF2C2C2C);
     }
@@ -95,6 +103,26 @@ public class DemoWidgetScreen extends WidgetScreen {
 
         // 添加分隔线
         panel.addWidget(new LabelWidget(0, y, Component.literal("-------------------------"), 0x888888));
+        y += 20;
+
+        // 创建物品槽
+        IItemHandlerModifiable itemhandler = new CustomItemStackHandler(3);
+        itemhandler.setStackInSlot(0, new ItemStack(Items.DIAMOND));
+        itemhandler.setStackInSlot(2, new ItemStack(Items.GOLD_INGOT));
+
+        SlotWidget diamondSlot = new SlotWidget(0, y,itemhandler,0);
+        diamondSlot.setHoverText(Component.literal("钻石物品槽"));
+        panel.addWidget(diamondSlot);
+
+        // 创建空物品槽
+        SlotWidget emptySlot = new SlotWidget(30, y,itemhandler,1);
+        emptySlot.setHoverText(Component.literal("空物品槽"));
+        panel.addWidget(emptySlot);
+
+        // 创建使用物品提供者的物品槽
+        SlotWidget dynamicSlot = new SlotWidget(60, y, itemhandler,2);
+        dynamicSlot.setHoverText(Component.literal("动态物品槽"));
+        panel.addWidget(dynamicSlot);
         y += 20;
 
         // 添加关闭按钮
