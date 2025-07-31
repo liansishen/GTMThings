@@ -28,10 +28,10 @@ public class GTMThingsCommand {
                     ServerPlayer player = context.getSource().getPlayerOrException();
 
                     // 在客户端打开UI
-                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                        ScreenManager.openDemoWidgetScreen(player);
-                    });
-
+//                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+//                        ScreenManager.openDemoWidgetScreen(player);
+//                    });
+                    ScreenManager.openDemoWidgetScreen(player);
                     context.getSource().sendSuccess(() -> Component.translatable("command.gtmthings.demo_ui.success"), false);
                     return 1;
                 })
