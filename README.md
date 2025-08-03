@@ -6,7 +6,8 @@
 |-------------------------|------------------|----|
 | ≤ 1.4.6                 | 1.6.4            |⛔️ End of Support  |
 | 1.4.7 ~ 1.5.2           | 7.0 Snapshot     |⚠️ Not Recommended|
-| ≥ 1.5.3                 | 7.0.0 ~ 7.0.1    |🟢 Currently Supported|
+| 1.5.3                   | 7.0.0 ~ 7.0.2    |⛔️ End of Support|
+| ≥ 1.5.4                 | 7.1.0            |🟢 Currently Supported|
 
 # 关于本mod / About This Mod
 给GTM添加一些实用的机器 / Add some practical machines to GregTech-Modern.
