@@ -127,7 +127,7 @@ public class CustomMachines {
                     .tooltips(Component.translatable("gtceu.machine.dual_hatch.import.tooltip"),
                             Component.translatable("gtceu.universal.tooltip.item_storage_capacity", (int) Math.pow((tier - 4), 2)),
                             Component.translatable("gtceu.universal.tooltip.fluid_storage_capacity_mult", (tier - 4), DualHatchPartMachine.getTankCapacity(DualHatchPartMachine.INITIAL_TANK_CAPACITY, tier)),
-                            Component.translatable("gtceu.universal.enabled"))
+                            Component.translatable("gtceu.part_sharing.enabled"))
                     .register(),
             DUAL_HATCH_TIERS);
 
