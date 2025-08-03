@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.client.screen;
 
+import com.hepdd.gtmthings.client.menu.EnergyDisplayMenu;
 import com.hepdd.gtmthings.client.menu.ExampleMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -19,20 +20,11 @@ public class ScreenManager {
      * @param player 玩家
      */
     public static void openDemoWidgetScreen(Player player) {
-//        Minecraft mc = Minecraft.getInstance();
-//        if (mc == null || mc.player == null) return;
-//
-//        mc.execute(() -> {
-//            try {
-//                mc.setScreen(new DemoWidgetScreen(mc,500,500));
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        });
+
         if (player instanceof ServerPlayer serverPlayer) {
             NetworkHooks.openScreen(serverPlayer, new SimpleMenuProvider(
                     (containerId, playerInventory, playerEntity) ->
-                            new ExampleMenu(containerId, playerInventory),
+                            new EnergyDisplayMenu(containerId, playerInventory),
                     Component.literal("Example Menu")
             ));
         }

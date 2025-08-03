@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiGraphics;
 public class WidgetContainer extends AbstractWidget {
 
     protected final List<Widget> children = new ArrayList<>();
+    protected final int backgroundColor;
 
     /**
      * 创建一个新的WidgetContainer
@@ -20,7 +21,12 @@ public class WidgetContainer extends AbstractWidget {
      * @param height 高度
      */
     public WidgetContainer(int x, int y, int width, int height) {
+        this(x, y, width, height,0);
+    }
+
+    public WidgetContainer(int x, int y, int width, int height, int backgroundColor) {
         super(x, y, width, height);
+        this.backgroundColor = backgroundColor;
     }
 
     /**
@@ -65,6 +71,10 @@ public class WidgetContainer extends AbstractWidget {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         if (!isVisible()) {
             return;
+        }
+
+        if (this.backgroundColor != 0) {
+            guiGraphics.fill(getX(),getY(),getX() + getWidth(), getY() + getHeight(), backgroundColor);
         }
 
         // 渲染所有子widget

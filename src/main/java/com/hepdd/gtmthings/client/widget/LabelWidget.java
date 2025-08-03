@@ -3,6 +3,11 @@ package com.hepdd.gtmthings.client.widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 一个简单的文本标签widget
@@ -20,6 +25,8 @@ public class LabelWidget extends AbstractWidget {
 
     // 文本对齐方式
     protected TextAlignment alignment;
+
+    protected @Nullable Consumer<Component> textSupplier;
 
     /**
      * 文本对齐方式枚举
@@ -44,6 +51,22 @@ public class LabelWidget extends AbstractWidget {
         // 自动计算宽度和高度
         this.width = Minecraft.getInstance().font.width(text);
         this.height = Minecraft.getInstance().font.lineHeight;
+    }
+
+    public LabelWidget(int x, int y,Consumer<Component> textSupplier) {
+        this(x,y,0,0,textSupplier);
+
+        this.width = Minecraft.getInstance().font.width(text);
+        this.height = Minecraft.getInstance().font.lineHeight;
+    }
+
+    public LabelWidget(int x, int y, int width, int height,@Nonnull Consumer<Component> textSupplier) {
+        super(x, y, width, height);
+        this.textSupplier = textSupplier;
+        this.textSupplier.accept(this.text);
+        this.color = 0xFF000000;
+        this.shadow = false;
+        this.alignment = TextAlignment.LEFT;
     }
 
     /**
