@@ -85,4 +85,8 @@ repositories {
         name = "TerraformersMC"
         url = "https://maven.terraformersmc.com/"
     }
+    exclusiveContent { // Configuration
+        forRepository { maven { url = "https://api.repsy.io/mvn/toma/public" } }
+        filter { includeGroup("dev.toma.configuration")}
+    }
 }

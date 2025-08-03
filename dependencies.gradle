@@ -4,7 +4,7 @@ dependencies {
     modImplementation("com.gregtechceu.gtceu:gtceu-${project.minecraft_version}:${project.gtceu_version}")
     modImplementation("com.lowdragmc.ldlib:ldlib-forge-$project.minecraft_version:$project.ldlib_version") { transitive = false }
     modImplementation("com.tterrag.registrate:Registrate:$project.registrate_version")
-    modImplementation("dev.toma.configuration:configuration-forge-$project.minecraft_version:$project.configuration_version")
+    modImplementation("dev.toma.configuration:configuration-$project.minecraft_version:$project.configuration_version")
 
     // JEI
     modCompileOnly("mezz.jei:jei-$project.minecraft_version-forge-api:$project.jei_version") { transitive = false }
