@@ -10,7 +10,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import com.hepdd.gtmthings.config.ConfigHolder;
 import com.hepdd.gtmthings.data.*;
 
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
@@ -28,7 +27,6 @@ public class GTMThings {
 
     public GTMThings(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
-        ConfigHolder.init();
         GTMTHINGS_REGISTRATE.registerEventListeners(modEventBus);
         modEventBus.addGenericListener(GTRecipeType.class, this::registerRecipeTypes);
         modEventBus.addGenericListener(MachineDefinition.class, this::registerMachines);

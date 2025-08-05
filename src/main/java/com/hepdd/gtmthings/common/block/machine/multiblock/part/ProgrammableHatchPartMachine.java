@@ -16,7 +16,7 @@ public class ProgrammableHatchPartMachine extends DualHatchPartMachine {
     }
 
     protected @NotNull NotifiableItemStackHandler createInventory(Object @NotNull... args) {
-        return new NotifiableItemStackHandler(this, getInventorySize(), io).setFilter(itemStack -> !itemStack.is(CustomItems.VIRTUAL_ITEM_PROVIDER.get()));
+        return new NotifiableItemStackHandler(this, getInventorySize(), io).setFilter(itemStack -> !(itemStack.hasTag() && itemStack.is(CustomItems.VIRTUAL_ITEM_PROVIDER.get())));
     }
 
     @Override

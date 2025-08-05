@@ -2,7 +2,7 @@ dependencies {
     compileOnly libs.jetbrains.annotations
 
     //modImplementation("com.gregtechceu.gtceu:gtceu-${project.minecraft_version}:${project.gtceu_version}")
-    modImplementation("dev:gtceu-1.20.1-1.7.0")
+    modImplementation("dev:gtceu-1.20.1-1.8.0")
     modImplementation("com.lowdragmc.ldlib:ldlib-forge-$project.minecraft_version:$project.ldlib_version") { transitive = false }
     modImplementation("com.tterrag.registrate:Registrate:$project.registrate_version")
     modImplementation("dev.toma.configuration:configuration-forge-$project.minecraft_version:$project.configuration_version")

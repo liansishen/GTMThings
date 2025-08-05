@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.api.machine.trait.MachineTrait;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableComputationContainer;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 
+import com.hepdd.gtmthings.api.misc.CleanableReferenceSupplier;
 import com.hepdd.gtmthings.common.block.machine.multiblock.part.computation.WirelessOpticalComputationHatchMachine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,10 +19,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class WirelessNotifiableComputationContainer extends NotifiableComputationContainer {
 
     private int currentOutputCwu = 0, lastOutputCwu = 0;
+
+    private final Supplier<WirelessOpticalComputationHatchMachine> target = new CleanableReferenceSupplier<>(() -> {
+        if (machine instanceof WirelessOpticalComputationHatchMachine woc && woc.getTransmitterPos() != null) {
+            if (MetaMachine.getMachine(machine.getLevel(), woc.getTransmitterPos()) instanceof WirelessOpticalComputationHatchMachine hatchMachine) {
+                return hatchMachine;
+            }
+        }
+        return null;
+    }, MetaMachine::isInValid);
 
     public WirelessNotifiableComputationContainer(MetaMachine machine, IO handlerIO, boolean transmitter) {
         super(machine, handlerIO, transmitter);
@@ -206,11 +217,9 @@ public class WirelessNotifiableComputationContainer extends NotifiableComputatio
 
     @Nullable
     private IOpticalComputationProvider getOpticalNetProvider() {
-        if (machine instanceof WirelessOpticalComputationHatchMachine woc && woc.getTransmitterPos() != null) {
-            var transmitterMachine = MetaMachine.getMachine(machine.getLevel(), woc.getTransmitterPos());
-            if (transmitterMachine instanceof WirelessOpticalComputationHatchMachine transmitter) {
-                return transmitter.getComputationContainer();
-            }
+        var t = target.get();
+        if (t != null) {
+            return t.getComputationContainer();
         }
         return null;
     }

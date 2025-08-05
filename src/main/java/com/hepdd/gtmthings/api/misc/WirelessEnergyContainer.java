@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.server.MinecraftServer;
 
-import com.hepdd.gtmthings.config.ConfigHolder;
 import com.hepdd.gtmthings.data.WirelessEnergySavaedData;
 import com.hepdd.gtmthings.utils.BigIntegerUtils;
 import com.hepdd.gtmthings.utils.TeamUtil;
@@ -54,8 +53,7 @@ public class WirelessEnergyContainer {
     }
 
     public long addEnergy(long energy, @Nullable MetaMachine machine) {
-        long change = energy;
-        if (ConfigHolder.INSTANCE.isWirelessRateEnable) change = Math.min(rate, energy);
+        long change = Math.min(rate, energy);
         if (change <= 0) return 0;
         storage = storage.add(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);
@@ -69,8 +67,7 @@ public class WirelessEnergyContainer {
     }
 
     public long removeEnergy(long energy, @Nullable MetaMachine machine) {
-        long change = Math.min(BigIntegerUtils.getLongValue(storage), energy);
-        if (ConfigHolder.INSTANCE.isWirelessRateEnable) change = Math.min(BigIntegerUtils.getLongValue(storage), Math.min(rate, energy));
+        long change = Math.min(BigIntegerUtils.getLongValue(storage), Math.min(rate, energy));
         if (change <= 0) return 0;
         storage = storage.subtract(BigInteger.valueOf(change));
         WirelessEnergySavaedData.INSTANCE.setDirty(true);

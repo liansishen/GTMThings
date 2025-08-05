@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.common.cover;
 
+import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
@@ -15,6 +16,7 @@ import com.gregtechceu.gtceu.common.machine.storage.CrateMachine;
 import com.gregtechceu.gtceu.common.machine.storage.DrumMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumChestMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumTankMachine;
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -27,11 +29,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
 
-import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper;
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
+import com.hepdd.gtmthings.api.misc.BlockEntityCache;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -60,6 +64,8 @@ public class WirelessTransferCover extends CoverBehavior {
     @Persisted
     protected Direction facing;
 
+    private final BlockEntityCache target = new BlockEntityCache(() -> targetLever.getBlockEntity(targetPos));
+
     public WirelessTransferCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int transferType) {
         super(definition, coverHolder, attachedSide);
         this.transferType = transferType;
@@ -72,7 +78,7 @@ public class WirelessTransferCover extends CoverBehavior {
 
     @Override
     public boolean canAttach() {
-        var targetMachine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        var targetMachine = MetaMachine.getMachine(coverHolder.holder());
         if (targetMachine instanceof WorkableTieredMachine workableTieredMachine) {
             if ((workableTieredMachine.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM) || (workableTieredMachine.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID)) {
 
@@ -110,7 +116,8 @@ public class WirelessTransferCover extends CoverBehavior {
     @Override
     public void onLoad() {
         super.onLoad();
-        GetLevel();
+        if (coverHolder.isRemote()) return;
+        getTargetLevel();
         subscription = coverHolder.subscribeServerTick(subscription, this::update);
     }
 
@@ -132,9 +139,9 @@ public class WirelessTransferCover extends CoverBehavior {
             var intZ = tag.getInt("z");
             this.targetPos = new BlockPos(intX, intY, intZ);
             this.facing = Direction.byName(tag.getString("facing"));
-            GetLevel();
+            getTargetLevel();
         }
-        var targetMachine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        var targetMachine = MetaMachine.getMachine(coverHolder.holder());
         if (targetMachine instanceof SimpleTieredMachine simpleTieredMachine) {
             if (this.transferType == TRANSFER_ITEM) simpleTieredMachine.setAutoOutputItems(false);
             if (this.transferType == TRANSFER_FLUID) simpleTieredMachine.setAutoOutputFluids(false);
@@ -146,25 +153,46 @@ public class WirelessTransferCover extends CoverBehavior {
         super.onAttached(itemStack, player);
     }
 
-    protected void GetLevel() {
+    private void update() {
+        if (coverHolder.getOffsetTimer() % 20 == 0) {
+            if (transferType == TRANSFER_ITEM) {
+                var targetItemTransfer = getTargetItemTransfer();
+                var ownItemTransfer = getOwnItemTransfer();
+                if (ownItemTransfer != null && targetItemTransfer != null) {
+                    GTTransferUtils.transferItemsFiltered(ownItemTransfer, targetItemTransfer, o -> true, Integer.MAX_VALUE);
+                }
+            } else if (transferType == TRANSFER_FLUID) {
+                var targetFluidTransfer = getTargetFluidTransfer();
+                var ownFluidTransfer = getOwnFluidTransfer();
+                if (ownFluidTransfer != null && targetFluidTransfer != null) {
+                    GTTransferUtils.transferFluidsFiltered(ownFluidTransfer, targetFluidTransfer, o -> true, Integer.MAX_VALUE);
+                }
+            }
+        }
+    }
+
+    private void getTargetLevel() {
         if (this.dimensionId == null) return;
         ResourceLocation resLoc = tryParse(this.dimensionId);
         ResourceKey<Level> resKey = ResourceKey.create(Registries.DIMENSION, resLoc);
         this.targetLever = Objects.requireNonNull(coverHolder.getLevel().getServer()).getLevel(resKey);
     }
 
-    private void update() {
-        if (coverHolder.getOffsetTimer() % 5 == 0) {
-            if (this.targetLever == null || this.targetPos == null || coverHolder.getLevel().isClientSide()) return;
-            if (this.transferType == TRANSFER_ITEM) {
-                var itemTransfer = ItemTransferHelper.getItemTransfer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
-                if (itemTransfer == null) return;
-                ItemTransferHelper.exportToTarget(itemTransfer, Integer.MAX_VALUE, f -> true, this.targetLever, this.targetPos, this.facing);
-            } else {
-                var fluidTransfer = FluidTransferHelper.getFluidTransfer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
-                if (fluidTransfer == null) return;
-                FluidTransferHelper.exportToTarget(fluidTransfer, Integer.MAX_VALUE, f -> true, this.targetLever, this.targetPos, this.facing);
-            }
-        }
+    protected @Nullable IItemHandler getOwnItemTransfer() {
+        return coverHolder.getItemHandlerCap(attachedSide, false);
+    }
+
+    protected @Nullable IItemHandler getTargetItemTransfer() {
+        if (targetLever == null || targetPos == null) return null;
+        return GTCapabilityHelper.getItemHandler(target.get(), facing.getOpposite());
+    }
+
+    protected @Nullable IFluidHandler getOwnFluidTransfer() {
+        return coverHolder.getFluidHandlerCap(attachedSide, false);
+    }
+
+    protected @Nullable IFluidHandler getTargetFluidTransfer() {
+        if (targetLever == null || targetPos == null) return null;
+        return GTCapabilityHelper.getFluidHandler(target.get(), facing.getOpposite());
     }
 }

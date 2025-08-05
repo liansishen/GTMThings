@@ -32,8 +32,8 @@ public class WirelessEnergyHatchProvider extends CapabilityBlockProvider<IBindab
     }
 
     @Override
-    protected @Nullable IBindable getCapability(Level level, BlockPos pos, @Nullable Direction side) {
-        var metaMachine = MetaMachine.getMachine(level, pos);
+    protected @Nullable IBindable getCapability(Level level, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side) {
+        var metaMachine = MetaMachine.getMachine(blockEntity);
         if (metaMachine != null) {
             if (metaMachine instanceof IBindable bindable && bindable.display()) {
                 return bindable;

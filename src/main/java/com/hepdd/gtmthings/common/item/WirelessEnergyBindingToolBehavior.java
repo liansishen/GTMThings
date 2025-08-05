@@ -18,7 +18,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
-import com.hepdd.gtmthings.config.ConfigHolder;
 
 import java.math.BigInteger;
 
@@ -27,16 +26,14 @@ public class WirelessEnergyBindingToolBehavior implements IInteractionItem {
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         if (context.getLevel().isClientSide()) return InteractionResult.PASS;
-        if (ConfigHolder.INSTANCE.isWirelessRateEnable) {
-            BlockPos pos = context.getClickedPos();
-            long rate = getRate(context.getLevel(), pos);
-            if (rate > 0) {
-                WirelessEnergyContainer container = WirelessEnergyContainer.getOrCreateContainer(context.getPlayer().getUUID());
-                container.setRate(rate);
-                container.setBindPos(GlobalPos.of(context.getLevel().dimension(), pos));
-                context.getPlayer().sendSystemMessage(Component.translatable("item.gtmthings.wireless_transfer.tooltip.bind.1", Component.translatable(context.getLevel().getBlockState(pos).getBlock().getDescriptionId()), pos.toShortString()));
-                return InteractionResult.CONSUME;
-            }
+        BlockPos pos = context.getClickedPos();
+        long rate = getRate(context.getLevel(), pos);
+        if (rate > 0) {
+            WirelessEnergyContainer container = WirelessEnergyContainer.getOrCreateContainer(context.getPlayer().getUUID());
+            container.setRate(rate);
+            container.setBindPos(GlobalPos.of(context.getLevel().dimension(), pos));
+            context.getPlayer().sendSystemMessage(Component.translatable("item.gtmthings.wireless_transfer.tooltip.bind.1", Component.translatable(context.getLevel().getBlockState(pos).getBlock().getDescriptionId()), pos.toShortString()));
+            return InteractionResult.CONSUME;
         }
         return InteractionResult.PASS;
     }

@@ -28,8 +28,8 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
     }
 
     @Override
-    protected @Nullable IGTMTJadeIF getCapability(Level level, BlockPos pos, @Nullable Direction side) {
-        if (MetaMachine.getMachine(level, pos) instanceof IGTMTJadeIF jadeIF) {
+    protected @Nullable IGTMTJadeIF getCapability(Level level, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side) {
+        if (MetaMachine.getMachine(blockEntity) instanceof IGTMTJadeIF jadeIF) {
             return jadeIF;
         }
         return null;

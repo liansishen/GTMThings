@@ -42,15 +42,15 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
     private MetaMachine machine;
 
     private final long energyPerTick;
+    private final long voltage;
     private final int tier;
-    private final int amperage;
     private long machineMaxEnergy;
 
     public WirelessEnergyReceiveCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int tier, int amperage) {
         super(definition, coverHolder, attachedSide);
         this.tier = tier;
-        this.amperage = amperage;
-        this.energyPerTick = GTValues.VEX[tier] * amperage;
+        this.voltage = GTValues.VEX[tier];
+        this.energyPerTick = voltage * amperage;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
 
     private void updateEnergy() {
         if (getUUID() == null) return;
-        var energyContainer = getEnergyContainer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
+        var energyContainer = getEnergyContainer(coverHolder.holder(), attachedSide);
         if (energyContainer != null) {
             var machine = getMachine();
             if (machine instanceof BatteryBufferMachine || machine instanceof HullMachine || machine instanceof WirelessEnergyReceiveCoverHolder) {
@@ -115,7 +115,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
                 WirelessEnergyContainer container = getWirelessEnergyContainer();
                 if (container == null) return;
                 long changeenergy = container.removeEnergy(changeStored, machine);
-                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, changeenergy / this.amperage, this.amperage);
+                if (changeenergy > 0) energyContainer.acceptEnergyFromNetwork(null, voltage, this.energyPerTick);
             } else {
                 var changeStored = Math.min(this.machineMaxEnergy - energyContainer.getEnergyStored(), this.energyPerTick);
                 if (changeStored <= 0) return;
@@ -143,7 +143,7 @@ public class WirelessEnergyReceiveCover extends CoverBehavior implements IWirele
 
     @Nullable
     private MetaMachine getMachine() {
-        if (machine == null) machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        if (machine == null) machine = MetaMachine.getMachine(coverHolder.holder());
         if (machine instanceof TieredEnergyMachine tieredEnergyMachine) {
             this.machineMaxEnergy = GTValues.VEX[tieredEnergyMachine.getTier()] << 6;
         }

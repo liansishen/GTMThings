@@ -118,7 +118,7 @@ public class AdvancedBlockPattern extends BlockPattern {
         Level world = player.level();
         int minZ = -centerOffset[4];
         clearWorldState(worldState);
-        IMultiController controller = worldState.getController();
+        IMultiController controller = worldState.controller;
         BlockPos centerPos = controller.self().getPos();
         Direction facing = controller.self().getFrontFacing();
         Direction upwardsFacing = controller.self().getUpwardsFacing();

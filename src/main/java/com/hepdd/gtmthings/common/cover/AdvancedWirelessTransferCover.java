@@ -1,5 +1,6 @@
 package com.hepdd.gtmthings.common.cover;
 
+import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
@@ -35,11 +36,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
+import com.hepdd.gtmthings.api.misc.BlockEntityCache;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
@@ -91,24 +91,18 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
     @Getter
     protected final FilterHandler<ItemStack, ItemFilter> filterHandlerItem;
 
+    private final BlockEntityCache target = new BlockEntityCache(() -> targetLever.getBlockEntity(targetPos));
+
     public AdvancedWirelessTransferCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int transferType) {
         super(definition, coverHolder, attachedSide);
         this.transferType = transferType;
-
-        filterHandlerFluid = FilterHandlers.fluid(this)
-                .onFilterLoaded(f -> configureFilter())
-                .onFilterUpdated(f -> configureFilter())
-                .onFilterRemoved(f -> configureFilter());
-
-        filterHandlerItem = FilterHandlers.item(this)
-                .onFilterLoaded(f -> configureFilter())
-                .onFilterUpdated(f -> configureFilter())
-                .onFilterRemoved(f -> configureFilter());
+        filterHandlerFluid = FilterHandlers.fluid(this);
+        filterHandlerItem = FilterHandlers.item(this);
     }
 
     @Override
     public boolean canAttach() {
-        var targetMachine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        var targetMachine = MetaMachine.getMachine(coverHolder.holder());
         if (targetMachine instanceof WorkableTieredMachine workableTieredMachine) {
             return (workableTieredMachine.exportItems.getSlots() > 0 && this.transferType == TRANSFER_ITEM) || (workableTieredMachine.exportFluids.getTanks() > 0 && this.transferType == TRANSFER_FLUID);
         } else if (targetMachine instanceof PumpMachine || targetMachine instanceof QuantumTankMachine || targetMachine instanceof DrumMachine) {
@@ -128,9 +122,9 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
             var intZ = tag.getInt("z");
             this.targetPos = new BlockPos(intX, intY, intZ);
             this.facing = Direction.byName(tag.getString("facing"));
-            GetLevel();
+            getTargetLevel();
         }
-        var targetMachine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        var targetMachine = MetaMachine.getMachine(coverHolder.holder());
         if (targetMachine instanceof SimpleTieredMachine simpleTieredMachine) {
             if (this.transferType == TRANSFER_ITEM) simpleTieredMachine.setAutoOutputItems(false);
             if (this.transferType == TRANSFER_FLUID) simpleTieredMachine.setAutoOutputFluids(false);
@@ -157,7 +151,7 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
     @Override
     public void onLoad() {
         super.onLoad();
-        GetLevel();
+        getTargetLevel();
         subscription = coverHolder.subscribeServerTick(subscription, this::update);
     }
 
@@ -170,88 +164,46 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
     }
 
     private void update() {
-        long timer = coverHolder.getOffsetTimer();
-        if (timer % 5 == 0) {
+        if (coverHolder.getOffsetTimer() % 20 == 0) {
             if (transferType == TRANSFER_ITEM) {
-                var adjacentItemTransfer = getAdjacentItemTransfer();
-                var myItemHandler = getOwnItemTransfer();
-
-                if (adjacentItemTransfer != null && myItemHandler != null) {
-                    moveInventoryItems(myItemHandler, adjacentItemTransfer);
+                var targetItemTransfer = getTargetItemTransfer();
+                var ownItemTransfer = getOwnItemTransfer();
+                if (ownItemTransfer != null && targetItemTransfer != null) {
+                    GTTransferUtils.transferItemsFiltered(ownItemTransfer, targetItemTransfer, filterHandlerItem.getFilter(), Integer.MAX_VALUE);
                 }
             } else if (transferType == TRANSFER_FLUID) {
-                var adjacentFluidTransfer = getAdjacentFluidTransfer();
+                var targetFluidTransfer = getTargetFluidTransfer();
                 var ownFluidTransfer = getOwnFluidTransfer();
-                if (ownFluidTransfer != null && adjacentFluidTransfer != null) {
-                    transferAny(ownFluidTransfer, adjacentFluidTransfer);
+                if (ownFluidTransfer != null && targetFluidTransfer != null) {
+                    GTTransferUtils.transferFluidsFiltered(ownFluidTransfer, targetFluidTransfer, filterHandlerFluid.getFilter(), Integer.MAX_VALUE);
                 }
             }
         }
     }
 
-    protected void moveInventoryItems(IItemHandler sourceInventory, IItemHandler targetInventory) {
-        ItemFilter filter = filterHandlerItem.getFilter();
-        int itemsLeftToTransfer = Integer.MAX_VALUE;
-
-        for (int srcIndex = 0; srcIndex < sourceInventory.getSlots(); srcIndex++) {
-            ItemStack sourceStack = sourceInventory.extractItem(srcIndex, itemsLeftToTransfer, true);
-            if (sourceStack.isEmpty()) {
-                continue;
-            }
-
-            if (!filter.test(sourceStack)) {
-                continue;
-            }
-
-            ItemStack remainder = ItemHandlerHelper.insertItemStacked(targetInventory, sourceStack, true);
-            int amountToInsert = sourceStack.getCount() - remainder.getCount();
-
-            if (amountToInsert > 0) {
-                sourceStack = sourceInventory.extractItem(srcIndex, amountToInsert, false);
-                if (!sourceStack.isEmpty()) {
-                    ItemHandlerHelper.insertItemStacked(targetInventory, sourceStack, false);
-                    itemsLeftToTransfer -= sourceStack.getCount();
-
-                    if (itemsLeftToTransfer == 0) {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    protected void transferAny(IFluidHandler source, IFluidHandler destination) {
-        GTTransferUtils.transferFluidsFiltered(source, destination,
-                filterHandlerFluid.getFilter(), Integer.MAX_VALUE);
-    }
-
-    protected void GetLevel() {
+    private void getTargetLevel() {
         if (this.dimensionId == null) return;
         ResourceLocation resLoc = tryParse(this.dimensionId);
         ResourceKey<Level> resKey = ResourceKey.create(Registries.DIMENSION, resLoc);
         this.targetLever = Objects.requireNonNull(coverHolder.getLevel().getServer()).getLevel(resKey);
     }
 
-    protected void configureFilter() {
-        // Do nothing in the base implementation. This is intended to be overridden by subclasses.
-    }
-
     protected @Nullable IItemHandler getOwnItemTransfer() {
         return coverHolder.getItemHandlerCap(attachedSide, false);
     }
 
-    protected @Nullable IItemHandler getAdjacentItemTransfer() {
+    protected @Nullable IItemHandler getTargetItemTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return GTTransferUtils.getItemHandler(targetLever, targetPos, facing.getOpposite()).resolve().orElse(null);
+        return GTCapabilityHelper.getItemHandler(target.get(), facing.getOpposite());
     }
 
     protected @Nullable IFluidHandler getOwnFluidTransfer() {
         return coverHolder.getFluidHandlerCap(attachedSide, false);
     }
 
-    protected @Nullable IFluidHandler getAdjacentFluidTransfer() {
+    protected @Nullable IFluidHandler getTargetFluidTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return FluidUtil.getFluidHandler(targetLever, targetPos, facing.getOpposite()).resolve().orElse(null);
+        return GTCapabilityHelper.getFluidHandler(target.get(), facing.getOpposite());
     }
 
     @Override

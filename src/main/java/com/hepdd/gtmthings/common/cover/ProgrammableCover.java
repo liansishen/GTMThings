@@ -16,7 +16,7 @@ public final class ProgrammableCover extends CoverBehavior {
 
     @Override
     public boolean canAttach() {
-        MetaMachine machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        MetaMachine machine = MetaMachine.getMachine(coverHolder.holder());
         if (machine instanceof SimpleTieredMachine) {
             for (CoverBehavior cover : machine.getCoverContainer().getCovers()) {
                 if (cover instanceof ProgrammableCover) return false;

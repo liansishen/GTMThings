@@ -98,7 +98,7 @@ public class CreativeEnergyCover extends CoverBehavior {
     }
 
     private void updateEnergy() {
-        var energyContainer = getEnergyContainer(coverHolder.getLevel(), coverHolder.getPos(), attachedSide);
+        var energyContainer = getEnergyContainer(coverHolder.holder(), attachedSide);
         if (energyContainer != null) {
             var changeStored = Math.min(this.machineMaxEnergy - energyContainer.getEnergyStored(), this.energyPerTick);
             if (changeStored <= 0) return;
@@ -109,6 +109,6 @@ public class CreativeEnergyCover extends CoverBehavior {
 
     @Nullable
     private MetaMachine getMachine() {
-        return MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        return MetaMachine.getMachine(coverHolder.holder());
     }
 }

@@ -26,6 +26,7 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @Getter
@@ -45,9 +46,11 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
 
     @Setter
     @Persisted
+    @Nullable
     private BlockPos transmitterPos;
     @Setter
     @Persisted
+    @Nullable
     private BlockPos receiverPos;
     protected WirelessNotifiableComputationContainer computationContainer;
 

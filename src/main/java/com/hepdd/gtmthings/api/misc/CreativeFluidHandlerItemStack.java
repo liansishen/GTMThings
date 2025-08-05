@@ -49,22 +49,7 @@ public class CreativeFluidHandlerItemStack extends FluidHandlerItemStack impleme
     }
 
     @Override
-    public int getMaxFluidTemperature() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
     public boolean isGasProof() {
-        return true;
-    }
-
-    @Override
-    public boolean isAcidProof() {
-        return true;
-    }
-
-    @Override
-    public boolean isCryoProof() {
         return true;
     }
 

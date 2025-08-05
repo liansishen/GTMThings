@@ -169,8 +169,8 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     }
 
     @Override
-    public void inValid() {
-        super.inValid();
+    public void onMachineUnLoad() {
+        super.onMachineUnLoad();
         this.cachedItemTransfer = null;
     }
 

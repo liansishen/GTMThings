@@ -61,7 +61,14 @@ public class TimeWheel {
     }
 
     public @NotNull BigDecimal getAvgByTick() {
-        if (lastUpdateTick - firstUpdateTick < slotResolution * slotNum) return new BigDecimal(sum).divide(BigDecimal.valueOf(lastUpdateTick - firstUpdateTick + 1), RoundingMode.HALF_UP);
-        return slots.isEmpty() ? BigDecimal.ZERO : new BigDecimal(sum).divide(BigDecimal.valueOf((long) slots.size() * slotResolution + lastUpdateTick % slotResolution - slotResolution), RoundingMode.HALF_UP);
+        if (this.lastUpdateTick - this.firstUpdateTick < this.slotResolution * this.slotNum) {
+            return (new BigDecimal(this.sum)).divide(BigDecimal.valueOf(this.lastUpdateTick - this.firstUpdateTick + 1), RoundingMode.HALF_UP);
+        } else {
+            try {
+                return this.slots.isEmpty() ? BigDecimal.ZERO : (new BigDecimal(this.sum)).divide(BigDecimal.valueOf((long) this.slots.size() * (long) this.slotResolution + (long) (this.lastUpdateTick % this.slotResolution) - (long) this.slotResolution), RoundingMode.HALF_UP);
+            } catch (ArithmeticException e) {
+                return BigDecimal.ZERO;
+            }
+        }
     }
 }
