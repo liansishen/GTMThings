@@ -323,7 +323,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         }
         outputItemHandler.storage.onContentsChanged(0);
 
-        var matches = machine.getRecipeType().searchRecipe(this, r -> RecipeHelper.matchContents(this, r).isSuccess());
+        var matches = machine.getRecipeType().searchRecipe(this, r -> RecipeHelper.matchContents(this, r));
 
         while (matches != null && matches.hasNext()) {
             GTRecipe match = matches.next();
@@ -331,7 +331,7 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
 
             var eut = match.getInputEUt();
             if (GTUtil.getTierByVoltage(eut) <= getVoltageTier()) {
-                if (RecipeHelper.handleRecipeIO(this, match, IO.OUT, this.chanceCaches).isSuccess()) {
+                if (RecipeHelper.handleRecipeIO(this, match, IO.OUT, this.chanceCaches)) {
                     blockDrops.clear();
                     var result = new ArrayList<ItemStack>();
                     for (int i = 0; i < outputItemHandler.storage.getSlots(); ++i) {

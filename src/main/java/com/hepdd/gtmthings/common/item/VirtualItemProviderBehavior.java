@@ -40,7 +40,7 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
 
     public static final VirtualItemProviderBehavior INSTANCE = new VirtualItemProviderBehavior();
 
-    private static ItemStack setVirtualItem(ItemStack stack, ItemStack virtualItem) {
+    public static ItemStack setVirtualItem(ItemStack stack, ItemStack virtualItem) {
         CompoundTag tag = stack.getOrCreateTag();
         tag.remove("t");
         ResourceLocation id = BuiltInRegistries.ITEM.getKey(virtualItem.getItem());
@@ -68,7 +68,9 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
     @Override
     public void appendHoverText(@NotNull ItemStack itemstack, @Nullable Level world, @NotNull List<Component> list, @NotNull TooltipFlag flag) {
         if (itemstack.hasTag()) {
-            list.add(Component.translatable("gui.ae2.Items").append(": ").append(getVirtualItem(itemstack).getDisplayName()));
+            var item = getVirtualItem(itemstack);
+            list.add(Component.translatable("gui.ae2.Items").append(": "));
+            list.addAll(item.getTooltipLines(null, TooltipFlag.Default.NORMAL));
         }
     }
 

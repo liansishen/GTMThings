@@ -116,7 +116,7 @@ public class DigitalMiner extends WorkableTieredMachine implements IDigitalMiner
     }
 
     @Override
-    protected RecipeLogic createRecipeLogic(Object... args) {
+    public RecipeLogic createRecipeLogic(Object... args) {
         return new DigitalMinerLogic(this, minerRadius, minHeight, maxHeight, silkLevel, itemFilter, (int) (40 / Math.pow(2, getTier())));
     }
 

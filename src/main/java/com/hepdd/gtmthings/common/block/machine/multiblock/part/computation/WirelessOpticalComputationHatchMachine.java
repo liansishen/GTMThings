@@ -1,6 +1,6 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part.computation;
 
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
+import com.gregtechceu.gtceu.api.capability.IOpticalComputationHatch;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
@@ -32,7 +32,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Getter
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine implements IInteractedMachine, IGTMTJadeIF {
+public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine implements IOpticalComputationHatch, IInteractedMachine, IGTMTJadeIF {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             WirelessOpticalComputationHatchMachine.class, MultiblockPartMachine.MANAGED_FIELD_HOLDER);
@@ -61,12 +61,8 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
     }
 
     protected WirelessNotifiableComputationContainer createComputationContainer(Object... args) {
-        IO io = IO.IN;
-        if (args.length > 1 && args[args.length - 2] instanceof IO newIo) {
-            io = newIo;
-        }
         if (args.length > 0 && args[args.length - 1] instanceof Boolean transmitter) {
-            return new WirelessNotifiableComputationContainer(this, io, transmitter);
+            return new WirelessNotifiableComputationContainer(this, transmitter);
         }
         throw new IllegalArgumentException();
     }
@@ -184,5 +180,15 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
             return this.transmitterPos.toShortString();
         }
         return "";
+    }
+
+    @Override
+    public long requestCWU(long cwu, boolean simulate) {
+        return computationContainer.requestCWU(cwu, simulate);
+    }
+
+    @Override
+    public boolean canBridge() {
+        return computationContainer.canBridge();
     }
 }

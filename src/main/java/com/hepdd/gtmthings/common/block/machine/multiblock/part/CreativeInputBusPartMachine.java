@@ -43,7 +43,7 @@ import java.util.function.IntFunction;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEConfigSlotWidget.drawSelectionOverlay;
+import static com.gregtechceu.gtceu.integration.ae2.gui.widget.list.AEListGridWidget.drawSelectionOverlay;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawItemStack;
 
 @ParametersAreNonnullByDefault

@@ -135,7 +135,7 @@ public class CustomItems {
     public static ItemEntry<ComponentItem> ADVANCED_TERMINAL = GTMTHINGS_REGISTRATE
             .item("advanced_terminal", ComponentItem::create)
             .properties(p -> p.stacksTo(1))
-            .onRegister(attach(new AdvancedTerminalBehavior())).register();
+            .register();
 
     public static ItemEntry<ComponentItem> WIRELESS_ENERGY_TERMINAL = GTMTHINGS_REGISTRATE
             .item("wireless_energy_terminal", ComponentItem::create)
