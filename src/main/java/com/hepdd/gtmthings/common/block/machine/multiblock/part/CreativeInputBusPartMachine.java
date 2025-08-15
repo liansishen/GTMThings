@@ -1,10 +1,10 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
@@ -69,7 +69,7 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     private ItemStackTransfer creativeStorage;
     protected ArrayList<Item> lstItem;
 
-    public CreativeInputBusPartMachine(IMachineBlockEntity holder, Function<Integer, ItemStackTransfer> transferFactory) {
+    public CreativeInputBusPartMachine(MetaMachineBlockEntity holder, Function<Integer, ItemStackTransfer> transferFactory) {
         super(holder, GTValues.MAX, IO.IN);
         this.inventory = createInventory();
         this.circuitInventory = createCircuitItemHandler();
@@ -77,7 +77,7 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
         this.lstItem = new ArrayList<>();
     }
 
-    public CreativeInputBusPartMachine(IMachineBlockEntity holder) {
+    public CreativeInputBusPartMachine(MetaMachineBlockEntity holder) {
         this(holder, ItemStackTransfer::new);
     }
 

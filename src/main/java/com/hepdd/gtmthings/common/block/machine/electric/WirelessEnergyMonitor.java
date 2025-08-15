@@ -1,7 +1,7 @@
 package com.hepdd.gtmthings.common.block.machine.electric;
 
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 
@@ -38,7 +38,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
     public static int p;
     public static BlockPos pPos;
 
-    public WirelessEnergyMonitor(IMachineBlockEntity holder) {
+    public WirelessEnergyMonitor(MetaMachineBlockEntity holder) {
         super(holder);
     }
 

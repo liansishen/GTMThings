@@ -2,7 +2,6 @@ package com.hepdd.gtmthings.common.item;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.ChatFormatting;
@@ -12,15 +11,14 @@ import net.minecraft.world.level.Level;
 import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
 import com.hepdd.gtmthings.api.misc.ITransferData;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
-import com.hepdd.gtmthings.utils.BigIntegerUtils;
 import com.hepdd.gtmthings.utils.TeamUtil;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Duration;
 import java.util.*;
 
+import static com.gregtechceu.gtceu.common.machine.multiblock.electric.PowerSubstationMachine.getTimeToFillDrainText;
 import static com.hepdd.gtmthings.utils.FormatUtil.*;
 import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 
@@ -83,34 +81,4 @@ public interface IWirelessMonitor extends IWirelessEnergyContainerHolder {
     }
 
     Level getLevel();
-
-    private static Component getTimeToFillDrainText(BigInteger timeToFillSeconds) {
-        if (timeToFillSeconds.compareTo(BigIntegerUtils.BIG_INTEGER_MAX_LONG) > 0) {
-            timeToFillSeconds = BigIntegerUtils.BIG_INTEGER_MAX_LONG;
-        }
-
-        Duration duration = Duration.ofSeconds(timeToFillSeconds.longValue());
-        String key;
-        long fillTime;
-        if (duration.getSeconds() <= 180) {
-            fillTime = duration.getSeconds();
-            key = "gtceu.multiblock.power_substation.time_seconds";
-        } else if (duration.toMinutes() <= 180) {
-            fillTime = duration.toMinutes();
-            key = "gtceu.multiblock.power_substation.time_minutes";
-        } else if (duration.toHours() <= 72) {
-            fillTime = duration.toHours();
-            key = "gtceu.multiblock.power_substation.time_hours";
-        } else if (duration.toDays() <= 730) { // 2 years
-            fillTime = duration.toDays();
-            key = "gtceu.multiblock.power_substation.time_days";
-        } else if (duration.toDays() / 365 < 1_000_000) {
-            fillTime = duration.toDays() / 365;
-            key = "gtceu.multiblock.power_substation.time_years";
-        } else {
-            return Component.translatable("gtceu.multiblock.power_substation.time_forever");
-        }
-
-        return Component.translatable(key, FormattingUtil.formatNumbers(fillTime));
-    }
 }

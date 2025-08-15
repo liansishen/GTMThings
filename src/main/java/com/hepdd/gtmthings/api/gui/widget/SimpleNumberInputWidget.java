@@ -7,48 +7,48 @@ import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import lombok.Getter;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
 
 public class SimpleNumberInputWidget extends WidgetGroup {
 
     @Getter
-    private Supplier<Integer> valueSupplier;
+    private final IntSupplier valueSupplier;
     @Getter
-    private Integer min = defaultMin();
+    private int min = defaultMin();
     @Getter
-    private Integer max = defaultMax();
+    private int max = defaultMax();
 
-    private final Consumer<Integer> onChanged;
+    private final IntConsumer onChanged;
 
     private TextFieldWidget textField;
 
-    protected String toText(Integer value) {
+    protected String toText(int value) {
         return String.valueOf(value);
     }
 
-    protected Integer fromText(String value) {
+    protected int fromText(String value) {
         return Integer.parseInt(value);
     }
 
-    protected Integer clamp(Integer value, Integer min, Integer max) {
+    protected int clamp(int value, int min, int max) {
         return Mth.clamp(value, min, max);
     }
 
-    protected Integer defaultMin() {
+    protected int defaultMin() {
         return 0;
     }
 
-    protected Integer defaultMax() {
+    protected int defaultMax() {
         return Integer.MAX_VALUE;
     }
 
-    protected void setTextFieldRange(TextFieldWidget textField, Integer min, Integer max) {
+    protected void setTextFieldRange(TextFieldWidget textField, int min, int max) {
         textField.setNumbersOnly(min, max);
     }
 
-    public SimpleNumberInputWidget(int x, int y, int width, int height, Supplier<Integer> valueSupplier,
-                                   Consumer<Integer> onChanged) {
+    public SimpleNumberInputWidget(int x, int y, int width, int height, IntSupplier valueSupplier,
+                                   IntConsumer onChanged) {
         super(x, y, width, height);
         this.valueSupplier = valueSupplier;
         this.onChanged = onChanged;
@@ -58,13 +58,13 @@ public class SimpleNumberInputWidget extends WidgetGroup {
     @Override
     public void initWidget() {
         super.initWidget();
-        this.textField.setCurrentString(toText(valueSupplier.get()));
+        this.textField.setCurrentString(toText(valueSupplier.getAsInt()));
     }
 
     @Override
     public void writeInitialData(FriendlyByteBuf buffer) {
         super.writeInitialData(buffer);
-        buffer.writeUtf(toText(valueSupplier.get()));
+        buffer.writeUtf(toText(valueSupplier.getAsInt()));
     }
 
     @Override
@@ -75,25 +75,25 @@ public class SimpleNumberInputWidget extends WidgetGroup {
 
     private void buildUI() {
         this.textField = new TextFieldWidget(0, 0, getSizeWidth(), 12,
-                () -> toText(valueSupplier.get()),
+                () -> toText(valueSupplier.getAsInt()),
                 stringValue -> this.setValue(clamp(fromText(stringValue), min, max)));
 
         this.addWidget(this.textField);
     }
 
-    public SimpleNumberInputWidget setValue(Integer value) {
+    public SimpleNumberInputWidget setValue(int value) {
         onChanged.accept(value);
         return this;
     }
 
-    public SimpleNumberInputWidget setMin(Integer min) {
+    public SimpleNumberInputWidget setMin(int min) {
         this.min = min;
         updateTextFieldRange();
 
         return this;
     }
 
-    public SimpleNumberInputWidget setMax(Integer max) {
+    public SimpleNumberInputWidget setMax(int max) {
         this.max = max;
         updateTextFieldRange();
 
@@ -103,6 +103,6 @@ public class SimpleNumberInputWidget extends WidgetGroup {
     protected void updateTextFieldRange() {
         setTextFieldRange(textField, min, max);
 
-        this.setValue(clamp(valueSupplier.get(), min, max));
+        this.setValue(clamp(valueSupplier.getAsInt(), min, max));
     }
 }

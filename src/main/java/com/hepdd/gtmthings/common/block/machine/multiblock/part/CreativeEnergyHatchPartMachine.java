@@ -1,9 +1,9 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
@@ -60,7 +60,7 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
     @Persisted
     private int setTier = 0;
 
-    public CreativeEnergyHatchPartMachine(IMachineBlockEntity holder) {
+    public CreativeEnergyHatchPartMachine(MetaMachineBlockEntity holder) {
         super(holder, GTValues.MAX, IO.IN);
         this.energyContainer = createEnergyContainer();
     }

@@ -43,11 +43,16 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
     public static ItemStack setVirtualItem(ItemStack stack, ItemStack virtualItem) {
         CompoundTag tag = stack.getOrCreateTag();
         tag.remove("t");
-        ResourceLocation id = BuiltInRegistries.ITEM.getKey(virtualItem.getItem());
-        tag.putString("m", id.getNamespace());
-        tag.putString("n", id.getPath());
-        CompoundTag itemTag = virtualItem.getTag();
-        if (itemTag != null) tag.put("t", itemTag);
+        if (virtualItem.isEmpty()) {
+            tag.remove("m");
+            tag.putString("n", "air");
+        } else {
+            ResourceLocation id = BuiltInRegistries.ITEM.getKey(virtualItem.getItem());
+            tag.putString("m", id.getNamespace());
+            tag.putString("n", id.getPath());
+            CompoundTag itemTag = virtualItem.getTag();
+            if (itemTag != null) tag.put("t", itemTag);
+        }
         return stack;
     }
 

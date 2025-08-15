@@ -1,7 +1,7 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part.computation;
 
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IOpticalComputationHatch;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
@@ -54,7 +54,7 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
     private BlockPos receiverPos;
     protected WirelessNotifiableComputationContainer computationContainer;
 
-    public WirelessOpticalComputationHatchMachine(IMachineBlockEntity holder, boolean transmitter) {
+    public WirelessOpticalComputationHatchMachine(MetaMachineBlockEntity holder, boolean transmitter) {
         super(holder);
         this.transmitter = transmitter;
         this.computationContainer = createComputationContainer(transmitter);
@@ -185,6 +185,11 @@ public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachin
     @Override
     public long requestCWU(long cwu, boolean simulate) {
         return computationContainer.requestCWU(cwu, simulate);
+    }
+
+    @Override
+    public long getMaxCWU() {
+        return computationContainer.getMaxCWU();
     }
 
     @Override

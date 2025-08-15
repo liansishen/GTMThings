@@ -12,7 +12,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 
@@ -31,11 +31,11 @@ public class UnlimitedItemStackTransfer extends CustomItemStackHandler {
     }
 
     @Setter
-    private Function<ItemStack, Boolean> filter;
+    private Predicate<ItemStack> filter;
 
     @Override
     public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-        return filter == null || filter.apply(stack);
+        return filter == null || filter.test(stack);
     }
 
     @Override

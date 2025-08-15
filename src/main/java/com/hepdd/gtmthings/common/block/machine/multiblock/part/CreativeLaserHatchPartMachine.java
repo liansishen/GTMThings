@@ -1,9 +1,9 @@
 package com.hepdd.gtmthings.common.block.machine.multiblock.part;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
@@ -71,7 +71,7 @@ public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implement
             BLUE.toString() + BOLD + "OpV",
             RED.toString() + BOLD + "MAX" };
 
-    public CreativeLaserHatchPartMachine(IMachineBlockEntity holder) {
+    public CreativeLaserHatchPartMachine(MetaMachineBlockEntity holder) {
         super(holder, GTValues.MAX, IO.IN);
         this.voltage = GTValues.VEX[setTier];
         this.maxEnergy = voltage * 64L * amps;

@@ -1,10 +1,10 @@
 package com.hepdd.gtmthings.common.block.machine.electric;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.cover.filter.ItemFilter;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.WorkableTieredMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
@@ -88,7 +88,7 @@ public class DigitalMiner extends WorkableTieredMachine implements IDigitalMiner
     private int silkLevel;
     private int fortuneLevel;
 
-    public DigitalMiner(IMachineBlockEntity holder, int tier, Object... args) {
+    public DigitalMiner(MetaMachineBlockEntity holder, int tier, Object... args) {
         super(holder, tier, GTMachineUtils.defaultTankSizeFunction, args);
         this.energyPerTick = GTValues.VEX[tier - 1];
         this.filterInventory = createFilterItemHandler();

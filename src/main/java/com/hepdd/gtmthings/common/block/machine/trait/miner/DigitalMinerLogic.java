@@ -7,16 +7,13 @@ import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.misc.IgnoreEnergyRecipeHandler;
 import com.gregtechceu.gtceu.api.misc.ItemRecipeHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.transfer.item.NotifiableAccountedInvWrapper;
 import com.gregtechceu.gtceu.common.data.GTMaterialItems;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
-import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.BlockPos;
@@ -50,10 +47,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(DigitalMinerLogic.class,
             RecipeLogic.MANAGED_FIELD_HOLDER);
-    private static final short MAX_SPEED = Short.MAX_VALUE;
-    private static final byte POWER = 5;
-    private static final byte TICK_TOLERANCE = 20;
-    private static final double DIVIDEND = MAX_SPEED * Math.pow(TICK_TOLERANCE, POWER);
     protected final IDigitalMiner miner;
     @Nullable
     private NotifiableAccountedInvWrapper cachedItemTransfer = null;
@@ -112,8 +105,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     protected final Map<IO, List<RecipeHandlerList>> capabilitiesProxy;
     @Getter
     protected final Map<IO, Map<RecipeCapability<?>, List<IRecipeHandler<?>>>> capabilitiesFlat;
-    private final ItemRecipeHandler inputItemHandler, outputItemHandler;
-    private final IgnoreEnergyRecipeHandler inputEnergyHandler;
     @Getter
     private int oreAmount;
     @Getter
@@ -134,12 +125,9 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         this.itemFilter = itemFilter;
         this.capabilitiesProxy = new EnumMap<>(IO.class);
         this.capabilitiesFlat = new EnumMap<>(IO.class);
-        this.inputItemHandler = new ItemRecipeHandler(IO.IN,
-                machine.getRecipeType().getMaxInputs(ItemRecipeCapability.CAP));
-        this.outputItemHandler = new ItemRecipeHandler(IO.OUT,
-                machine.getRecipeType().getMaxOutputs(ItemRecipeCapability.CAP));
-        this.inputEnergyHandler = new IgnoreEnergyRecipeHandler();
-        addHandlerList(RecipeHandlerList.of(IO.IN, inputItemHandler, inputEnergyHandler));
+        ItemRecipeHandler inputItemHandler = new ItemRecipeHandler(IO.IN, machine.getRecipeType().getMaxInputs(ItemRecipeCapability.CAP));
+        ItemRecipeHandler outputItemHandler = new ItemRecipeHandler(IO.OUT, machine.getRecipeType().getMaxOutputs(ItemRecipeCapability.CAP));
+        addHandlerList(RecipeHandlerList.of(IO.IN, inputItemHandler));
         addHandlerList(RecipeHandlerList.of(IO.OUT, outputItemHandler));
     }
 
@@ -234,10 +222,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
                     } else {
                         getRegularBlockDrops(blockDrops, blockState, builder);
                     }
-                    // handle recipe type
-                    if (hasPostProcessing()) {
-                        doPostProcessing(blockDrops, blockState, builder);
-                    }
                     // try to insert them
                     mineAndInsertItems(blockDrops, serverLevel);
                     this.oreAmount = blocksToMine.size();
@@ -285,13 +269,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
      */
     protected void onMineOperation() {}
 
-    /**
-     * Should we apply additional processing according to the recipe type.
-     */
-    protected boolean hasPostProcessing() {
-        return false;
-    }
-
     protected boolean isSilkTouchMode() {
         return silk == 1;
     }
@@ -305,51 +282,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     protected void getRegularBlockDrops(NonNullList<ItemStack> blockDrops, BlockState blockState,
                                         LootParams.Builder builder) {
         blockDrops.addAll(blockState.getDrops(builder));
-    }
-
-    protected int getVoltageTier() {
-        return 0;
-    }
-
-    protected boolean doPostProcessing(NonNullList<ItemStack> blockDrops, BlockState blockState,
-                                       LootParams.Builder builder) {
-        ItemStack oreDrop = blockDrops.get(0);
-
-        // create dummy recipe handler
-        inputItemHandler.storage.setStackInSlot(0, oreDrop);
-        inputItemHandler.storage.onContentsChanged(0);
-        for (int i = 0; i < outputItemHandler.storage.getSlots(); ++i) {
-            outputItemHandler.storage.setStackInSlot(i, ItemStack.EMPTY);
-        }
-        outputItemHandler.storage.onContentsChanged(0);
-
-        var matches = machine.getRecipeType().searchRecipe(this, r -> RecipeHelper.matchContents(this, r));
-
-        while (matches != null && matches.hasNext()) {
-            GTRecipe match = matches.next();
-            if (match == null) continue;
-
-            var eut = match.getInputEUt();
-            if (GTUtil.getTierByVoltage(eut) <= getVoltageTier()) {
-                if (RecipeHelper.handleRecipeIO(this, match, IO.OUT, this.chanceCaches)) {
-                    blockDrops.clear();
-                    var result = new ArrayList<ItemStack>();
-                    for (int i = 0; i < outputItemHandler.storage.getSlots(); ++i) {
-                        var stack = outputItemHandler.storage.getStackInSlot(i);
-                        if (stack.isEmpty()) continue;
-                        result.add(stack);
-                    }
-                    dropPostProcessing(blockDrops, result, blockState, builder);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    protected void dropPostProcessing(NonNullList<ItemStack> blockDrops, List<ItemStack> outputs, BlockState blockState,
-                                      LootParams.Builder builder) {
-        blockDrops.addAll(outputs);
     }
 
     /**
@@ -456,9 +388,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
      */
     private LinkedList<BlockPos> getBlocksToMine() {
         LinkedList<BlockPos> blocks = new LinkedList<>();
-
-        // determine how many blocks to retrieve this time
-        double quotient = getQuotient(getMeanTickTime(getMachine().getLevel()));
         // int calcAmount = quotient < 1 ? 1 : (int) (Math.min(quotient, Short.MAX_VALUE));
         int calcAmount = Short.MAX_VALUE;
         int calculated = 0;
@@ -508,41 +437,17 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
     }
 
     /**
-     * @param values to find the mean of
-     * @return the mean value
-     */
-    private static long mean(@NotNull long[] values) {
-        if (values.length == 0L)
-            return 0L;
-
-        long sum = 0L;
-        for (long v : values)
-            sum += v;
-        return sum / values.length;
-    }
-
-    /**
-     * @param world the {@link Level} to get the average tick time of
-     * @return the mean tick time
-     */
-    private static double getMeanTickTime(@NotNull Level world) {
-        return mean(Objects.requireNonNull(world.getServer()).tickTimes) * 1.0E-6D;
-    }
-
-    /**
-     * gets the quotient for determining the amount of blocks to mine
-     *
-     * @param base is a value used for calculation, intended to be the mean tick time of the world the miner is in
-     * @return the quotient
-     */
-    private static double getQuotient(double base) {
-        return DIVIDEND / Math.pow(base, POWER);
-    }
-
-    /**
      * @return the position to start mining from
      */
     public BlockPos getMiningPos() {
         return getMachine().getPos();
     }
+
+    @Override
+    public @Nullable RecipeHandlerList getCurrentHandlerList() {
+        return null;
+    }
+
+    @Override
+    public void setCurrentHandlerList(RecipeHandlerList list, GTRecipe recipe) {}
 }

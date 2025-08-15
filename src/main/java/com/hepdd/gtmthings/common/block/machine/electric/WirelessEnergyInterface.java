@@ -1,10 +1,8 @@
 package com.hepdd.gtmthings.common.block.machine.electric;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
@@ -26,8 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import com.hepdd.gtmthings.api.machine.IWirelessEnergyContainerHolder;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
+import com.hepdd.gtmthings.utils.BigIntegerUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
@@ -42,70 +39,16 @@ import static com.hepdd.gtmthings.utils.TeamUtil.GetName;
 @MethodsReturnNonnullByDefault
 public class WirelessEnergyInterface extends TieredIOPartMachine implements IInteractedMachine, IMachineLife, IWirelessEnergyContainerHolder {
 
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyInterface.class,
-            MetaMachine.MANAGED_FIELD_HOLDER);
-
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
-
-    private TickableSubscription updEnergySubs;
-
     @Getter
     @Setter
     @Nullable
     private WirelessEnergyContainer WirelessEnergyContainerCache;
 
-    @Persisted
     public final NotifiableEnergyContainer energyContainer;
 
-    public WirelessEnergyInterface(IMachineBlockEntity holder) {
+    public WirelessEnergyInterface(MetaMachineBlockEntity holder) {
         super(holder, GTValues.MAX, IO.IN);
-        this.energyContainer = createEnergyContainer();
-    }
-
-    protected NotifiableEnergyContainer createEnergyContainer() {
-        NotifiableEnergyContainer container;
-
-        container = NotifiableEnergyContainer.receiverContainer(this, Long.MAX_VALUE,
-                GTValues.VEX[tier], 67108864);
-        container.setSideInputCondition(s -> s == getFrontFacing() && isWorkingEnabled());
-        container.setCapabilityValidator(s -> s == null || s == getFrontFacing());
-
-        return container;
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        updateEnergySubscription();
-    }
-
-    @Override
-    public void onUnload() {
-        super.onUnload();
-        if (updEnergySubs != null) {
-            updEnergySubs.unsubscribe();
-            updEnergySubs = null;
-        }
-    }
-
-    private void updateEnergySubscription() {
-        if (this.getUUID() != null) {
-            updEnergySubs = subscribeServerTick(updEnergySubs, this::updateEnergy);
-        } else if (updEnergySubs != null) {
-            updEnergySubs.unsubscribe();
-            updEnergySubs = null;
-        }
-    }
-
-    private void updateEnergy() {
-        var currentStored = energyContainer.getEnergyStored();
-        if (currentStored <= 0) return;
-        WirelessEnergyContainer container = getWirelessEnergyContainer();
-        if (container == null) return;
-        long changeEnergy = container.addEnergy(currentStored, this);
-        if (changeEnergy > 0) energyContainer.setEnergyStored(currentStored - changeEnergy);
+        this.energyContainer = new Interface(this);
     }
 
     @Override
@@ -122,7 +65,6 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
             setOwnerUUID(player.getUUID());
             setWirelessEnergyContainerCache(null);
             player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.bind", GetName(player)));
-            updateEnergySubscription();
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
@@ -137,7 +79,6 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
             setOwnerUUID(null);
             setWirelessEnergyContainerCache(null);
             player.sendSystemMessage(Component.translatable("gtmthings.machine.wireless_energy_hatch.tooltip.unbind"));
-            updateEnergySubscription();
             return true;
         }
         return false;
@@ -147,7 +88,6 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
     public void onMachinePlaced(@Nullable LivingEntity player, ItemStack stack) {
         if (player != null) {
             setOwnerUUID(player.getUUID());
-            updateEnergySubscription();
         }
     }
 
@@ -166,5 +106,67 @@ public class WirelessEnergyInterface extends TieredIOPartMachine implements IInt
             return GTValues.VC[getTier()];
         }
         return super.tintColor(index);
+    }
+
+    private static class Interface extends NotifiableEnergyContainer {
+
+        private final WirelessEnergyInterface energyInterface;
+
+        private Interface(WirelessEnergyInterface machine) {
+            super(machine, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE, 0, 0);
+            energyInterface = machine;
+        }
+
+        @Override
+        public long getEnergyCapacity() {
+            var c = energyInterface.getWirelessEnergyContainer();
+            if (c == null) return 0;
+            var cap = c.getCapacity();
+            if (cap == null) return Long.MAX_VALUE;
+            return BigIntegerUtils.getLongValue(cap);
+        }
+
+        @Override
+        public long getEnergyStored() {
+            var c = energyInterface.getWirelessEnergyContainer();
+            if (c == null) return 0;
+            return BigIntegerUtils.getLongValue(c.getStorage());
+        }
+
+        @Override
+        public long acceptEnergyFromNetwork(@Nullable Direction side, long voltage, long energyAdded) {
+            if (side == null || inputsEnergy(side)) {
+                var c = energyInterface.getWirelessEnergyContainer();
+                if (c == null) return 0;
+                return c.addEnergy(energyAdded, energyInterface);
+            }
+            return 0;
+        }
+
+        @Override
+        public void checkOutputSubscription() {}
+
+        @Override
+        public void updateTick() {
+            if (updateSubs != null) {
+                updateSubs.unsubscribe();
+                updateSubs = null;
+            }
+        }
+
+        @Override
+        public boolean inputsEnergy(Direction side) {
+            return machine.getFrontFacing() == side;
+        }
+
+        @Override
+        public boolean outputsEnergy(Direction side) {
+            return false;
+        }
+
+        @Override
+        public long changeEnergy(long energyToAdd) {
+            return 0;
+        }
     }
 }
