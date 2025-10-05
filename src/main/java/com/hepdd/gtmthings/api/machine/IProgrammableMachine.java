@@ -4,5 +4,5 @@ public interface IProgrammableMachine {
 
     boolean isProgrammable();
 
-    void setProgrammable();
+    void setProgrammable(boolean programmable);
 }

@@ -19,7 +19,7 @@ public final class ProgrammableCover extends CoverBehavior {
     public boolean canAttach() {
         MetaMachine machine = MetaMachine.getMachine(coverHolder.holder());
         if (machine instanceof IProgrammableMachine programmableMachine) {
-            programmableMachine.setProgrammable();
+            programmableMachine.setProgrammable(true);
             for (CoverBehavior cover : machine.getCoverContainer().getCovers()) {
                 if (cover instanceof ProgrammableCover) return false;
             }
@@ -29,11 +29,19 @@ public final class ProgrammableCover extends CoverBehavior {
     }
 
     @Override
+    public void onRemoved() {
+        MetaMachine machine = MetaMachine.getMachine(coverHolder.holder());
+        if (machine instanceof IProgrammableMachine programmableMachine) {
+            programmableMachine.setProgrammable(false);
+        }
+    }
+
+    @Override
     public void onLoad() {
         super.onLoad();
         MetaMachine machine = MetaMachine.getMachine(coverHolder.holder());
         if (machine instanceof IProgrammableMachine programmableMachine) {
-            programmableMachine.setProgrammable();
+            programmableMachine.setProgrammable(true);
         }
     }
 }
