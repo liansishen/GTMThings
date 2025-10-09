@@ -49,7 +49,7 @@ public class WirelessOpticalComputationHatchProvider extends CapabilityBlockProv
         if (!capData.getBoolean("isGTMTJadeIF")) return;
         if (capData.getBoolean("isBinded")) {
             if (capData.getBoolean("isTransmitter")) {
-                tooltip.add(Component.translatable("gtmthings.transmitter_hatch.bind", capData.getString("pos")));
+                tooltip.add(Component.translatable("gtmthings.machine.transmitter_hatch.bind", capData.getString("pos")));
             } else {
                 tooltip.add(Component.translatable("gtmthings.machine.receiver_hatch.bind", capData.getString("pos")));
             }
