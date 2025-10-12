@@ -20,8 +20,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -31,9 +29,6 @@ import static com.gregtechceu.gtceu.api.capability.GTCapabilityHelper.getEnergyC
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CreativeEnergyCover extends CoverBehavior {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeEnergyCover.class,
-            CoverBehavior.MANAGED_FIELD_HOLDER);
 
     private TickableSubscription subscription;
 
@@ -47,11 +42,6 @@ public class CreativeEnergyCover extends CoverBehavior {
     private int amperage;
     @Persisted
     private long machineMaxEnergy;
-
-    @Override
-    public @NotNull ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     public CreativeEnergyCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide) {
         super(definition, coverHolder, attachedSide);

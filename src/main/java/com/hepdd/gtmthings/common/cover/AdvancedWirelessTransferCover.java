@@ -38,7 +38,6 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,14 +51,6 @@ import static net.minecraft.resources.ResourceLocation.tryParse;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AdvancedWirelessTransferCover extends CoverBehavior implements IUICover {
-
-    public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            AdvancedWirelessTransferCover.class, CoverBehavior.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     public static final int TRANSFER_ITEM = 1;
     public static final int TRANSFER_FLUID = 2;

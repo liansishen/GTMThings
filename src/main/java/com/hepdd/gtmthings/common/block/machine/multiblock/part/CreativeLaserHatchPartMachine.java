@@ -25,7 +25,6 @@ import com.lowdragmc.lowdraglib.gui.widget.SelectorWidget;
 import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -42,8 +41,6 @@ import static net.minecraft.ChatFormatting.*;
 
 @ParametersAreNonnullByDefault
 public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implements IDataInfoProvider {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeLaserHatchPartMachine.class, TieredIOPartMachine.MANAGED_FIELD_HOLDER);
 
     @Persisted
     private NotifiableLaserContainer buffer;
@@ -112,12 +109,6 @@ public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implement
     @Override
     public boolean canShared() {
         return false;
-    }
-
-    @Override
-    @NotNull
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Override

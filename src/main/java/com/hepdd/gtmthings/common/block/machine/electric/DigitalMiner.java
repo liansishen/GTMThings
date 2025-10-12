@@ -37,7 +37,6 @@ import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,9 +52,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DigitalMiner extends WorkableTieredMachine implements IDigitalMiner, IFancyUIMachine, IDataInfoProvider {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(DigitalMiner.class,
-            WorkableTieredMachine.MANAGED_FIELD_HOLDER);
 
     private long energyPerTick;
     @Nullable
@@ -98,11 +94,6 @@ public class DigitalMiner extends WorkableTieredMachine implements IDigitalMiner
     //////////////////////////////////////
     // ***** Initialization ******//
     //////////////////////////////////////
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     protected CustomItemStackHandler createFilterItemHandler() {
         var transfer = new CustomItemStackHandler();

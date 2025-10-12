@@ -20,7 +20,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import com.hepdd.gtmthings.api.capability.IGTMTJadeIF;
 import com.hepdd.gtmthings.common.block.machine.trait.WirelessNotifiableComputationContainer;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
@@ -30,14 +29,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine implements IOpticalComputationHatch, IDataStickInteractable, IGTMTJadeIF {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
-            WirelessOpticalComputationHatchMachine.class, MultiblockPartMachine.MANAGED_FIELD_HOLDER);
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     private final boolean transmitter;
 

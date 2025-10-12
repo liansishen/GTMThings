@@ -34,7 +34,6 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 
 import com.hepdd.gtmthings.api.capability.IDigitalMiner;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,8 +44,6 @@ import java.util.*;
 
 public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityHolder {
 
-    public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(DigitalMinerLogic.class,
-            RecipeLogic.MANAGED_FIELD_HOLDER);
     protected final IDigitalMiner miner;
     @Nullable
     private NotifiableAccountedInvWrapper cachedItemTransfer = null;
@@ -149,11 +146,6 @@ public class DigitalMinerLogic extends RecipeLogic implements IRecipeCapabilityH
         this.blocksToMine.clear();
         this.oreAmount = 0;
         this.resetRecipeLogic();
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Override

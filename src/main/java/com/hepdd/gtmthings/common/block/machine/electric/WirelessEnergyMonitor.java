@@ -16,7 +16,6 @@ import com.hepdd.gtmthings.common.item.IWirelessMonitor;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -32,19 +31,11 @@ import static com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget.ALIGN_CENTER;
 @MethodsReturnNonnullByDefault
 public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachine, IWirelessMonitor {
 
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessEnergyMonitor.class,
-            MetaMachine.MANAGED_FIELD_HOLDER);
-
     public static int p;
     public static BlockPos pPos;
 
     public WirelessEnergyMonitor(MetaMachineBlockEntity holder) {
         super(holder);
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Getter

@@ -20,7 +20,6 @@ import net.minecraftforge.fluids.FluidStack;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,9 +30,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CreativeInputHatchPartMachine extends TieredIOPartMachine implements IDistinctPart {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CreativeInputHatchPartMachine.class,
-            TieredIOPartMachine.MANAGED_FIELD_HOLDER);
 
     private final int SLOT_COUNT = 9;
 
@@ -62,10 +58,6 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
     //////////////////////////////////////
     // ***** Initialization ******//
     //////////////////////////////////////
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
-    }
 
     protected NotifiableFluidTank createTank() {
         return new InfinityFluidTank(this, SLOT_COUNT, Integer.MAX_VALUE, IO.IN);

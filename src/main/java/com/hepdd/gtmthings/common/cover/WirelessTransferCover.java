@@ -27,7 +27,6 @@ import net.minecraftforge.items.IItemHandler;
 
 import com.hepdd.gtmthings.api.misc.BlockEntityCache;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
-import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -39,9 +38,6 @@ import static net.minecraft.resources.ResourceLocation.tryParse;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class WirelessTransferCover extends CoverBehavior {
-
-    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(WirelessTransferCover.class,
-            CoverBehavior.MANAGED_FIELD_HOLDER);
 
     public static final int TRANSFER_ITEM = 1;
     public static final int TRANSFER_FLUID = 2;
@@ -62,11 +58,6 @@ public class WirelessTransferCover extends CoverBehavior {
     public WirelessTransferCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide, int transferType) {
         super(definition, coverHolder, attachedSide);
         this.transferType = transferType;
-    }
-
-    @Override
-    public ManagedFieldHolder getFieldHolder() {
-        return MANAGED_FIELD_HOLDER;
     }
 
     @Override
