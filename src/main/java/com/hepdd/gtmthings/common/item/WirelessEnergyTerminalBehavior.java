@@ -52,7 +52,7 @@ public class WirelessEnergyTerminalBehavior implements IItemUIFactory {
     private static void addDisplayText(List<Component> textList, WirelessMonitor monitor) {
         if (monitor.isRemote()) return;
         if (monitor.displayTextCache == null || monitor.level.getServer().getTickCount() % 10 == 0) {
-            monitor.displayTextCache = monitor.getDisplayText(false, DISPLAY_TEXT_WIDTH);
+            monitor.displayTextCache = monitor.getDisplayText(false, 0, DISPLAY_TEXT_WIDTH);
         }
         textList.addAll(monitor.displayTextCache);
     }

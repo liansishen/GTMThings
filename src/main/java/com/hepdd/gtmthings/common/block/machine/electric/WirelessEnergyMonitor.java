@@ -49,6 +49,9 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
     @Persisted
     private boolean all;
 
+    @Persisted
+    private int powerDisplayMode;
+
     //////////////////////////////////////
     // *********** GUI ***********//
     //////////////////////////////////////
@@ -56,6 +59,10 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
         if (componentData.equals("all")) {
             if (!clickData.isRemote) {
                 all = !all;
+            }
+        } else if (componentData.equals("power_mode")) {
+            if (!clickData.isRemote) {
+                powerDisplayMode = (powerDisplayMode + 1) % 3; // 在 0, 1, 2 之间循环
             }
         } else if (clickData.isRemote) {
             p = 100;
@@ -86,7 +93,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
     public void addDisplayText(@NotNull List<Component> textList) {
         if (isRemote()) return;
         if (textListCache == null || this.holder.getOffsetTimer() % 10 == 0) {
-            textListCache = getDisplayText(all, DISPLAY_TEXT_WIDTH);
+            textListCache = getDisplayText(all, powerDisplayMode, DISPLAY_TEXT_WIDTH);
         }
         textList.addAll(textListCache);
     }
