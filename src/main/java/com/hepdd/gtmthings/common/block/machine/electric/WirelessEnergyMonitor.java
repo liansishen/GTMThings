@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 
 import com.hepdd.gtmthings.api.gui.widget.AlignComponentPanelWidget;
 import com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget;
+import com.hepdd.gtmthings.api.gui.widget.FixedDraggableScrollableWidgetGroup;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import com.hepdd.gtmthings.common.item.IWirelessMonitor;
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
@@ -69,7 +70,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
     public Widget createUIWidget() {
         var group = new WidgetGroup(0, 0, DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8);
 
-        group.addWidget(new DraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117)
+        group.addWidget(new FixedDraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117)
                 .setBackground(GuiTextures.DISPLAY)
                 .setYScrollBarWidth(2) // 滚动条宽度为2像素
                 .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))

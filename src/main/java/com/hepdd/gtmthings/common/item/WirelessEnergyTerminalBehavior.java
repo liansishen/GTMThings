@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 
 import com.hepdd.gtmthings.api.gui.widget.AlignComponentPanelWidget;
 import com.hepdd.gtmthings.api.gui.widget.AlignLabelWidget;
+import com.hepdd.gtmthings.api.gui.widget.FixedDraggableScrollableWidgetGroup;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
@@ -35,7 +36,7 @@ public class WirelessEnergyTerminalBehavior implements IItemUIFactory {
         var group = new WidgetGroup(0, 0, DISPLAY_TEXT_WIDTH + 8 + 8, 117 + 8 + 8 + 8 + 17);
         Widget label = new AlignLabelWidget(DISPLAY_TEXT_WIDTH / 2 + 4, 5, descriptionId).setTextAlign(ALIGN_CENTER);
         group.addWidget(
-                new DraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117 + 8 + 8 + 17)
+                new FixedDraggableScrollableWidgetGroup(4, 4, DISPLAY_TEXT_WIDTH + 8, 117 + 8 + 8 + 17)
                         .setBackground(GuiTextures.DISPLAY)
                         .setYScrollBarWidth(2)
                         .setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1))
