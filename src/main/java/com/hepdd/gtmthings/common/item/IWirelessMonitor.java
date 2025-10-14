@@ -41,11 +41,11 @@ public interface IWirelessMonitor extends IWirelessEnergyContainerHolder {
         var stat = container.getEnergyStat();
         textListCache.add(Component.translatable("gtmthings.machine.wireless_energy_monitor.tooltip.net_power"));
 
-        BigDecimal avgMinute = stat.getMinuteAvg();
+        BigDecimal avgMinute = stat.minute.getAvgByTick();
         textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_minute", Component.literal(formatBigDecimalNumberOrSic(avgMinute)).withStyle(ChatFormatting.DARK_AQUA), Component.literal(voltageAmperage(avgMinute).toEngineeringString()), voltageName(avgMinute)));
-        BigDecimal avgHour = stat.getHourAvg();
+        BigDecimal avgHour = stat.hour.getAvgByTick();
         textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_hour", Component.literal(formatBigDecimalNumberOrSic(avgHour)).withStyle(ChatFormatting.YELLOW), Component.literal(voltageAmperage(avgHour).toEngineeringString()), voltageName(avgHour)));
-        BigDecimal avgDay = stat.getDayAvg();
+        BigDecimal avgDay = stat.day.getAvgByTick();
         textListCache.add(formatWithConstantWidth("gtmthings.machine.wireless_energy_monitor.tooltip.last_day", Component.literal(formatBigDecimalNumberOrSic(avgDay)).withStyle(ChatFormatting.DARK_GREEN), Component.literal(voltageAmperage(avgDay).toEngineeringString()), voltageName(avgDay)));
         // average useage
         BigDecimal avgEnergy = stat.getAvgEnergy();
