@@ -85,7 +85,7 @@ public class WirelessEnergyMonitor extends MetaMachine implements IFancyUIMachin
 
     public void addDisplayText(@NotNull List<Component> textList) {
         if (isRemote()) return;
-        if (textListCache == null || getOffsetTimer() % 10 == 0) {
+        if (textListCache == null || this.holder.getOffsetTimer() % 10 == 0) {
             textListCache = getDisplayText(all, DISPLAY_TEXT_WIDTH);
         }
         textList.addAll(textListCache);
