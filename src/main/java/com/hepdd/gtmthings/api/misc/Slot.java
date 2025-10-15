@@ -4,5 +4,6 @@ import java.math.BigInteger;
 
 public class Slot {
 
-    BigInteger sum = BigInteger.ZERO;
+    BigInteger inputSum = BigInteger.ZERO;
+    BigInteger outputSum = BigInteger.ZERO;
 }
