@@ -284,17 +284,16 @@ public class AlignComponentPanelWidget extends Widget {
 
     @OnlyIn(Dist.CLIENT)
     public void drawInForeground(@Nonnull @NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        Style style = this.getStyleUnderMouse(mouseX, mouseY);
-        if (style != null && style.getHoverEvent() != null) {
-            HoverEvent hoverEvent = style.getHoverEvent();
-            Component hoverTips = hoverEvent.getValue(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT);
-            if (hoverTips != null) {
-                this.gui.getModularUIGui().setHoverTooltip(List.of(hoverTips), ItemStack.EMPTY, null, null);
-                return;
+        if (isMouseOverElement(mouseX, mouseY)) {
+            Style style = this.getStyleUnderMouse(mouseX, mouseY);
+            if (style != null && style.getHoverEvent() != null) {
+                HoverEvent hoverEvent = style.getHoverEvent();
+                Component hoverTips = hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT);
+                if (hoverTips != null) {
+                    this.gui.getModularUIGui().setHoverTooltip(List.of(hoverTips), ItemStack.EMPTY, null, null);
+                }
             }
         }
-
-        super.drawInForeground(graphics, mouseX, mouseY, partialTicks);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -335,5 +334,23 @@ public class AlignComponentPanelWidget extends Widget {
 
     public List<FormattedCharSequence> cacheLines() {
         return this.cacheLines;
+    }
+
+    @Override
+    public boolean isMouseOverElement(double mouseX, double mouseY) {
+        boolean isOverSelf = super.isMouseOverElement(mouseX, mouseY);
+        if (!isOverSelf) {
+            return false;
+        }
+        Widget parent = this.getParent();
+        while (parent != null) {
+            Position parentPos = parent.getPosition();
+            Size parentSize = parent.getSize();
+            if (!Widget.isMouseOver(parentPos.x, parentPos.y, parentSize.width, parentSize.height, mouseX, mouseY)) {
+                return false;
+            }
+            parent = parent.getParent();
+        }
+        return true;
     }
 }

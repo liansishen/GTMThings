@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TimeWheel {
 
@@ -25,6 +26,8 @@ public class TimeWheel {
     private final int slotNum;
     ArrayDeque<Slot> slots;
     private BigInteger sum = BigInteger.ZERO;
+    private BigInteger inputSum = BigInteger.ZERO;
+    private BigInteger outputSum = BigInteger.ZERO;
     private final int startIndex;
     private int currentIndex;
 
@@ -43,7 +46,9 @@ public class TimeWheel {
         if (slots.size() == slotNum) {
             Slot s = slots.poll();
             if (s != null) {
-                sum = sum.subtract(s.sum);
+                sum = sum.subtract(s.inputSum).add(s.outputSum); // net = net - in + out
+                inputSum = inputSum.subtract(s.inputSum);
+                outputSum = outputSum.subtract(s.outputSum);
             }
         }
         slots.offer(new Slot());
@@ -54,21 +59,78 @@ public class TimeWheel {
     public void update(BigInteger value, int currentTick) {
         Slot slot = slots.peekLast();
         if (slot == null) return;
-        slot.sum = slot.sum.add(value);
-        sum = sum.add(value);
+        if (value.compareTo(BigInteger.ZERO) > 0) {
+            slot.inputSum = slot.inputSum.add(value);
+            inputSum = inputSum.add(value);
+            sum = sum.add(value); // 更新净值
+        } else if (value.compareTo(BigInteger.ZERO) < 0) {
+            BigInteger positiveValue = value.negate();
+            slot.outputSum = slot.outputSum.add(positiveValue);
+            outputSum = outputSum.add(positiveValue);
+            sum = sum.add(value); // 更新净值（减去）
+        }
         this.lastUpdateTick = currentTick;
         if (firstUpdateTick == -1) firstUpdateTick = lastUpdateTick;
     }
 
     public @NotNull BigDecimal getAvgByTick() {
-        if (this.lastUpdateTick - this.firstUpdateTick < this.slotResolution * this.slotNum) {
-            return (new BigDecimal(this.sum)).divide(BigDecimal.valueOf(this.lastUpdateTick - this.firstUpdateTick + 1), RoundingMode.HALF_UP);
+        return calculateAvg(this.sum);
+    }
+
+    /**
+     * (新方法) 获取输入能量的平均值/刻。
+     */
+    public @NotNull BigDecimal getAvgInputByTick() {
+        return calculateAvg(this.inputSum);
+    }
+
+    /**
+     * (新方法) 获取输出能量的平均值/刻。
+     */
+    public @NotNull BigDecimal getAvgOutputByTick() {
+        return calculateAvg(this.outputSum);
+    }
+
+    /**
+     * (新方法) 获取每个时间片（Slot）的输入历史数据，用于绘制图表。
+     * 列表中的每个值代表一个时间片内的总输入量。
+     */
+    public @NotNull List<BigInteger> getInputHistory() {
+        return slots.stream().map(slot -> slot.inputSum).collect(Collectors.toList());
+    }
+
+    /**
+     * (新方法) 获取每个时间片（Slot）的输出历史数据，用于绘制图表。
+     * 列表中的每个值代表一个时间片内的总输出量。
+     */
+    public @NotNull List<BigInteger> getOutputHistory() {
+        return slots.stream().map(slot -> slot.outputSum).collect(Collectors.toList());
+    }
+
+    private @NotNull BigDecimal calculateAvg(BigInteger total) {
+        if (total.equals(BigInteger.ZERO)) return BigDecimal.ZERO;
+
+        long divisor;
+        int ticksElapsed = this.lastUpdateTick - this.firstUpdateTick + 1;
+
+        if (firstUpdateTick == -1 || ticksElapsed <= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        if (ticksElapsed < this.windowSize) {
+            // 如果时间轮未满，则使用实际经过的tick数计算
+            divisor = ticksElapsed;
         } else {
-            try {
-                return this.slots.isEmpty() ? BigDecimal.ZERO : (new BigDecimal(this.sum)).divide(BigDecimal.valueOf((long) this.slots.size() * (long) this.slotResolution + (long) (this.lastUpdateTick % this.slotResolution) - (long) this.slotResolution), RoundingMode.HALF_UP);
-            } catch (ArithmeticException e) {
-                return BigDecimal.ZERO;
-            }
+            // 如果时间轮已满，则使用窗口大小计算
+            divisor = (long) this.slots.size() * this.slotResolution;
+        }
+
+        if (divisor <= 0) return BigDecimal.ZERO;
+
+        try {
+            return new BigDecimal(total).divide(BigDecimal.valueOf(divisor), 2, RoundingMode.HALF_UP);
+        } catch (ArithmeticException e) {
+            return BigDecimal.ZERO;
         }
     }
 }
