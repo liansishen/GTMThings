@@ -3,7 +3,6 @@ package com.hepdd.gtmthings;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
-import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -28,13 +27,8 @@ public class GTMThings {
     public GTMThings(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
         GTMTHINGS_REGISTRATE.registerEventListeners(modEventBus);
-        modEventBus.addGenericListener(GTRecipeType.class, this::registerRecipeTypes);
         modEventBus.addGenericListener(MachineDefinition.class, this::registerMachines);
         modEventBus.addGenericListener(CoverDefinition.class, this::registerCovers);
-    }
-
-    private void registerRecipeTypes(GTCEuAPI.RegisterEvent<ResourceLocation, GTRecipeType> event) {
-        GTMTRecipeTypes.init();
     }
 
     private void registerMachines(GTCEuAPI.RegisterEvent<ResourceLocation, MachineDefinition> event) {

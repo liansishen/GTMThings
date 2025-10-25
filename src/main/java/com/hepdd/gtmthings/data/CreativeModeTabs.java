@@ -9,7 +9,6 @@ import com.tterrag.registrate.util.entry.RegistryEntry;
 
 import static com.gregtechceu.gtceu.common.data.GTMachines.CREATIVE_ENERGY;
 import static com.hepdd.gtmthings.common.registry.GTMTRegistration.GTMTHINGS_REGISTRATE;
-import static com.hepdd.gtmthings.data.CustomMachines.DIGITAL_MINER;
 
 public class CreativeModeTabs {
 
@@ -33,7 +32,7 @@ public class CreativeModeTabs {
             .defaultCreativeTab("more_machines", builder -> builder
                     .displayItems(new GTCreativeModeTabs.RegistrateDisplayItemsGenerator("more_machines", GTMTHINGS_REGISTRATE))
                     .title(GTMTHINGS_REGISTRATE.addLang("itemGroup", GTMThings.id("more_machines"), GTMThings.NAME))
-                    .icon(DIGITAL_MINER[2]::asStack)
+                    .icon(CustomMachines.ME_EXPORT_BUFFER::asStack)
                     .build())
             .register();
 
