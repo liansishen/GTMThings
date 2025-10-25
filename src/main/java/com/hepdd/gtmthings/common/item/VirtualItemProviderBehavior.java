@@ -71,7 +71,7 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
     private InteractionHand hand;
 
     @Override
-    public void appendHoverText(@NotNull ItemStack itemstack, @Nullable Level world, @NotNull List<Component> list, @NotNull TooltipFlag flag) {
+    public void appendTooltips(@NotNull ItemStack itemstack, @Nullable Level world, @NotNull List<Component> list, @NotNull TooltipFlag flag) {
         if (itemstack.hasTag()) {
             var item = getVirtualItem(itemstack);
             list.add(Component.translatable("gui.ae2.Items").append(": "));

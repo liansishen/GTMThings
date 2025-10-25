@@ -26,8 +26,8 @@ public class WirelessTransferCoverTooltipBehavior implements IAddInformation {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
-                                TooltipFlag isAdvanced) {
+    public void appendTooltips(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+                               TooltipFlag isAdvanced) {
         var tag = stack.getTag();
         if (tag != null) {
             String itemId = tag.getString("blockid");

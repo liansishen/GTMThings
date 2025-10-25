@@ -48,7 +48,7 @@ public class CreativeFluidStats implements IItemComponent, IComponentCapability,
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+    public void appendTooltips(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
         tooltipComponents.add(Component.translatable("gtmthings.creative_tooltip"));
         if (stack.hasTag() && stack.getTag().contains("Fluid")) {
             FluidUtil.getFluidContained(stack).ifPresent(tank -> {
