@@ -10,7 +10,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
@@ -24,10 +23,6 @@ import java.util.UUID;
 public class WirelessEnergySavaedData extends SavedData {
 
     public static WirelessEnergySavaedData INSTANCE;
-
-    public static WirelessEnergySavaedData getOrCreate(ServerLevel serverLevel) {
-        return serverLevel.getDataStorage().computeIfAbsent(WirelessEnergySavaedData::new, WirelessEnergySavaedData::new, "gtceu_wireless_energy");
-    }
 
     public final Map<UUID, WirelessEnergyContainer> containerMap = new O2OOpenCacheHashMap<>();
 

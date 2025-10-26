@@ -14,9 +14,12 @@ import org.jetbrains.annotations.Nullable;
 import java.math.BigInteger;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.function.Function;
 
 @Getter
 public class WirelessEnergyContainer {
+
+    public static Function<UUID, WirelessEnergyContainer> CREATOR = WirelessEnergyContainer::new;
 
     public static boolean observed;
 
@@ -24,7 +27,7 @@ public class WirelessEnergyContainer {
     public static MinecraftServer server;
 
     public static WirelessEnergyContainer getOrCreateContainer(UUID uuid) {
-        return WirelessEnergySavaedData.INSTANCE.containerMap.computeIfAbsent(TeamUtil.getTeamUUID(uuid), WirelessEnergyContainer::new);
+        return WirelessEnergySavaedData.INSTANCE.containerMap.computeIfAbsent(TeamUtil.getTeamUUID(uuid), CREATOR);
     }
 
     private BigInteger storage;
