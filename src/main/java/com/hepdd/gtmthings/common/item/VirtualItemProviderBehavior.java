@@ -67,7 +67,6 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
         return stack;
     }
 
-    private Player player;
     private InteractionHand hand;
 
     @Override
@@ -81,7 +80,6 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
 
     @Override
     public InteractionResultHolder<ItemStack> use(Item item, Level level, Player player, InteractionHand usedHand) {
-        this.player = player;
         hand = usedHand;
         return IItemUIFactory.super.use(item, level, player, usedHand);
     }
@@ -95,7 +93,7 @@ public final class VirtualItemProviderBehavior implements IAddInformation, IItem
     public Widget createMainPage(FancyMachineUIWidget widget) {
         WidgetGroup group = new WidgetGroup(0, 0, 18 + 16, 18 + 16);
         WidgetGroup container = new WidgetGroup(4, 4, 18 + 8, 18 + 8);
-        container.addWidget(new SlotWidget(new ItemHandler(player, hand), 0, 4, 4, true, true).setBackground(GuiTextures.SLOT));
+        container.addWidget(new SlotWidget(new ItemHandler(widget.getGui().entityPlayer, hand), 0, 4, 4, true, true).setBackground(GuiTextures.SLOT));
         group.addWidget(container);
         return group;
     }

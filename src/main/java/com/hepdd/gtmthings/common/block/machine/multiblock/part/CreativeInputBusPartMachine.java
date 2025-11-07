@@ -129,22 +129,20 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     }
 
     protected void autoKeep() {
-        if (getOffsetTimer() % 20 == 0) {
-            for (int i = 0; i < this.getInventorySize(); i++) {
-                ItemStack is = this.creativeStorage.getStackInSlot(i);
-                if (!getInventory().storage.stacks[i].is(is.getItem())) {
-                    var newItem = is.copy();
-                    newItem.setCount(Integer.MAX_VALUE);
-                    getInventory().storage.setStackInSlot(i, newItem);
-                }
+        for (int i = 0; i < this.getInventorySize(); i++) {
+            ItemStack is = this.creativeStorage.getStackInSlot(i);
+            if (!getInventory().storage.stacks[i].is(is.getItem())) {
+                var newItem = is.copy();
+                newItem.setCount(Integer.MAX_VALUE);
+                getInventory().storage.setStackInSlot(i, newItem);
             }
-            updateInventorySubscription();
         }
+        updateInventorySubscription();
     }
 
     protected void updateInventorySubscription() {
         if (!lstItem.isEmpty()) {
-            autoIOSubs = subscribeServerTick(autoIOSubs, this::autoKeep);
+            autoIOSubs = subscribeServerTick(autoIOSubs, this::autoKeep, 20);
         } else if (autoIOSubs != null) {
             autoIOSubs.unsubscribe();
             autoIOSubs = null;

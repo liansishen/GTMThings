@@ -8,7 +8,7 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
-import com.gregtechceu.gtceu.api.pattern.MultiblockWorldSavedData;
+import com.gregtechceu.gtceu.api.pattern.MultiblockWorldData;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -141,7 +141,7 @@ public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implemen
                         c.getPatternLock().lock();
                         try {
                             c.onStructureInvalid();
-                            var mwsd = MultiblockWorldSavedData.getOrCreate(serverLevel);
+                            var mwsd = MultiblockWorldData.getOrCreate(serverLevel);
                             mwsd.removeMapping(c.getMultiblockState());
                             mwsd.addAsyncLogic(c);
                         } finally {

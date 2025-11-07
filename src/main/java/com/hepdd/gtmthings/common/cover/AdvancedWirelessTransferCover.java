@@ -133,7 +133,7 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
     public void onLoad() {
         super.onLoad();
         getTargetLevel();
-        subscription = coverHolder.subscribeServerTick(subscription, this::update);
+        subscription = coverHolder.subscribeServerTick(subscription, this::update, 20);
     }
 
     @Override
@@ -145,19 +145,17 @@ public class AdvancedWirelessTransferCover extends CoverBehavior implements IUIC
     }
 
     private void update() {
-        if (coverHolder.getOffsetTimer() % 20 == 0) {
-            if (transferType == TRANSFER_ITEM) {
-                var targetItemTransfer = getTargetItemTransfer();
-                var ownItemTransfer = getOwnItemTransfer();
-                if (ownItemTransfer != null && targetItemTransfer != null) {
-                    GTTransferUtils.transferItemsFiltered(ownItemTransfer, targetItemTransfer, filterHandlerItem.getFilter(), Integer.MAX_VALUE);
-                }
-            } else if (transferType == TRANSFER_FLUID) {
-                var targetFluidTransfer = getTargetFluidTransfer();
-                var ownFluidTransfer = getOwnFluidTransfer();
-                if (ownFluidTransfer != null && targetFluidTransfer != null) {
-                    GTTransferUtils.transferFluidsFiltered(ownFluidTransfer, targetFluidTransfer, filterHandlerFluid.getFilter(), Integer.MAX_VALUE);
-                }
+        if (transferType == TRANSFER_ITEM) {
+            var targetItemTransfer = getTargetItemTransfer();
+            var ownItemTransfer = getOwnItemTransfer();
+            if (ownItemTransfer != null && targetItemTransfer != null) {
+                GTTransferUtils.transferItemsFiltered(ownItemTransfer, targetItemTransfer, filterHandlerItem.getFilter(), Integer.MAX_VALUE);
+            }
+        } else if (transferType == TRANSFER_FLUID) {
+            var targetFluidTransfer = getTargetFluidTransfer();
+            var ownFluidTransfer = getOwnFluidTransfer();
+            if (ownFluidTransfer != null && targetFluidTransfer != null) {
+                GTTransferUtils.transferFluidsFiltered(ownFluidTransfer, targetFluidTransfer, filterHandlerFluid.getFilter(), Integer.MAX_VALUE);
             }
         }
     }

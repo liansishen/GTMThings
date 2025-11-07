@@ -86,7 +86,7 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
 
     protected void updateTankSubscription() {
         if (!fluidMap.isEmpty()) {
-            autoIOSubs = subscribeServerTick(autoIOSubs, this::autoKeep);
+            autoIOSubs = subscribeServerTick(autoIOSubs, this::autoKeep, 20);
         } else if (autoIOSubs != null) {
             clearAll();
             autoIOSubs.unsubscribe();
@@ -95,23 +95,21 @@ public class CreativeInputHatchPartMachine extends TieredIOPartMachine implement
     }
 
     protected void autoKeep() {
-        if (getOffsetTimer() % 20 == 0) {
-            for (int i = 0; i < SLOT_COUNT; i++) {
-                if (fluidMap.containsKey(i)) {
-                    var mFluid = this.creativeTanks[i].getFluid();
-                    if (!this.tank.getFluidInTank(i).equals(mFluid)) {
-                        var copy = mFluid.copy();
-                        copy.setAmount(Integer.MAX_VALUE);
-                        this.tank.setFluidInTank(i, copy);
-                    }
-                } else {
-                    if (!this.tank.getFluidInTank(i).isEmpty()) {
-                        this.tank.setFluidInTank(i, FluidStack.EMPTY);
-                    }
+        for (int i = 0; i < SLOT_COUNT; i++) {
+            if (fluidMap.containsKey(i)) {
+                var mFluid = this.creativeTanks[i].getFluid();
+                if (!this.tank.getFluidInTank(i).equals(mFluid)) {
+                    var copy = mFluid.copy();
+                    copy.setAmount(Integer.MAX_VALUE);
+                    this.tank.setFluidInTank(i, copy);
+                }
+            } else {
+                if (!this.tank.getFluidInTank(i).isEmpty()) {
+                    this.tank.setFluidInTank(i, FluidStack.EMPTY);
                 }
             }
-            updateTankSubscription();
         }
+        updateTankSubscription();
     }
 
     protected void clearAll() {
