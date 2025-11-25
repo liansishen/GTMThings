@@ -1,6 +1,8 @@
 dependencies {
     compileOnly libs.jetbrains.annotations
 
+    implementation("dev:fastcollection-1.0")
+
     //modImplementation("com.gregtechceu.gtceu:gtceu-${project.minecraft_version}:${project.gtceu_version}")
     modImplementation("dev:gtceu-1.20.1-1.8.0")
     modImplementation("com.lowdragmc.ldlib:ldlib-forge-$project.minecraft_version:$project.ldlib_version") { transitive = false }

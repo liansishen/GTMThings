@@ -1,7 +1,5 @@
 package com.hepdd.gtmthings.data;
 
-import com.gregtechceu.gtceu.utils.collection.O2OOpenCacheHashMap;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.Registries;
@@ -12,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.saveddata.SavedData;
 
+import com.fast.fastcollection.O2OOpenCacheHashMap;
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +21,7 @@ import java.util.UUID;
 
 public class WirelessEnergySavaedData extends SavedData {
 
-    public static WirelessEnergySavaedData INSTANCE;
+    public static WirelessEnergySavaedData INSTANCE = new WirelessEnergySavaedData();
 
     public final Map<UUID, WirelessEnergyContainer> containerMap = new O2OOpenCacheHashMap<>();
 
