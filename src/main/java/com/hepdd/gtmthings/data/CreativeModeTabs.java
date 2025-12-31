@@ -20,14 +20,6 @@ public class CreativeModeTabs {
                     .build())
             .register();
 
-    public static final RegistryEntry<CreativeModeTab> WIRELESS_TAB = GTMTHINGS_REGISTRATE
-            .defaultCreativeTab("wireless", builder -> builder
-                    .displayItems(new GTCreativeModeTabs.RegistrateDisplayItemsGenerator("wireless", GTMTHINGS_REGISTRATE))
-                    .title(GTMTHINGS_REGISTRATE.addLang("itemGroup", GTMThings.id("wireless"), GTMThings.NAME))
-                    .icon(WirelessMachines.WIRELESS_ENERGY_INTERFACE::asStack)
-                    .build())
-            .register();
-
     public static final RegistryEntry<CreativeModeTab> MORE_MACHINES = GTMTHINGS_REGISTRATE
             .defaultCreativeTab("more_machines", builder -> builder
                     .displayItems(new GTCreativeModeTabs.RegistrateDisplayItemsGenerator("more_machines", GTMTHINGS_REGISTRATE))
