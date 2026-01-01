@@ -6,7 +6,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
+import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableLaserContainer;
 import com.gregtechceu.gtceu.common.item.PortableScannerBehavior;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -40,10 +40,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import static net.minecraft.ChatFormatting.*;
 
 @ParametersAreNonnullByDefault
-public class CreativeLaserHatchPartMachine extends TieredIOPartMachine implements IDataInfoProvider {
+public class CreativeLaserHatchPartMachine extends WorkableTieredIOPartMachine implements IDataInfoProvider {
 
     @Persisted
-    private NotifiableLaserContainer buffer;
+    private final NotifiableLaserContainer buffer;
     @Nullable
     protected ISubscription LaserListener;
     protected TickableSubscription explosionSubs;

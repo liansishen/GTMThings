@@ -6,7 +6,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
+import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.api.pattern.MultiblockWorldData;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
@@ -43,7 +43,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CreativeEnergyHatchPartMachine extends TieredIOPartMachine implements IDataInfoProvider {
+public class CreativeEnergyHatchPartMachine extends WorkableTieredIOPartMachine implements IDataInfoProvider {
 
     @Persisted
     public final NotifiableEnergyContainer energyContainer;

@@ -9,7 +9,7 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
+import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableTieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
@@ -47,7 +47,7 @@ import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawItemStack;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CreativeInputBusPartMachine extends TieredIOPartMachine implements IDistinctPart {
+public class CreativeInputBusPartMachine extends WorkableTieredIOPartMachine implements IDistinctPart {
 
     private final int ITEM_SIZE = 5;
 
@@ -62,7 +62,7 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
     @Persisted
     protected final NotifiableItemStackHandler circuitInventory;
     @Persisted
-    private ItemStackTransfer creativeStorage;
+    private final ItemStackTransfer creativeStorage;
     protected ArrayList<Item> lstItem;
 
     public CreativeInputBusPartMachine(MetaMachineBlockEntity holder, Function<Integer, ItemStackTransfer> transferFactory) {
@@ -234,7 +234,7 @@ public class CreativeInputBusPartMachine extends TieredIOPartMachine implements 
                                 GuiTextures.CONFIG_ARROW_DARK.draw(graphics, mouseX, mouseY, position.x, position.y, 18, 18);
                                 int stackX = position.x + 1;
                                 int stackY = position.y + 1;
-                                ItemStack stack = null;
+                                ItemStack stack;
                                 if (getHandler() != null) {
                                     stack = getHandler().getItem();
                                     drawItemStack(graphics, stack, stackX, stackY, 0xFFFFFFFF, null);

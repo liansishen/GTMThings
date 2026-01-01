@@ -4,7 +4,7 @@ import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.IOpticalComputationHatch;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
-import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
+import com.gregtechceu.gtceu.api.machine.multiblock.part.WorkableMultiblockPartMachine;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -28,7 +28,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Getter
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class WirelessOpticalComputationHatchMachine extends MultiblockPartMachine implements IOpticalComputationHatch, IDataStickInteractable, IGTMTJadeIF {
+public class WirelessOpticalComputationHatchMachine extends WorkableMultiblockPartMachine implements IOpticalComputationHatch, IDataStickInteractable, IGTMTJadeIF {
 
     private final boolean transmitter;
 
