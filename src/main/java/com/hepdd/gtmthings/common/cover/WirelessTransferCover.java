@@ -138,7 +138,7 @@ public class WirelessTransferCover extends CoverBehavior {
 
     protected @Nullable IItemHandler getTargetItemTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return GTCapabilityHelper.getItemHandler(target.get(), facing.getOpposite());
+        return GTCapabilityHelper.getItemHandler(target.get(), facing);
     }
 
     protected @Nullable IFluidHandler getOwnFluidTransfer() {
@@ -147,6 +147,6 @@ public class WirelessTransferCover extends CoverBehavior {
 
     protected @Nullable IFluidHandler getTargetFluidTransfer() {
         if (targetLever == null || targetPos == null) return null;
-        return GTCapabilityHelper.getFluidHandler(target.get(), facing.getOpposite());
+        return GTCapabilityHelper.getFluidHandler(target.get(), facing);
     }
 }
