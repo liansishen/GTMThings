@@ -49,6 +49,7 @@ public class WirelessEnergyContainer {
     private WirelessEnergyContainer(UUID uuid) {
         this.uuid = uuid;
         this.storage = BigInteger.ZERO;
+        this.rate = Long.MAX_VALUE;
         int currentTick = server.getTickCount();
         this.energyStat = new EnergyStat(currentTick);
     }
