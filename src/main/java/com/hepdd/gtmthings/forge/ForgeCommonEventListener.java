@@ -6,7 +6,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
-
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -28,7 +27,7 @@ public class ForgeCommonEventListener {
                         GlobalPos pos = container.getBindPos();
                         if (pos != null) {
                             long rate = WirelessEnergyBindingToolBehavior.getRate(
-                                event.getServer().getLevel(pos.dimension()), pos.pos());
+                                    event.getServer().getLevel(pos.dimension()), pos.pos());
                             container.setRate(rate);
                         }
                         // no bindPos = leave rate alone
@@ -57,5 +56,4 @@ public class ForgeCommonEventListener {
         WirelessEnergyContainer.server = null;
         WirelessEnergySavaedData.INSTANCE = null;
     }
-
 }
