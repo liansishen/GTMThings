@@ -56,7 +56,7 @@ public class WirelessEnergySavaedData extends SavedData {
         UUID uuid = engTag.getUUID("uuid");
         String en = engTag.getString("energy");
         BigInteger energy = new BigInteger(en.isEmpty() ? "0" : en);
-        long rate = engTag.getLong("rate");
+        long rate = engTag.contains("rate") ? engTag.getLong("rate") : Long.MAX_VALUE;
         GlobalPos bindPos = readGlobalPos(engTag.getString("dimension"), engTag.getLong("pos"));
         return new WirelessEnergyContainer(uuid, energy, rate, bindPos);
     }
@@ -68,7 +68,7 @@ public class WirelessEnergySavaedData extends SavedData {
             engTag.putString("energy", storage.toString());
         }
         long rate = container.getRate();
-        if (rate != 0) {
+        if (rate != Long.MAX_VALUE) {
             engTag.putLong("rate", rate);
         }
         GlobalPos bindPos = container.getBindPos();

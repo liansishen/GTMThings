@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -23,12 +24,13 @@ public class ForgeCommonEventListener {
                 boolean refreshBinding = event.getServer().getTickCount() % 200 == 0;
                 for (WirelessEnergyContainer container : WirelessEnergySavaedData.INSTANCE.containerMap.values()) {
                     if (refreshBinding) {
-                        long rate = 0;
                         GlobalPos pos = container.getBindPos();
                         if (pos != null) {
-                            rate = WirelessEnergyBindingToolBehavior.getRate(event.getServer().getLevel(pos.dimension()), pos.pos());
+                            long rate = WirelessEnergyBindingToolBehavior.getRate(
+                                    event.getServer().getLevel(pos.dimension()), pos.pos());
+                            container.setRate(rate);
                         }
-                        container.setRate(rate);
+                        // no bindPos = leave rate alone
                     }
                     container.getEnergyStat().tick();
                 }
@@ -46,5 +48,12 @@ public class ForgeCommonEventListener {
             WirelessEnergySavaedData.INSTANCE = WirelessEnergySavaedData.getOrCreate(serverLevel);
             WirelessEnergyContainer.server = event.getLevel().getServer();
         }
+    }
+
+    // fixes 110
+    @SubscribeEvent
+    public static void serverStopped(ServerStoppedEvent event) {
+        WirelessEnergyContainer.server = null;
+        WirelessEnergySavaedData.INSTANCE = null;
     }
 }
