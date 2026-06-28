@@ -24,7 +24,8 @@ public class GTMTCovers {
         GTMTHINGS_REGISTRATE.creativeModeTab(() -> CreativeModeTabs.WIRELESS_TAB);
     }
     public static final int[] ALL_TIERS = GTValues.tiersBetween(GTValues.LV,
-            GTCEuAPI.isHighTier() ? GTValues.OpV : GTValues.UV);
+            // MAX is also a tier with hatches.
+            GTCEuAPI.isHighTier() ? GTValues.MAX : GTValues.UV);
 
     public final static CoverDefinition CREATIVE_ENERGY = register("creative_energy",
             CreativeEnergyCover::new, () -> () -> new SimpleCoverRenderer(GTMThings.id("block/cover/overlay_creative_energy")));
