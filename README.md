@@ -9,6 +9,8 @@
 | 1.5.3                   | 7.0.0 ~ 7.0.2    |⛔️ End of Support|
 | ≥ 1.5.4                 | 7.1.0            |🟢 Currently Supported|
 
+## A README in English is available [here](README_EN.md)
+
 # 关于本mod / About This Mod
 给GTM添加一些实用的机器 / Add some practical machines to GregTech-Modern.
 
@@ -61,4 +63,3 @@
 
 ## 可编程电路系列 / Programmable Circuit Series
 通过虚拟物品提供器修改机器电路槽的物品。 / Modify the items in the machine circuit slots through a virtual item provider.
-
