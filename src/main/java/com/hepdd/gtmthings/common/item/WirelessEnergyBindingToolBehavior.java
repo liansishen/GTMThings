@@ -15,7 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
 import com.hepdd.gtmthings.config.ConfigHolder;
@@ -41,7 +41,7 @@ public class WirelessEnergyBindingToolBehavior implements IInteractionItem {
         return InteractionResult.PASS;
     }
 
-    public static long getRate(BlockGetter level, BlockPos pos) {
+    public static long getRate(Level level, BlockPos pos) {
         long rate = 0;
         if (level != null) {
             MetaMachine machine = MetaMachine.getMachine(level, pos);
@@ -53,8 +53,15 @@ public class WirelessEnergyBindingToolBehavior implements IInteractionItem {
                         rate += GTValues.VEX[electricItem.getTier()];
                     }
                 }
-            } else if (machine instanceof PowerSubstationMachine powerSubstationMachine && powerSubstationMachine.isFormed()) {
-                rate = powerSubstationMachine.getEnergyInfo().capacity().divide(BigInteger.valueOf(4096)).longValue();
+            } else if (machine instanceof PowerSubstationMachine psm && psm.isFormed()) {
+                rate = psm.getEnergyInfo().capacity()
+                        .divide(BigInteger.valueOf(4096)).longValue();
+            } else if (machine != null) {
+                // KubeJS and other generic multiblocks.
+                var energyContainer = GTCapabilityHelper.getEnergyContainer(level, pos, null);
+                if (energyContainer != null) {
+                    rate = energyContainer.getInputVoltage() * energyContainer.getInputAmperage();
+                }
             }
         }
         return rate;

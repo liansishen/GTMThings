@@ -71,11 +71,14 @@ public class FormatUtil {
     }
 
     public static String getSpacer(Font font, String splitChar, int spaceLength) {
+        // previously if before + after would exceed maxWidth spaceLength would go negative
+        // then splitChar.repeat(negative) would throw/produce garbage
+        if (spaceLength <= 0) return " ";
         int spacerCount = spaceLength / font.width(splitChar);
-        while (font.width(splitChar.repeat(spacerCount) + " ") <= spaceLength) {
+        while (spacerCount > 0 && font.width(splitChar.repeat(spacerCount) + " ") <= spaceLength) {
             spacerCount++;
         }
-        return splitChar.repeat(spacerCount - 2) + " ";
+        return spacerCount <= 1 ? " " : splitChar.repeat(spacerCount - 2) + " ";
     }
 
     public static List<FormattedCharSequence> formatJustifyComponent(FormattedText component, int maxWidth, Font font, String splitChar) {

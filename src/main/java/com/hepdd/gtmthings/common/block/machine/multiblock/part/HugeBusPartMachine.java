@@ -159,14 +159,16 @@ public class HugeBusPartMachine extends TieredIOPartMachine implements IDistinct
 
     @Override
     public boolean isDistinct() {
-        return getInventory().isDistinct() && circuitInventory.isDistinct() && shareInventory.isDistinct();
+        // shared inventory is *designed* to be shared.
+        // previously it was included in this check.
+        return getInventory().isDistinct() && circuitInventory.isDistinct();
     }
 
     @Override
     public void setDistinct(boolean isDistinct) {
         getInventory().setDistinct(isDistinct);
         circuitInventory.setDistinct(isDistinct);
-        shareInventory.setDistinct(isDistinct);
+        // shareInventory excluded for the same reason as above.
     }
 
     protected void refundAll(ClickData clickData) {
