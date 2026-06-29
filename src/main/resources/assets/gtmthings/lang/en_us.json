@@ -345,7 +345,7 @@
   "item.gtmthings.opv_4a_wireless_energy_receive_cover": "§94A §lOpV§r Wireless Energy Receive Cover",
   "item.gtmthings.max_4a_wireless_energy_receive_cover": "§c4A §lMAX§r Wireless Energy Receive Cover",
   "item.gtmthings.wireless_energy_receive_cover.tooltip.1": "§bPulls Energy§7 from your EU network to the machine as a §fCover§7.",
-  "item.gtmthings.wireless_energy_receive_cover.tooltip.2": "§7Can only used be for §esingle block machines§7. Can't be installed on a machine below the cover's voltage tier",
+  "item.gtmthings.wireless_energy_receive_cover.tooltip.2": "§7Can only used be for §esingle block machines§7. Can't exceed machine voltage.",
   "item.gtmthings.wireless_energy_receive_cover.tooltip.3": "§bEnergy transfer speed: §f%s §7EU/t",
   "item.gtmthings.wireless_item_transfer_cover": "Wireless Item Transfer Cover",
   "item.gtmthings.wireless_fluid_transfer_cover": "Wireless Fluid Transfer Cover",
