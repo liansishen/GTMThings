@@ -1,9 +1,7 @@
 package com.hepdd.gtmthings.common.item;
 
-import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
-import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -42,10 +40,10 @@ public interface IWirelessMonitor extends IWirelessEnergyContainerHolder {
             // Fix by using a BigDecimal
             BigDecimal rateBD = BigDecimal.valueOf(rate);
             textListCache.add(formatWithConstantWidth(
-                "gtmthings.machine.wireless_energy_monitor.tooltip.2",
-                Component.literal(formatBigIntegerNumberOrSic(BigInteger.valueOf(rate))),
-                Component.literal(voltageAmperage(rateBD).toEngineeringString()),
-                voltageName(rateBD)).withStyle(ChatFormatting.GRAY));
+                    "gtmthings.machine.wireless_energy_monitor.tooltip.2",
+                    Component.literal(formatBigIntegerNumberOrSic(BigInteger.valueOf(rate))),
+                    Component.literal(voltageAmperage(rateBD).toEngineeringString()),
+                    voltageName(rateBD)).withStyle(ChatFormatting.GRAY));
         }
 
         var stat = container.getEnergyStat();

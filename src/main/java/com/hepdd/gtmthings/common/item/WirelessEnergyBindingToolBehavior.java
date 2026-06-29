@@ -15,7 +15,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 
 import com.hepdd.gtmthings.api.misc.WirelessEnergyContainer;
@@ -56,7 +55,7 @@ public class WirelessEnergyBindingToolBehavior implements IInteractionItem {
                 }
             } else if (machine instanceof PowerSubstationMachine psm && psm.isFormed()) {
                 rate = psm.getEnergyInfo().capacity()
-                    .divide(BigInteger.valueOf(4096)).longValue();
+                        .divide(BigInteger.valueOf(4096)).longValue();
             } else if (machine != null) {
                 // KubeJS and other generic multiblocks.
                 var energyContainer = GTCapabilityHelper.getEnergyContainer(level, pos, null);
